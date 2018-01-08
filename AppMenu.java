@@ -23,9 +23,11 @@ import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.inquiry.QueryPannel;
 import spirit.fitness.scanner.inquiry.QueryResult;
 import spirit.fitness.scanner.model.Itembean;
+import spirit.fitness.scanner.model.Locationbean;
 import spirit.fitness.scanner.model.Modelbean;
 import spirit.fitness.scanner.receving.ItemsPannel;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
+import spirit.fitness.scanner.restful.LocationRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.ModelRepositoryImplRetrofit;
 
 public class AppMenu  implements ActionListener{
@@ -39,6 +41,7 @@ public class AppMenu  implements ActionListener{
 	public AppMenu() {
 		initialize();
 		loadModel();
+		loadLocatin();
 	}
 
 	public static void main(String[] args) {
@@ -168,5 +171,32 @@ public class AppMenu  implements ActionListener{
 			x.printStackTrace();
 		}
 	}
+	
+	
+	//Loading Models data from Server 
+		private void loadLocatin() 
+		{
+			//loading model and location information from Server
+	    	LocationRepositoryImplRetrofit fgModels = new LocationRepositoryImplRetrofit();
+			
+			try {
+				List<Locationbean> items = (ArrayList<Locationbean>)fgModels.getAllItems();			
+			   
+				HashMap<String,Locationbean> map = new HashMap<>();
+				for(Locationbean i : items) 
+			    {
+					map.put(i.Code, i);
+			    }
+				
+				Constrant.locations = map;
+				
+			} catch (NumberFormatException x) {
+				// TODO Auto-generated catch block
+				x.printStackTrace();
+			} catch (Exception x) {
+				// TODO Auto-generated catch block
+				x.printStackTrace();
+			}
+		}
 
 }

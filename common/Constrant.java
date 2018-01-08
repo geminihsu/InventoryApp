@@ -3,12 +3,14 @@ package spirit.fitness.scanner.common;
 import java.util.HashMap;
 import java.util.List;
 
+import spirit.fitness.scanner.model.Locationbean;
 import spirit.fitness.scanner.model.Modelbean;
 
 public class Constrant {
 	public static String webUrl = "http://172.16.2.96:5000";
 	
 	public static HashMap<String,Modelbean> models;
+	public static HashMap<String,Locationbean> locations;
 	 
 	//Zone mapping Table key : zone number, value : location number
     public static int ZONE_CODE_LEN_LIMIT = 3;
