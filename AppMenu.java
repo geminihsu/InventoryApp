@@ -50,6 +50,8 @@ public class AppMenu  implements ActionListener{
 				try {
 					AppMenu window = new AppMenu();
 					window.frame.setVisible(true);
+					//QueryResult window = new QueryResult();
+					//window.setContent(0, null);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -93,6 +95,7 @@ public class AppMenu  implements ActionListener{
 		    btnInQuiry.setMnemonic('Q');
 		    btnRecving.addActionListener(this);
 		    btnMoving.addActionListener(this);
+		    btnShipping.addActionListener(this);
 		    btnInQuiry.addActionListener(this);
 		    cp.add(btnRecving);
 		    cp.add(btnMoving);
@@ -133,9 +136,10 @@ public class AppMenu  implements ActionListener{
 		    	QueryPannel window = new QueryPannel();
 		    	window.frame.setVisible(true);
 		    	
-		    } else if (e.getSource()==btnLoading)
+		    }else if (e.getSource()==btnShipping)
 		    {
-		    	
+		    	ItemsPannel window = new ItemsPannel(ItemsPannel.SHIPPING);
+		    	window.frame.setVisible(true);
 		    	
 		    }
 		    
@@ -177,10 +181,10 @@ public class AppMenu  implements ActionListener{
 		private void loadLocatin() 
 		{
 			//loading model and location information from Server
-	    	LocationRepositoryImplRetrofit fgModels = new LocationRepositoryImplRetrofit();
+	    	LocationRepositoryImplRetrofit localModels = new LocationRepositoryImplRetrofit();
 			
 			try {
-				List<Locationbean> items = (ArrayList<Locationbean>)fgModels.getAllItems();			
+				List<Locationbean> items = (ArrayList<Locationbean>)localModels.getAllItems();			
 			   
 				HashMap<String,Locationbean> map = new HashMap<>();
 				for(Locationbean i : items) 

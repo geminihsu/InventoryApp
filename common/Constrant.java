@@ -32,4 +32,7 @@ public class Constrant {
     public static int ZONE_CODE_3_D = 911;
     //Zone 4 range
     public static int ZONE_CODE_4_ONE = 888;
+    
+    //Shipping
+    public static int ZONE_CODE_SHIPPING = 999;
 }

@@ -19,23 +19,23 @@ import spirit.fitness.scanner.model.Itembean;
  * Created by User on 5/1/2017.
  */
 
-public interface InventoryCallback {
+public interface ShippingCallback {
     
 	@Headers("Content-Type: application/json")
-	@GET("api/FGInventory")
+	@GET("api/Shippings")
 	Call<List<Itembean>> getAllItems();
 
-	@GET("api/FGInventory/location/{location}")
-	Call<List<Itembean>> getItemsByLocation(@Path("location") Integer location);
+	@GET("api/Shippings/date/{date}")
+	Call<List<Itembean>> getItemsByDate(@Path("date") String location);
 	
-	@GET("api/FGInventory/model/{modelNo}")
+	@GET("api/Shippings/model/{modelNo}")
 	Call<List<Itembean>> getItemsByModelNo(@Path("modelNo") Integer modelNo);
 	//Post one item
 	/*@POST("/api/FGInventory")
 	Call<Itembean> createItem(@Body Itembean itembean);*/
 	
 	//Post ArrayList items
-	@POST("api/FGInventory")
+	@POST("api/Shippings")
 	Call<List<Itembean>> createItem(@Body List<Itembean> itembean);
 
 	/*//PUT one item
@@ -44,11 +44,11 @@ public interface InventoryCallback {
 
 	
 	//PUT more than one item
-	@PUT("/api/FGInventory")
+	@PUT("/api/Shippings")
 	Call<List<Itembean>> updateItem(@Body List<Itembean> itembean);
 
 	//Delete no work
-	@DELETE("/api/FGInventory")
-	Call<List<Itembean>> deleteItem(@Body List<Itembean> itembean);
+	@DELETE("/api/Shippings/{seq}")
+	Call<Itembean> deleteItem(@Path("seq") Integer seq);
 
 }

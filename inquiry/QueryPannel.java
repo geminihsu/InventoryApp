@@ -177,6 +177,7 @@ public class QueryPannel implements ActionListener{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
 					
 			
 		}else if(queryType == QueryResult.QUERY_MODEL) 
