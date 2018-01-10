@@ -15,12 +15,14 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -107,27 +109,31 @@ public class QueryPannel implements ActionListener{
 	 * Initialize the contents of the frame.
 	 */
 	public void initialize() {
-		JFrame frame = new JFrame("Query Pannel");
+		
+		JFrame.setDefaultLookAndFeelDecorated(false);
+		JDialog.setDefaultLookAndFeelDecorated(false);
+		frame = new JFrame("Query Pannel");
 		// Setting the width and height of frame
 		frame.setSize(600, 400);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
+		 
 		/*
 		 * Creating panel. This is same as a div tag in HTML We can create several
 		 * panels and add them to specific positions in a JFrame. Inside panels we can
 		 * add text fields, buttons and other components.
 		 */
 		JPanel panel = new JPanel();
+		panel.setBackground(Constrant.BACKGROUN_COLOR);
 		// adding panel to frame
 		frame.add(panel);
-		/*
-		 * calling user defined method for adding components to the panel.
-		 */
+		
 		placeComponents(panel);
 
-		// Setting the frame visibility to true
+		//frame.setUndecorated(true);
+		//frame.getRootPane().setWindowDecorationStyle(JRootPane.COLOR_CHOOSER_DIALOG);
+		frame.setBackground(Color.WHITE);
 		frame.setVisible(true);
-
+       // frame.setDefaultLookAndFeelDecorated(true);
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -307,7 +313,9 @@ public class QueryPannel implements ActionListener{
 		} else if (location.equals("")) {
 			if ((model.length() != 16) && (model.length() != 6))
 				return false;
-
+      
+			if(model.length() == 16)
+				model = model.substring(0,6);
 			Modelbean map = Constrant.models.get(model);
 			if (map == null)
 				return false;

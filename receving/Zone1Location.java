@@ -42,8 +42,8 @@ public class Zone1Location implements ActionListener {
 	 */
 	private void initialize() {
 
-		JFrame.setDefaultLookAndFeelDecorated(true);
-		JDialog.setDefaultLookAndFeelDecorated(true);
+		JFrame.setDefaultLookAndFeelDecorated(false);
+	    JDialog.setDefaultLookAndFeelDecorated(false);
 		frame = new JFrame("Zone 1 Layout");
 		frame.setSize(800, 600);
 		frame.setLocationRelativeTo(null);

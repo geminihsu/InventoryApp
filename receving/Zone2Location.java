@@ -43,8 +43,8 @@ public class Zone2Location implements ActionListener {
 	 */
 	private void initialize() {
 
-		JFrame.setDefaultLookAndFeelDecorated(true);
-		JDialog.setDefaultLookAndFeelDecorated(true);
+		JFrame.setDefaultLookAndFeelDecorated(false);
+	    JDialog.setDefaultLookAndFeelDecorated(false);
 		frame = new JFrame("Zone 2 Layout");
 		frame.setSize(600, 600);
 		frame.setLocationRelativeTo(null);

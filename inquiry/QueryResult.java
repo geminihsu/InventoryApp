@@ -75,6 +75,9 @@ public class QueryResult implements ActionListener{
 	
 	public void setContent(int type, List<Itembean> _items) 
 	{
+		JFrame.setDefaultLookAndFeelDecorated(false);
+	    JDialog.setDefaultLookAndFeelDecorated(false);
+	    
 		if(type == QUERY_MODEL)
 			setModelLayOut(_items);
 		else if(type == QUERY_LOCATION)
@@ -86,6 +89,7 @@ public class QueryResult implements ActionListener{
 
 	private void setModelLayOut( List<Itembean> _items) 
     {
+		
 		String modelNo = _items.get(0).ModelNo;
 		String title = Constrant.models.get(modelNo).Model;
 		
@@ -96,13 +100,13 @@ public class QueryResult implements ActionListener{
 		frame.setTitle("Display the all model:" + title);
 		frame.getContentPane().setLayout(null);
 		
-	
 		Font font = new Font("Verdana", Font.BOLD, 18);
 	    
 		JLabel modelLabel = new JLabel("MODEL :"+title);
   	     
 	    modelLabel.setBounds(30,0,500,50);
 	    modelLabel.setFont(font);
+	    modelLabel.setBackground(Constrant.BACKGROUN_COLOR);
 	    frame.getContentPane().add(modelLabel);
 	    
 	    
@@ -110,6 +114,7 @@ public class QueryResult implements ActionListener{
  	     
 	    quantity.setBounds(400,0,300,50);
 	    quantity.setFont(font);
+	    quantity.setBackground(Constrant.BACKGROUN_COLOR);
 	    frame.getContentPane().add(quantity);
 	    
 	    //display Zone 2
@@ -117,6 +122,7 @@ public class QueryResult implements ActionListener{
 	     
 	    zone2.setBounds(30,40,300,50);
 	    zone2.setFont(font);
+	    zone2.setBackground(Constrant.BACKGROUN_COLOR);
 	    frame.getContentPane().add(zone2);
 	    
 	    //display Zone 1
@@ -124,6 +130,7 @@ public class QueryResult implements ActionListener{
 	     
 	    zone1.setBounds(30,200,300,50);
 	    zone1.setFont(font);
+	    zone1.setBackground(Constrant.BACKGROUN_COLOR);
 	    frame.getContentPane().add(zone1);
 	    
 	    //display Zone 3
@@ -131,6 +138,7 @@ public class QueryResult implements ActionListener{
 	     
 	    zone3.setBounds(30,360,300,50);
 	    zone3.setFont(font);
+	    zone3.setBackground(Constrant.BACKGROUN_COLOR);
 	    frame.getContentPane().add(zone3);
 	    
 	    //display Zone 4
@@ -138,6 +146,7 @@ public class QueryResult implements ActionListener{
 	     
 	    zone4.setBounds(30,360,300,50);
 	    zone4.setFont(font);
+	    zone4.setBackground(Constrant.BACKGROUN_COLOR);
 	    frame.getContentPane().add(zone4);
 	    
 		// ScrollPane for Zone1
@@ -242,8 +251,13 @@ public class QueryResult implements ActionListener{
 	  	
 		if(zone1Data != null) {
 			zone1.setText("Zone 1 : "+ zoneCount.get(1));
-			scrollZone1Pane.setBounds(33, 250, 700, 50*zone1Data.length+20);	      
+			scrollZone1Pane.setBounds(33, 250, 700, 50*zone1Data.length+20);
+			scrollZone1Pane.setBackground(Constrant.BACKGROUN_COLOR);
+			
 			JTable zone1Table = new JTable(model1);
+			zone1Table.getTableHeader().setBackground(Constrant.TABLE_COLOR);
+			zone1Table.getTableHeader().setFont(font);
+			zone1Table.setBackground(Constrant.TABLE_COLOR);
 			zone1Table.setRowHeight(40);
 			zone1Table.setFont(font);
 			scrollZone1Pane.setViewportView(zone1Table);
@@ -256,7 +270,12 @@ public class QueryResult implements ActionListener{
 		if(zone2Data != null) {
 			zone2.setText("Zone 2 : "+ zoneCount.get(2));
 			scrollZone2Pane.setBounds(33, 91, 700, 50*zone2Data.length+20);	
+			scrollZone2Pane.setBackground(Constrant.TABLE_COLOR);
+			
 			JTable zone2Table = new JTable(model2);
+			zone2Table.getTableHeader().setBackground(Constrant.TABLE_COLOR);
+			zone2Table.getTableHeader().setFont(font);
+			zone2Table.setBackground(Constrant.TABLE_COLOR);
 			zone2Table.setRowHeight(40);
 			zone2Table.setFont(font);
 			scrollZone2Pane.setViewportView(zone2Table);
@@ -268,7 +287,12 @@ public class QueryResult implements ActionListener{
 		if(zone3Data != null) {
 			zone3.setText("Return : "+ zoneCount.get(3));
 			scrollZone3Pane.setBounds(33, 420, 700, 50*zone3Data.length+20);	
+			scrollZone3Pane.setBackground(Constrant.TABLE_COLOR);
+			
 			JTable zone3Table = new JTable(model3);
+			zone3Table.getTableHeader().setBackground(Constrant.TABLE_COLOR);
+			zone3Table.getTableHeader().setFont(font);
+			zone3Table.setBackground(Constrant.TABLE_COLOR);
 			zone3Table.setRowHeight(40);
 			zone3Table.setFont(font);
 			scrollZone3Pane.setViewportView(zone3Table);
@@ -279,8 +303,13 @@ public class QueryResult implements ActionListener{
 		
 		if(zone4Data != null) {
 			zone4.setText("Show Room : "+ zoneCount.get(4));
-			scrollZone4Pane.setBounds(33, 420, 700, 50*zone4Data.length+20);	
+			scrollZone4Pane.setBounds(33, 420, 700, 50*zone4Data.length+20);
+			scrollZone4Pane.setBackground(Constrant.TABLE_COLOR);
+			
 			JTable zone4Table = new JTable(model4);
+			zone4Table.getTableHeader().setBackground(Constrant.TABLE_COLOR);
+			zone4Table.getTableHeader().setFont(font);
+			zone4Table.setBackground(Constrant.TABLE_COLOR);
 			zone4Table.setRowHeight(40);
 			zone4Table.setFont(font);
 			scrollZone4Pane.setViewportView(zone4Table);
@@ -290,6 +319,9 @@ public class QueryResult implements ActionListener{
 		}
 		
 		quantity.setText("QUANTITY :"+queryModelCount);
+		frame.getContentPane().setBackground(Constrant.BACKGROUN_COLOR);
+		
+		
 		frame.setVisible(true);
 		
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -375,14 +407,22 @@ public class QueryResult implements ActionListener{
 	
 	private void setLocationLayOut( List<Itembean> _items) 
     {
+		
+		String locationbead = _items.get(0).Location;
+		Locationbean title = Constrant.locations.get(locationbead);
+
 		JFrame frame = new JFrame();
+		frame.setTitle("Location :" + title.Code +"( Zone "+ title.ZoneCode +" )");
+		frame.getContentPane().setLayout(null);
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.setLocationRelativeTo(null);  
-	    frame.setBounds(500, 200, 1000, 600);
-	    
+		frame.setBounds(100, 100, 780, 600);
+		frame.getContentPane().setLayout(null);
+		
 	    JPanel panel = new JPanel();    
+	    panel.setBackground(Constrant.BACKGROUN_COLOR);
         // adding panel to frame
-	    frame.add(panel, BorderLayout.NORTH);
+	    //frame.add(panel, BorderLayout.NORTH);
 	    Font font = new Font("Verdana", Font.BOLD, 18);
         // Creating JLabel
 	    JLabel modelLabel = new JLabel("Location : 002                                ");
@@ -391,13 +431,20 @@ public class QueryResult implements ActionListener{
         modelLabel.setFont(font);
         panel.add(modelLabel);
 
-        /* Creating text field where user is supposed to
-         * enter user name.
-         */
+       
         JLabel modelText = new JLabel("                         TOTAL: 50");
         modelText.setFont(font);
         modelText.setBounds(230,200,200,25);
         panel.add(modelText);
+        
+        panel.setBounds(0, 30, 780, 50);
+        frame.getContentPane().add(panel);
+        
+        // ScrollPane for Result
+     	JScrollPane scrollZonePane = new JScrollPane();
+     
+     	scrollZonePane.setBackground(Constrant.TABLE_COLOR);
+     	frame.getContentPane().add(scrollZonePane);
         
        
         if(!_items.isEmpty())
@@ -455,13 +502,20 @@ public class QueryResult implements ActionListener{
      			   }
      			   };
              
-           
+     			  
        		JTable table = new JTable(model);
+       		table.getTableHeader().setBackground(Constrant.TABLE_COLOR);
+       		table.getTableHeader().setFont(font);
+   
+       		table.setBackground(Constrant.TABLE_COLOR);
        		table.setRowHeight(40);
        		table.setFont(font);
-       		JScrollPane scrollPane = new JScrollPane(table);
-       		scrollPane.setBounds(230,200,200,25);
-       		frame.add(scrollPane);
+       		scrollZonePane.setBounds(33, 91, 700, 50*rowData.length+20);
+       		scrollZonePane.setViewportView(table);
+       		
+  
+       		frame.add(scrollZonePane);
+       	
         }
         
        
@@ -471,6 +525,7 @@ public class QueryResult implements ActionListener{
 	   
 	    //frame.setLocationRelativeTo(null);  
 	    //frame.setSize(1000, 500);
+		frame.getContentPane().setBackground(Constrant.BACKGROUN_COLOR);
 	    frame.setVisible(true);
 			
 	    frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);

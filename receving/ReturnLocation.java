@@ -43,8 +43,8 @@ public class ReturnLocation implements ActionListener {
 	 */
 	private void initialize() {
 
-		JFrame.setDefaultLookAndFeelDecorated(true);
-		JDialog.setDefaultLookAndFeelDecorated(true);
+		JFrame.setDefaultLookAndFeelDecorated(false);
+	    JDialog.setDefaultLookAndFeelDecorated(false);
 		frame = new JFrame("FG Inventory App");
 		frame.setSize(600, 300);
 		frame.setLocationRelativeTo(null);

@@ -1,9 +1,13 @@
 package spirit.fitness.scanner;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,11 +17,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.metal.DefaultMetalTheme;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.inquiry.QueryPannel;
@@ -30,16 +43,17 @@ import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.LocationRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.ModelRepositoryImplRetrofit;
 
-public class AppMenu  implements ActionListener{
+public class AppMenu implements ActionListener {
 
 	/**
 	 * Create the application.
 	 */
-	
-	private  JButton btnRecving,btnMoving,btnInQuiry,btnShipping,btnReport,btnLoading;
+
+	private JButton btnRecving, btnMoving, btnInQuiry, btnShipping, btnReport, btnLoading;
 	private JFrame frame;
+
 	public AppMenu() {
-		initialize();
+		initialize();		
 		loadModel();
 		loadLocatin();
 	}
@@ -50,123 +64,116 @@ public class AppMenu  implements ActionListener{
 				try {
 					AppMenu window = new AppMenu();
 					window.frame.setVisible(true);
-					//QueryResult window = new QueryResult();
-					//window.setContent(0, null);
+					// QueryResult window = new QueryResult();
+					// window.setContent(0, null);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
 	}
-	
+
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-			
-		 JFrame.setDefaultLookAndFeelDecorated(true);
-		    JDialog.setDefaultLookAndFeelDecorated(true);
-		    frame=new JFrame("FG Inventory App");
-		    frame.setSize(1000,600); 
-		    frame.setLocationRelativeTo(null);  
-		    frame.setVisible(true); 
-		    Container cp=frame.getContentPane();
-		    cp.setLayout(new GridLayout(0,3));
-		    
-		    Font font = new Font("Verdana", Font.BOLD, 30);
-		    btnRecving=new JButton("Receiving");  
-		    btnRecving.setFont(font);
-		    btnMoving=new JButton("Moving");   
-		    btnMoving.setFont(font);
-		    btnInQuiry=new JButton("InQuiry");  
-		    btnInQuiry.setFont(font);
-		    btnShipping=new JButton("Shipping");
-		    btnShipping.setFont(font);
-		    btnReport=new JButton("Report");
-		    btnReport.setFont(font);
-		    btnLoading=new JButton("Loading");
-		    btnLoading.setFont(font);
-		    //btnRecving.setBounds(20,20,100,40);
-		    //btnMoving.setBounds(150,20,100,40);
-		    //btnInQuiry.setBounds(280,20,100,40);
-		    //btnShipping.setBounds(410,20,100,40);
-		    btnRecving.setMnemonic('O');  
-		    btnMoving.setMnemonic('C');
-		    btnInQuiry.setMnemonic('Q');
-		    btnRecving.addActionListener(this);
-		    btnMoving.addActionListener(this);
-		    btnShipping.addActionListener(this);
-		    btnInQuiry.addActionListener(this);
-		    cp.add(btnRecving);
-		    cp.add(btnMoving);
-		    cp.add(btnInQuiry);
-		    cp.add(btnShipping);
-		    cp.add(btnReport);
-		    //cp.add(btnLoading);
-		    frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		    frame.addWindowListener(new WindowAdapter() {
-		      public void windowClosing(WindowEvent e) {
-		        int result=JOptionPane.showConfirmDialog(frame,
-		                   "Do you want to close the app?",
-		                   "The app will be close",
-		                   JOptionPane.YES_NO_OPTION,
-		                   JOptionPane.WARNING_MESSAGE);
-		        if (result==JOptionPane.YES_OPTION) {System.exit(0);}
-		        }    
-		      });
-	
-}
+
+		JFrame.setDefaultLookAndFeelDecorated(false);
+	    JDialog.setDefaultLookAndFeelDecorated(false);
+		frame = new JFrame("FG Inventory App");
+		frame.setSize(1000, 600);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+		Container cp = frame.getContentPane();
+		cp.setLayout(new GridLayout(0, 3));
+
+		Font font = new Font("Verdana", Font.BOLD, 30);
+		btnRecving = new JButton("Receiving");
+		btnRecving.setFont(font);
+		btnMoving = new JButton("Moving");
+		btnMoving.setFont(font);
+		btnInQuiry = new JButton("InQuiry");
+		btnInQuiry.setFont(font);
+		btnShipping = new JButton("Shipping");
+		btnShipping.setFont(font);
+		btnReport = new JButton("Report");
+		btnReport.setFont(font);
+		btnLoading = new JButton("Loading");
+		btnLoading.setFont(font);
+		// btnRecving.setBounds(20,20,100,40);
+		// btnMoving.setBounds(150,20,100,40);
+		// btnInQuiry.setBounds(280,20,100,40);
+		// btnShipping.setBounds(410,20,100,40);
+		btnRecving.setMnemonic('O');
+		btnMoving.setMnemonic('C');
+		btnInQuiry.setMnemonic('Q');
+		btnRecving.addActionListener(this);
+		btnMoving.addActionListener(this);
+		btnShipping.addActionListener(this);
+		btnInQuiry.addActionListener(this);
+		cp.add(btnRecving);
+		cp.add(btnMoving);
+		cp.add(btnInQuiry);
+		cp.add(btnShipping);
+		cp.add(btnReport);
+		// cp.add(btnLoading);
+		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		frame.setDefaultLookAndFeelDecorated(true);
+
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				int result = JOptionPane.showConfirmDialog(frame, "Do you want to close the app?",
+						"The app will be close", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if (result == JOptionPane.YES_OPTION) {
+					System.exit(0);
+				}
+			}
+		});
+
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		 String btn="";
-		    if (e.getSource()==btnRecving) 
-		    {
-		    	//btnRecving.setEnabled(false);
-		    	ItemsPannel window = new ItemsPannel(ItemsPannel.RECEVING);
-		    	window.frame.setVisible(true);
-		    }
-		    else if (e.getSource()==btnMoving) 
-		    {
-		    	ItemsPannel window = new ItemsPannel(ItemsPannel.MOVING);
-		    	window.frame.setVisible(true);
-		    }
-		    else if (e.getSource()==btnInQuiry)
-		    {
-		    	QueryPannel window = new QueryPannel();
-		    	window.frame.setVisible(true);
-		    	
-		    }else if (e.getSource()==btnShipping)
-		    {
-		    	ItemsPannel window = new ItemsPannel(ItemsPannel.SHIPPING);
-		    	window.frame.setVisible(true);
-		    	
-		    }
-		    
-		   /* JOptionPane.showMessageDialog(f,
-		      "the" + btn,
-		      "problem",JOptionPane.INFORMATION_MESSAGE);
-*/
-		
+		String btn = "";
+		if (e.getSource() == btnRecving) {
+			// btnRecving.setEnabled(false);
+			ItemsPannel window = new ItemsPannel(ItemsPannel.RECEVING);
+			// window.frame.setVisible(true);
+		} else if (e.getSource() == btnMoving) {
+			ItemsPannel window = new ItemsPannel(ItemsPannel.MOVING);
+			window.frame.setVisible(true);
+		} else if (e.getSource() == btnInQuiry) {
+			QueryPannel window = new QueryPannel();
+			window.frame.setVisible(true);
+
+		} else if (e.getSource() == btnShipping) {
+			ItemsPannel window = new ItemsPannel(ItemsPannel.SHIPPING);
+			window.frame.setVisible(true);
+
+		}
+
+		/*
+		 * JOptionPane.showMessageDialog(f, "the" + btn,
+		 * "problem",JOptionPane.INFORMATION_MESSAGE);
+		 */
+
 	}
-	
-	//Loading Models data from Server 
-	private void loadModel() 
-	{
-		//loading model and location information from Server
-    	ModelRepositoryImplRetrofit fgModels = new ModelRepositoryImplRetrofit();
-		
+
+	// Loading Models data from Server
+	private void loadModel() {
+		// loading model and location information from Server
+		ModelRepositoryImplRetrofit fgModels = new ModelRepositoryImplRetrofit();
+
 		try {
-			List<Modelbean> items = (ArrayList<Modelbean>)fgModels.getAllItems();			
-		   
-			HashMap<String,Modelbean> map = new HashMap<>();
-			for(Modelbean i : items) 
-		    {
+			List<Modelbean> items = (ArrayList<Modelbean>) fgModels.getAllItems();
+
+			HashMap<String, Modelbean> map = new HashMap<>();
+			for (Modelbean i : items) {
 				map.put(i.ModelNo, i);
-		    }
-			
+			}
+
 			Constrant.models = map;
-			
+
 		} catch (NumberFormatException x) {
 			// TODO Auto-generated catch block
 			x.printStackTrace();
@@ -175,32 +182,29 @@ public class AppMenu  implements ActionListener{
 			x.printStackTrace();
 		}
 	}
-	
-	
-	//Loading Models data from Server 
-		private void loadLocatin() 
-		{
-			//loading model and location information from Server
-	    	LocationRepositoryImplRetrofit localModels = new LocationRepositoryImplRetrofit();
-			
-			try {
-				List<Locationbean> items = (ArrayList<Locationbean>)localModels.getAllItems();			
-			   
-				HashMap<String,Locationbean> map = new HashMap<>();
-				for(Locationbean i : items) 
-			    {
-					map.put(i.Code, i);
-			    }
-				
-				Constrant.locations = map;
-				
-			} catch (NumberFormatException x) {
-				// TODO Auto-generated catch block
-				x.printStackTrace();
-			} catch (Exception x) {
-				// TODO Auto-generated catch block
-				x.printStackTrace();
+
+	// Loading Models data from Server
+	private void loadLocatin() {
+		// loading model and location information from Server
+		LocationRepositoryImplRetrofit localModels = new LocationRepositoryImplRetrofit();
+
+		try {
+			List<Locationbean> items = (ArrayList<Locationbean>) localModels.getAllItems();
+
+			HashMap<String, Locationbean> map = new HashMap<>();
+			for (Locationbean i : items) {
+				map.put(i.Code, i);
 			}
+
+			Constrant.locations = map;
+
+		} catch (NumberFormatException x) {
+			// TODO Auto-generated catch block
+			x.printStackTrace();
+		} catch (Exception x) {
+			// TODO Auto-generated catch block
+			x.printStackTrace();
 		}
+	}
 
 }

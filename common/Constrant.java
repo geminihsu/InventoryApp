@@ -1,5 +1,6 @@
 package spirit.fitness.scanner.common;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,4 +36,8 @@ public class Constrant {
     
     //Shipping
     public static int ZONE_CODE_SHIPPING = 999;
+    
+    public static Color BACKGROUN_COLOR = new java.awt.Color(235, 240, 255);
+    public static Color TABLE_COLOR = new java.awt.Color(255, 255, 255);
+    public static Color DISPALY_ITEMS_TABLE_COLOR = new java.awt.Color(255, 255, 240);
 }
