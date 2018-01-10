@@ -74,7 +74,7 @@ public class AppMenu  implements ActionListener{
 		    cp.setLayout(new GridLayout(0,3));
 		    
 		    Font font = new Font("Verdana", Font.BOLD, 30);
-		    btnRecving=new JButton("Receving");  
+		    btnRecving=new JButton("Receiving");  
 		    btnRecving.setFont(font);
 		    btnMoving=new JButton("Moving");   
 		    btnMoving.setFont(font);

@@ -76,7 +76,7 @@ public class QueryResult implements ActionListener{
 	public void setContent(int type, List<Itembean> _items) 
 	{
 		if(type == QUERY_MODEL)
-			setModelLayOut1(_items);
+			setModelLayOut(_items);
 		else if(type == QUERY_LOCATION)
 			setLocationLayOut(_items);
 			
@@ -84,7 +84,7 @@ public class QueryResult implements ActionListener{
 	
 	
 
-	private void setModelLayOut1( List<Itembean> _items) 
+	private void setModelLayOut( List<Itembean> _items) 
     {
 		String modelNo = _items.get(0).ModelNo;
 		String title = Constrant.models.get(modelNo).Model;
@@ -142,22 +142,22 @@ public class QueryResult implements ActionListener{
 	    
 		// ScrollPane for Zone1
 		JScrollPane scrollZone1Pane = new JScrollPane();
-		scrollZone1Pane.setBounds(33, 91, 700, 100);
+		scrollZone1Pane.setBounds(33, 91, 700, 200);
 		frame.getContentPane().add(scrollZone1Pane);
 		
 		// ScrollPane for Zone2
 		JScrollPane scrollZone2Pane = new JScrollPane();
-		scrollZone2Pane.setBounds(33, 250, 700,100);
+		scrollZone2Pane.setBounds(33, 250, 700,200);
 		frame.getContentPane().add(scrollZone2Pane);
 		
 		// ScrollPane for Zone3
 		JScrollPane scrollZone3Pane = new JScrollPane();
-		scrollZone3Pane.setBounds(33, 300, 700,100);
+		scrollZone3Pane.setBounds(33, 300, 700,200);
 		frame.getContentPane().add(scrollZone3Pane);
 		
 		// ScrollPane for Zone3
 		JScrollPane scrollZone4Pane = new JScrollPane();
-		scrollZone4Pane.setBounds(33, 300, 700,100);
+		scrollZone4Pane.setBounds(33, 300, 700,200);
 		frame.getContentPane().add(scrollZone4Pane);
 		
 		// Table
@@ -242,8 +242,9 @@ public class QueryResult implements ActionListener{
 	  	
 		if(zone1Data != null) {
 			zone1.setText("Zone 1 : "+ zoneCount.get(1));
-			scrollZone1Pane.setBounds(33, 250, 700, 40*zone1Data.length);	      
+			scrollZone1Pane.setBounds(33, 250, 700, 50*zone1Data.length+20);	      
 			JTable zone1Table = new JTable(model1);
+			zone1Table.setRowHeight(40);
 			zone1Table.setFont(font);
 			scrollZone1Pane.setViewportView(zone1Table);
 		}else 
@@ -254,8 +255,9 @@ public class QueryResult implements ActionListener{
 		
 		if(zone2Data != null) {
 			zone2.setText("Zone 2 : "+ zoneCount.get(2));
-			scrollZone2Pane.setBounds(33, 91, 700, 40*zone2Data.length);	
+			scrollZone2Pane.setBounds(33, 91, 700, 50*zone2Data.length+20);	
 			JTable zone2Table = new JTable(model2);
+			zone2Table.setRowHeight(40);
 			zone2Table.setFont(font);
 			scrollZone2Pane.setViewportView(zone2Table);
 		}else {
@@ -265,8 +267,9 @@ public class QueryResult implements ActionListener{
 		
 		if(zone3Data != null) {
 			zone3.setText("Return : "+ zoneCount.get(3));
-			scrollZone3Pane.setBounds(33, 420, 700, 40*zone3Data.length);	
+			scrollZone3Pane.setBounds(33, 420, 700, 50*zone3Data.length+20);	
 			JTable zone3Table = new JTable(model3);
+			zone3Table.setRowHeight(40);
 			zone3Table.setFont(font);
 			scrollZone3Pane.setViewportView(zone3Table);
 		}else {
@@ -276,8 +279,9 @@ public class QueryResult implements ActionListener{
 		
 		if(zone4Data != null) {
 			zone4.setText("Show Room : "+ zoneCount.get(4));
-			scrollZone4Pane.setBounds(33, 420, 700, 40*zone4Data.length);	
+			scrollZone4Pane.setBounds(33, 420, 700, 50*zone4Data.length+20);	
 			JTable zone4Table = new JTable(model4);
+			zone4Table.setRowHeight(40);
 			zone4Table.setFont(font);
 			scrollZone4Pane.setViewportView(zone4Table);
 		}else {
@@ -441,7 +445,7 @@ public class QueryResult implements ActionListener{
      			   {
      				   		Object model = modelMapingNumber.get(rowData[row][0]);
      				   		List<Itembean> items =queryModel(String.valueOf(model));
-     				   		setModelLayOut1(items);
+     				   		setModelLayOut(items);
      						  	        return false;
      			   }
      			   @Override
@@ -453,6 +457,7 @@ public class QueryResult implements ActionListener{
              
            
        		JTable table = new JTable(model);
+       		table.setRowHeight(40);
        		table.setFont(font);
        		JScrollPane scrollPane = new JScrollPane(table);
        		scrollPane.setBounds(230,200,200,25);

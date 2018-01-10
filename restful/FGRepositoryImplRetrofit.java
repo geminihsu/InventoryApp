@@ -82,7 +82,7 @@ public class FGRepositoryImplRetrofit {
 
 		Itembean item1 = new Itembean();
 
-		item1.seq = 289;
+		
 		item1.SN = "1580121711003849";
 		item1.date = "2018-01-08 14:56:58.000";
 		item1.Location = "721";
@@ -91,7 +91,7 @@ public class FGRepositoryImplRetrofit {
 
 		Itembean item2 = new Itembean();
 
-		item2.seq = 288;
+		
 		item2.SN = "1580121711003848";
 		item2.date = "2018-01-08 14:56:58.000";
 		item2.Location = "721";
@@ -110,11 +110,11 @@ public class FGRepositoryImplRetrofit {
 		// Itembean fg = fgRepository.getItemsByModel(Integer.valueOf("158012")).get(0);
 
 		// Itembean fg = fgRepository.getItemsByLocation(Integer.valueOf("025")).get(0);
-		// String fg = fgRepository.createItem(items).get(0).SN;
+		  String fg = fgRepository.createItem(items).get(0).SN;
 		// Itembean fg = fgRepository.updateItem(item);
 
-		 fgRepository.deleteItem(items);
-		 //System.out.println(fg);
+		 //fgRepository.deleteItem(items);
+		 System.out.println(fg);
 
 		// bookRepository.deleteBook(book.getId());
 	}

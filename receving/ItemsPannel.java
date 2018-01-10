@@ -31,6 +31,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
 
 import spirit.fitness.scanner.AppMenu;
 import spirit.fitness.scanner.common.Constrant;
@@ -86,16 +87,16 @@ public class ItemsPannel implements ActionListener {
 		String content = "";
 
 		for (int i = 1; i < 10; i++) {
-			content += "158012170600410" + i + "\n";
+			content += "158012170600710" + i + "\n";
 		}
 
 		for (int i = 10; i < 50; i++) {
-			content += "15801217110041" + i + "\n";
+			content += "15801217110071" + i + "\n";
 		}
-		
-		//for (int i = 3; i < 5; i++) {
-		//	content += "158012171100384" + i + "\n";
-		//}
+
+		// for (int i = 3; i < 5; i++) {
+		// content += "158012171100384" + i + "\n";
+		// }
 
 		// inputSN.setText("12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n12312312312312313212312312123121111111111111111111111111111111\n");
 
@@ -150,7 +151,7 @@ public class ItemsPannel implements ActionListener {
 		if (type != SHIPPING)
 			basic.add(btnDefault);
 
-		JButton btnRest = new JButton("Rest");
+		JButton btnRest = new JButton("Reset");
 		btnRest.setFont(font);
 
 		btnRest.setBounds(712, 387, 89, 23);
@@ -184,11 +185,11 @@ public class ItemsPannel implements ActionListener {
 					JOptionPane.showMessageDialog(null, "Please scan bar code item!");
 				else {
 					items = inputSN.getText().toString();
-					
+
 					if (type == SHIPPING) {
-						displayTable(items,String.valueOf(Constrant.ZONE_CODE_SHIPPING),SHIPPING);
+						displayTable(items, String.valueOf(Constrant.ZONE_CODE_SHIPPING), SHIPPING);
 					} else {
-						
+
 						frame.setVisible(false);
 						frame.dispose();
 
@@ -248,15 +249,30 @@ public class ItemsPannel implements ActionListener {
 		}
 
 		String zone = "";
-		if(location.equals(String.valueOf(Constrant.ZONE_CODE_SHIPPING)))
+		if (location.equals(String.valueOf(Constrant.ZONE_CODE_SHIPPING)))
 			zone = "Shipping";
 		else
 			zone = LocationHelper.DisplayZoneCode(LocationHelper.MapZoneCode(location));
-		Object columnNames[] = { "Serial Number", "Model",
-				"Location" + "(" +  zone + ")" };
+		Object columnNames[] = { "Serial Number", "Model", "Location" + "(" + zone + ")" };
 		Font font = new Font("Verdana", Font.BOLD, 18);
-		JTable table = new JTable(rowData, columnNames);
+		final Class[] columnClass = new Class[] { String.class, String.class, String.class };
+
+		DefaultTableModel model = new DefaultTableModel(rowData, columnNames) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+
+				return false;
+			}
+
+			@Override
+			public Class<?> getColumnClass(int columnIndex) {
+				return columnClass[columnIndex];
+			}
+		};
+
+		JTable table = new JTable(model);
 		table.setFont(font);
+		table.setRowHeight(40);
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		frame.add(scrollPane, BorderLayout.CENTER);
@@ -280,21 +296,21 @@ public class ItemsPannel implements ActionListener {
 						try {
 
 							List<Itembean> items = new ArrayList<Itembean>();
-							int index = 288;
+
 							String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 									.format(Calendar.getInstance().getTime());
 							for (String item : itemList) {
 								Itembean _item = new Itembean();
-								_item.seq = index;
+
 								_item.SN = item;
 								_item.date = timeStamp;
 								_item.Location = location;
 								_item.ModelNo = item.substring(0, 6);
 								items.add(_item);
-								index++;
+
 							}
 
-							submitServer(type, items,frame);
+							submitServer(type, items, frame);
 
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -342,7 +358,6 @@ public class ItemsPannel implements ActionListener {
 				}
 			} else if (type == SHIPPING) {
 
-				
 				ShippingRepositoryImplRetrofit shipping = new ShippingRepositoryImplRetrofit();
 				fg = shipping.createItem(items).get(0).SN;
 

@@ -17,114 +17,136 @@ import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 
 import spirit.fitness.scanner.receving.ItemsPannel;
+import spirit.fitness.scanner.receving.ReturnLocation.ZoneCodeReturnCallBackFunction;
 
-public class Zone1Location  implements ActionListener{
+public class Zone1Location implements ActionListener {
 
 	/**
 	 * Create the application.
 	 */
-	
-	private  JButton[] btnZoneCode;
+
+	private JButton[] btnZoneCode;
 	protected JFrame frame;
 	private String items;
-	private int assignType= 0;
+	private int assignType = 0;
 
 	public Zone1Location(String list, int type) {
 		items = list;
 		assignType = type;
-		initialize();
+		if (assignType != -1)
+			initialize();
 	}
 
-
-	
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-			
-		 JFrame.setDefaultLookAndFeelDecorated(true);
-		    JDialog.setDefaultLookAndFeelDecorated(true);
-		    frame=new JFrame("Zone 1 Layout");
-		    frame.setSize(800,600); 
-		    frame.setLocationRelativeTo(null);  
-		    frame.setVisible(true); 
-		    Container cp=frame.getContentPane();
-		    cp.setLayout(new GridLayout(7,10));
-		    
-		    btnZoneCode = new JButton[70];
-		    Font font = new Font("Verdana", Font.BOLD, 18);
-		    
-		    int index = 0;
-		    
-		    for(JButton btn : btnZoneCode) 
-		    {
-		    	String label ="";
-		    	
-		    	if(index / 10 == 0)
-		    		label = "00";
-		    	else
-		    		label = "0";
-		    	btn=new JButton(label + String.valueOf(index));    
-		    	btn.setFont(font);
-		    	final String content = label + String.valueOf(index);
-		    	//btn.addActionListener(this);
-		    	btn.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
+
+		JFrame.setDefaultLookAndFeelDecorated(true);
+		JDialog.setDefaultLookAndFeelDecorated(true);
+		frame = new JFrame("Zone 1 Layout");
+		frame.setSize(800, 600);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+		Container cp = frame.getContentPane();
+		cp.setLayout(new GridLayout(7, 10));
+
+		btnZoneCode = new JButton[70];
+		Font font = new Font("Verdana", Font.BOLD, 18);
+
+		int index = 0;
+
+		for (JButton btn : btnZoneCode) {
+			String label = "";
+
+			if (index / 10 == 0)
+				label = "00";
+			else
+				label = "0";
+			btn = new JButton(label + String.valueOf(index));
+			btn.setFont(font);
+			final String content = label + String.valueOf(index);
+			// btn.addActionListener(this);
+			btn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+
+					if (zone1CodeCallBackFunction != null) {
+						zone1CodeCallBackFunction.getZoneCode(content);
 						frame.dispose();
-				    	frame.setVisible(false);
-				    	
-						ItemsPannel window = new ItemsPannel(items,content,assignType);
-				    	window.frame.setVisible(true);				
-						
-					}});
-		    	cp.add(btn);
-		    	index++;
-		    	
-		    	
-		    }
-		   
-		   
-		   
-		    
-		   
-		    frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		    frame.addWindowListener(new WindowAdapter() {
-		      public void windowClosing(WindowEvent e) {
-		    	   frame.dispose();
-		    	   frame.setVisible(false);
-		        }    
-		      });
-	
-		   
-}
+						frame.setVisible(false);
+					} else {
+						frame.dispose();
+						frame.setVisible(false);
+
+						ItemsPannel window = new ItemsPannel(items, content, assignType);
+						window.frame.setVisible(true);
+					}
+
+				}
+			});
+			cp.add(btn);
+			index++;
+
+		}
+
+		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				frame.dispose();
+				frame.setVisible(false);
+			}
+		});
+
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		 String btn="";
-		 	
-		    if (e.getSource()==btnZoneCode) 
-		    {
-		    	
-		    	ItemsPannel window = new ItemsPannel(items,"Return("+btnZoneCode[0].getText().toString()+")",assignType);
-		    	window.frame.setVisible(true);
-		    }
-		    else if (e.getSource()==btnZoneCode[1]) 
-		    {
-		    	ItemsPannel window = new ItemsPannel(items,"Return("+btnZoneCode[1].getText().toString()+")",assignType);
-		    	window.frame.setVisible(true);
-		    	
-		    }else if (e.getSource()==btnZoneCode[2])
-		    {
-		    	ItemsPannel window = new ItemsPannel(items,"Return("+btnZoneCode[2].getText().toString()+")",assignType);
-		    	window.frame.setVisible(true);
-		    	
-		    }
-		    
-		   /* JOptionPane.showMessageDialog(f,
-		      "the" + btn,
-		      "problem",JOptionPane.INFORMATION_MESSAGE);
-*/
-		
+		String btn = "";
+
+		if (e.getSource() == btnZoneCode) {
+
+			ItemsPannel window = new ItemsPannel(items, "Return(" + btnZoneCode[0].getText().toString() + ")",
+					assignType);
+			window.frame.setVisible(true);
+		} else if (e.getSource() == btnZoneCode[1]) {
+			ItemsPannel window = new ItemsPannel(items, "Return(" + btnZoneCode[1].getText().toString() + ")",
+					assignType);
+			window.frame.setVisible(true);
+
+		} else if (e.getSource() == btnZoneCode[2]) {
+			ItemsPannel window = new ItemsPannel(items, "Return(" + btnZoneCode[2].getText().toString() + ")",
+					assignType);
+			window.frame.setVisible(true);
+
+		}
+
+		/*
+		 * JOptionPane.showMessageDialog(f, "the" + btn,
+		 * "problem",JOptionPane.INFORMATION_MESSAGE);
+		 */
+
+	}
+
+	// retrieve return code number
+	private static Zone1CodeCallBackFunction zone1CodeCallBackFunction;
+
+	public void setZone1CodeCallBackFunction(Zone1CodeCallBackFunction _zone1CodeCallBackFunction) {
+		zone1CodeCallBackFunction = _zone1CodeCallBackFunction;
+
+	}
+	
+	public Zone1CodeCallBackFunction getZone1CodeCallBackFunction() 
+	{
+		return zone1CodeCallBackFunction;
+	}
+
+	public void clearZone1CodeCallBackFunction() {
+		zone1CodeCallBackFunction = null;
+	}
+
+	public interface Zone1CodeCallBackFunction {
+		public void getZoneCode(String code);
+
 	}
 
 }
