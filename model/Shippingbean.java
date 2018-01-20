@@ -11,7 +11,7 @@ import java.util.List;
  * Created by User on 5/1/2017.
  */
 
-public class Itembean {
+public class Shippingbean {
 
 
 
@@ -25,8 +25,10 @@ public class Itembean {
     public String Location;
     @SerializedName("ModelNo")
     public String ModelNo;
-    @SerializedName("SalesOreder")
-    public String SalesOreder;
+    @SerializedName("SalesOrder")
+    public String SalesOrder;
+    @SerializedName("TrackingNo")
+    public String TrackingNo;
 
     @Override
     public String toString() {

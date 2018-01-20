@@ -34,16 +34,18 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.NumberFormatter;
 
 import spirit.fitness.scanner.common.Constrant;
+import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Locationbean;
 import spirit.fitness.scanner.model.Modelbean;
 import spirit.fitness.scanner.receving.ItemsPannel;
-import spirit.fitness.scanner.receving.ReturnLocation;
-import spirit.fitness.scanner.receving.Zone1Location;
-import spirit.fitness.scanner.receving.Zone2Location;
-import spirit.fitness.scanner.receving.ZoneMenu;
-import spirit.fitness.scanner.receving.ReturnLocation.ZoneCodeReturnCallBackFunction;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
+import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
+import spirit.fitness.scanner.zonepannel.ReturnLocation;
+import spirit.fitness.scanner.zonepannel.Zone1Location;
+import spirit.fitness.scanner.zonepannel.Zone2Location;
+import spirit.fitness.scanner.zonepannel.ZoneMenu;
+import spirit.fitness.scanner.zonepannel.ReturnLocation.ZoneCodeReturnCallBackFunction;
 
 public class QueryPannel implements ActionListener{
 
@@ -53,6 +55,10 @@ public class QueryPannel implements ActionListener{
 	private Zone1Location zone1Location;
 	private Zone2Location zone2Location;
 	private ZoneMenu showRoom;
+	
+	private int queryType;
+	
+	private FGRepositoryImplRetrofit fgRepository;
 
 	public QueryPannel() {
 		
@@ -63,6 +69,33 @@ public class QueryPannel implements ActionListener{
 	
 	public void initialZoneCodeCallback() 
 	{
+		fgRepository = new FGRepositoryImplRetrofit();
+		fgRepository.setinventoryServiceCallBackFunction(new InventoryCallBackFunction() {
+
+			@Override
+			public void resultCode(int code) {
+			
+			}
+
+			@Override
+			public void getInventoryItems(List<Itembean> items) {
+			   if(items.isEmpty()) 
+			   {
+					JOptionPane.showMessageDialog(null, "No Items");
+			   }else 
+			   {
+				   
+				   QueryResult window = new QueryResult();
+				   if (queryType == QueryResult.QUERY_LOCATION)
+						window.setContent(QueryResult.QUERY_LOCATION, items);
+					else
+						window.setContent(QueryResult.QUERY_MODEL, items);
+
+					window.frame.setVisible(true);
+				   
+			   }
+			}
+		});
 		zoneCodeReturn = new ReturnLocation(null,-1);
 		zoneCodeReturn.setZoneCodeReturnCallBackFunction(new ReturnLocation.ZoneCodeReturnCallBackFunction() {
 			
@@ -246,19 +279,15 @@ public class QueryPannel implements ActionListener{
 		panel.add(ResetButton);
 	}
 
-	private static void passQueryResult(String modelNo, String Location) {
-		QueryResult window = null;
-		List<Itembean> items = null;
-
-		int queryType = (modelNo.equals("") && !Location.equals("")) ? QueryResult.QUERY_LOCATION
-				: QueryResult.QUERY_MODEL;
+	private void passQueryResult(String modelNo, String Location) {
+		
+		queryType = (modelNo.equals("") && !Location.equals("")) ? QueryResult.QUERY_LOCATION: QueryResult.QUERY_MODEL;
 
 		if (queryType == QueryResult.QUERY_LOCATION) {
-			FGRepositoryImplRetrofit fgInventory = new FGRepositoryImplRetrofit();
-
+		
 			try {
-				items = (ArrayList<Itembean>) fgInventory.getItemsByLocation(Integer.valueOf(Location));
-				window = new QueryResult();
+				fgRepository.getItemsByLocation(Integer.valueOf(Location));
+			
 			} catch (NumberFormatException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -273,11 +302,9 @@ public class QueryPannel implements ActionListener{
 				modelNo = modelNo.substring(0, 6);
 			}
 
-			FGRepositoryImplRetrofit fgInventory = new FGRepositoryImplRetrofit();
-
 			try {
-				items = (ArrayList<Itembean>) fgInventory.getItemsByModel(Integer.valueOf(modelNo));
-				window = new QueryResult();
+				fgRepository.getItemsByModel(Integer.valueOf(modelNo));
+				
 			} catch (NumberFormatException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -288,16 +315,6 @@ public class QueryPannel implements ActionListener{
 
 		}
 
-		if (items.size() == 0)
-			JOptionPane.showMessageDialog(null, "No Items");
-		else {
-			if (queryType == QueryResult.QUERY_LOCATION)
-				window.setContent(QueryResult.QUERY_LOCATION, items);
-			else
-				window.setContent(QueryResult.QUERY_MODEL, items);
-
-			window.frame.setVisible(true);
-		}
 	}
 
 	private boolean verifyText(String model, String location) {

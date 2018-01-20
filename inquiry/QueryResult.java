@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -36,9 +37,11 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
 import spirit.fitness.scanner.common.Constrant;
+import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Locationbean;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
+import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 
 public class QueryResult implements ActionListener{
 
@@ -67,6 +70,9 @@ public class QueryResult implements ActionListener{
 	//key:location title, value:location number
 	private Map<String,String> modelMapingNumber;
 	
+	private  FGRepositoryImplRetrofit fgInventory;
+	private int queryType;
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -77,7 +83,8 @@ public class QueryResult implements ActionListener{
 	{
 		JFrame.setDefaultLookAndFeelDecorated(false);
 	    JDialog.setDefaultLookAndFeelDecorated(false);
-	    
+	    exceuteCallback();
+	    queryType = type;
 		if(type == QUERY_MODEL)
 			setModelLayOut(_items);
 		else if(type == QUERY_LOCATION)
@@ -188,8 +195,8 @@ public class QueryResult implements ActionListener{
 	  	       public boolean isCellEditable(int row, int column)
 	  	       {
 	  	    	  			Object location = zone1Data[row][0];
-	  	    	            List<Itembean> items = queryLocation(String.valueOf(location));
-	  	    	            setLocationLayOut(items);
+	  	    	            queryLocation(String.valueOf(location));
+	  	    	            
 	  	            		return false;
 	  	       }
 	  	      @Override
@@ -205,8 +212,8 @@ public class QueryResult implements ActionListener{
 		  	       public boolean isCellEditable(int row, int column)
 		  	       {
 		  	    	  		Object location = zone1Data[row][0];
-		  	    	  		List<Itembean> items = queryLocation(String.valueOf(location));
-		  	    	  		setLocationLayOut(items);
+		  	    	  		queryLocation(String.valueOf(location));
+		  	    	  		
 		  	            		return false;
 		  	       }
 		  	      @Override
@@ -222,8 +229,8 @@ public class QueryResult implements ActionListener{
 				  public boolean isCellEditable(int row, int column)
 				  {
 					  		Object location = zone1Data[row][0];
-	    	            	List<Itembean> items = queryLocation(String.valueOf(location));
-	    	            	setLocationLayOut(items);
+	    	            	queryLocation(String.valueOf(location));
+	    	            	
 				  	            		return false;
 				  }
 				  @Override
@@ -238,8 +245,7 @@ public class QueryResult implements ActionListener{
 				   public boolean isCellEditable(int row, int column)
 				   {
 					   		Object location = zone1Data[row][0];
-					   		List<Itembean> items = queryLocation(String.valueOf(location));
-					   		setLocationLayOut(items);
+					   		queryLocation(String.valueOf(location));
 							  	        return false;
 				   }
 				   @Override
@@ -491,8 +497,8 @@ public class QueryResult implements ActionListener{
      			   public boolean isCellEditable(int row, int column)
      			   {
      				   		Object model = modelMapingNumber.get(rowData[row][0]);
-     				   		List<Itembean> items =queryModel(String.valueOf(model));
-     				   		setModelLayOut(items);
+     				   		queryModel(String.valueOf(model));
+     				   		
      						  	        return false;
      			   }
      			   @Override
@@ -537,40 +543,60 @@ public class QueryResult implements ActionListener{
 	      });
     }
 	
-   private List<Itembean> queryLocation(String Location) 
-   {
-	   FGRepositoryImplRetrofit fgInventory = new FGRepositoryImplRetrofit();
-	   List<Itembean> items = null;
-		try {
-			items = (ArrayList<Itembean>)fgInventory.getItemsByLocation(Integer.valueOf(Location));			
-			
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+private void exceuteCallback() {
 		
-		return items;
-   }
+		fgInventory = new FGRepositoryImplRetrofit();
+		fgInventory.setinventoryServiceCallBackFunction(new InventoryCallBackFunction() {
+
+			@Override
+			public void resultCode(int code) {
+				// TODO Auto-generated method stub
+				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
+					
+				}
+			}
+
+			@Override
+			public void getInventoryItems(List<Itembean> items) {
+				if (!items.isEmpty()) {
+					
+					if(queryType == QUERY_MODEL)
+						setModelLayOut(items);
+					else
+						setLocationLayOut(items);
+				}
+			}
+		});
+		
+	}
+	
+	private void queryLocation(String Location) {
+
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+
+					fgInventory.getItemsByLocation(Integer.valueOf(Location));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+	}
    
-   private List<Itembean> queryModel(String modelNo) 
-   {
-	   FGRepositoryImplRetrofit fgInventory = new FGRepositoryImplRetrofit();
-	   List<Itembean> items = null;
-		try {
-			items = (ArrayList<Itembean>)fgInventory.getItemsByModel(Integer.valueOf(modelNo));			
-			
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return items;
-   }
+	private void queryModel(String modelNo) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+
+					fgInventory.getItemsByModel(Integer.valueOf(modelNo));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+	}
 
 }

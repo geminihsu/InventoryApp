@@ -5,11 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import spirit.fitness.scanner.common.Constrant;
+import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.restful.callback.InventoryCallback;
+import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
+import spirit.fitness.scanner.zonepannel.Zone1Location.Zone1CodeCallBackFunction;
 
 public class FGRepositoryImplRetrofit {
 
@@ -23,12 +27,24 @@ public class FGRepositoryImplRetrofit {
 	 * return service.updateItem(item.seq, item).execute().body(); }
 	 */
 
+	// retrieve return code number
+	private InventoryCallBackFunction inventoryServiceCallBackFunction;
+
+	public void setinventoryServiceCallBackFunction(InventoryCallBackFunction _inventoryCallBackFunction) {
+			inventoryServiceCallBackFunction = _inventoryCallBackFunction;
+
+	}
+	
 	public List<Itembean> updateItem(List<Itembean> item) throws Exception {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
 				.addConverterFactory(GsonConverterFactory.create()).build();
 		InventoryCallback service = retrofit.create(InventoryCallback.class);
 
-		return service.updateItem(item).execute().body();
+		Response<List<Itembean>> request = service.updateItem(item).execute();
+		int code = request.code();
+		List<Itembean> result = retriveCode(code,request);
+		
+		return result;
 	}
 
 	/*
@@ -46,7 +62,12 @@ public class FGRepositoryImplRetrofit {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
 				.addConverterFactory(GsonConverterFactory.create()).build();
 		InventoryCallback service = retrofit.create(InventoryCallback.class);
-		return service.createItem(items).execute().body();
+		
+		Response<List<Itembean>> request = service.createItem(items).execute();
+		int code = request.code();
+		List<Itembean> result = retriveCode(code,request);
+		
+		return result;
 
 	}
 
@@ -54,35 +75,43 @@ public class FGRepositoryImplRetrofit {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
 				.addConverterFactory(GsonConverterFactory.create()).build();
 		InventoryCallback service = retrofit.create(InventoryCallback.class);
-		Call<List<Itembean>> items = service.getAllItems();
-		return items.execute().body();
+		
+		Response<List<Itembean>> request = service.getAllItems().execute();
+		int code = request.code();
+		List<Itembean> result = retriveCode(code,request);
+		
+		return result;
 	}
 
 	public List<Itembean> getItemsByLocation(Integer location) throws Exception {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
 				.addConverterFactory(GsonConverterFactory.create()).build();
 		InventoryCallback service = retrofit.create(InventoryCallback.class);
-		Call<List<Itembean>> items = service.getItemsByLocation(location);
-		// System.out.println(items.execute().toString());
-		return items.execute().body();
+		
+		Response<List<Itembean>> request = service.getItemsByLocation(location).execute();
+		int code = request.code();
+		List<Itembean> result = retriveCode(code,request);
+		return result;
 	}
 
 	public List<Itembean> getItemsByModel(Integer modelNo) throws Exception {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
 				.addConverterFactory(GsonConverterFactory.create()).build();
 		InventoryCallback service = retrofit.create(InventoryCallback.class);
-		Call<List<Itembean>> items = service.getItemsByModelNo(modelNo);
-		return items.execute().body();
+		
+		Response<List<Itembean>> request = service.getItemsByModelNo(modelNo).execute();
+		int code = request.code();
+		List<Itembean> result = retriveCode(code,request);
+		return result;
 	}
 
-	public static void main(String[] args) throws Exception {
+	/*public static void main(String[] args) throws Exception {
 		FGRepositoryImplRetrofit fgRepository = new FGRepositoryImplRetrofit();
 
 		List<Itembean> items = new ArrayList<>();
 
 		Itembean item1 = new Itembean();
 
-		
 		item1.SN = "1580121711003849";
 		item1.date = "2018-01-08 14:56:58.000";
 		item1.Location = "721";
@@ -91,7 +120,6 @@ public class FGRepositoryImplRetrofit {
 
 		Itembean item2 = new Itembean();
 
-		
 		item2.SN = "1580121711003848";
 		item2.date = "2018-01-08 14:56:58.000";
 		item2.Location = "721";
@@ -110,14 +138,14 @@ public class FGRepositoryImplRetrofit {
 		// Itembean fg = fgRepository.getItemsByModel(Integer.valueOf("158012")).get(0);
 
 		// Itembean fg = fgRepository.getItemsByLocation(Integer.valueOf("025")).get(0);
-		  String fg = fgRepository.createItem(items).get(0).SN;
+		//String fg = fgRepository.createItem(items).get(0).SN;
 		// Itembean fg = fgRepository.updateItem(item);
 
-		 //fgRepository.deleteItem(items);
-		 System.out.println(fg);
+		// fgRepository.deleteItem(items);
+		//System.out.println(fg);
 
 		// bookRepository.deleteBook(book.getId());
-	}
+	//}
 
 	public List<Itembean> deleteItem(List<Itembean> items) throws Exception {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
@@ -130,5 +158,20 @@ public class FGRepositoryImplRetrofit {
 	public Itembean findItemBySeq(Integer seq) {
 		return null;
 	}
+
+	private List<Itembean> retriveCode(int code, Response<List<Itembean>> request) {
+		List<Itembean> resultData = null;
+
+		if (inventoryServiceCallBackFunction != null) {
+			inventoryServiceCallBackFunction.resultCode(code);
+			if (code == HttpRequestCode.HTTP_REQUEST_OK) {
+				resultData = request.body();
+				inventoryServiceCallBackFunction.getInventoryItems(resultData);
+			}
+			
+		}
+		return resultData;
+	}
+
 
 }

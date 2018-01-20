@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -33,15 +35,25 @@ import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import spirit.fitness.scanner.common.Constrant;
+import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.inquiry.QueryPannel;
 import spirit.fitness.scanner.inquiry.QueryResult;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Locationbean;
 import spirit.fitness.scanner.model.Modelbean;
+import spirit.fitness.scanner.model.Reportbean;
 import spirit.fitness.scanner.receving.ItemsPannel;
+import spirit.fitness.scanner.report.DailyReport;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.LocationRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.ModelRepositoryImplRetrofit;
+import spirit.fitness.scanner.restful.ReportRepositoryImplRetrofit;
+import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
+import spirit.fitness.scanner.restful.listener.LocationCallBackFunction;
+import spirit.fitness.scanner.restful.listener.ModelsCallBackFunction;
+import spirit.fitness.scanner.restful.listener.ReportCallBackFunction;
+import spirit.fitness.scanner.shipping.ShippingConfirm;
+import spirit.fitness.scanner.util.EmailHelper;
 
 public class AppMenu implements ActionListener {
 
@@ -49,14 +61,24 @@ public class AppMenu implements ActionListener {
 	 * Create the application.
 	 */
 
-	private JButton btnRecving, btnMoving, btnInQuiry, btnShipping, btnReport, btnLoading;
+	private JButton btnRecving, btnMoving, btnInQuiry, btnShipping, btnReport, btnModelQuantity;
 	private JFrame frame;
+	private ReportRepositoryImplRetrofit fgReport;
+	private ModelRepositoryImplRetrofit fgModels;
+	private LocationRepositoryImplRetrofit localModels;
+
 
 	public AppMenu() {
-		initialize();		
+		//EmailHelper.sendMail();
+		//JOptionPane.showMessageDialog(null, "Model 15516 less than 50. Please move more item from Zone 1.");
+		exceuteCallback();
+		initialize();
+		loadReport();
 		loadModel();
 		loadLocatin();
 	}
+	
+	
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -96,10 +118,10 @@ public class AppMenu implements ActionListener {
 		btnInQuiry.setFont(font);
 		btnShipping = new JButton("Shipping");
 		btnShipping.setFont(font);
-		btnReport = new JButton("Report");
+		btnReport = new JButton("Daily Report");
 		btnReport.setFont(font);
-		btnLoading = new JButton("Loading");
-		btnLoading.setFont(font);
+		btnModelQuantity = new JButton("Model Quantity");
+		btnModelQuantity.setFont(font);
 		// btnRecving.setBounds(20,20,100,40);
 		// btnMoving.setBounds(150,20,100,40);
 		// btnInQuiry.setBounds(280,20,100,40);
@@ -111,12 +133,14 @@ public class AppMenu implements ActionListener {
 		btnMoving.addActionListener(this);
 		btnShipping.addActionListener(this);
 		btnInQuiry.addActionListener(this);
+		btnModelQuantity.addActionListener(this);
+		btnReport.addActionListener(this);
 		cp.add(btnRecving);
 		cp.add(btnMoving);
 		cp.add(btnInQuiry);
 		cp.add(btnShipping);
 		cp.add(btnReport);
-		// cp.add(btnLoading);
+	    cp.add(btnModelQuantity);
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.setDefaultLookAndFeelDecorated(true);
 
@@ -147,56 +171,152 @@ public class AppMenu implements ActionListener {
 			window.frame.setVisible(true);
 
 		} else if (e.getSource() == btnShipping) {
-			ItemsPannel window = new ItemsPannel(ItemsPannel.SHIPPING);
+			ShippingConfirm window = new ShippingConfirm();
 			window.frame.setVisible(true);
 
+		}else if (e.getSource() == btnReport) {
+			
+			//JOptionPane.showMessageDialog(null, "Model 15516 less than 50. Please move more item from Zone 1.");
+
+			DailyReport window = new DailyReport(Constrant.reports, DailyReport.REPORT);
+			window.frame.setVisible(true);
+ 
+		}else if (e.getSource() == btnModelQuantity) {
+			JOptionPane.showMessageDialog(null, "Model 15516 less than 50 in Zone 2. Please move more item from Zone 1.");
+
+			DailyReport window = new DailyReport(Constrant.reports,DailyReport.MIN_QUANTITY);
+			window.frame.setVisible(true);
+ 
 		}
 
-		/*
-		 * JOptionPane.showMessageDialog(f, "the" + btn,
-		 * "problem",JOptionPane.INFORMATION_MESSAGE);
-		 */
 
 	}
+
+	private void exceuteCallback() {
+
+		fgReport = new ReportRepositoryImplRetrofit();
+		fgReport.setinventoryServiceCallBackFunction(new ReportCallBackFunction() {
+
+			@Override
+			public void resultCode(int code) {
+				// TODO Auto-generated method stub
+				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
+
+				}
+			}
+
+			@Override
+			public void getReportItems(List<Reportbean> items) {
+				Constrant.reports = items;
+
+			}
+
+		});
+
+		fgModels = new ModelRepositoryImplRetrofit();
+		fgModels.setinventoryServiceCallBackFunction(new ModelsCallBackFunction() {
+
+			@Override
+			public void resultCode(int code) {
+				// TODO Auto-generated method stub
+				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
+
+				}
+			}
+
+			@Override
+			public void getModelsItems(List<Modelbean> items) {
+
+				HashMap<String, Modelbean> map = new HashMap<>();
+				for (Modelbean i : items) {
+					map.put(i.ModelNo, i);
+				}
+
+				Constrant.models = map;
+
+			}
+
+		});
+
+		localModels = new LocationRepositoryImplRetrofit();
+		localModels.setinventoryServiceCallBackFunction(new LocationCallBackFunction() {
+
+			@Override
+			public void resultCode(int code) {
+				// TODO Auto-generated method stub
+				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
+
+				}
+			}
+
+			@Override
+			public void getLocationItems(List<Locationbean> items) {
+				HashMap<String, Locationbean> map = new HashMap<>();
+				for (Locationbean i : items) {
+					map.put(i.Code, i);
+				}
+
+				Constrant.locations = map;
+
+			}
+
+		});
+
+	}
+	// Loading Models data from Server
+		private void loadReport() {
+			
+			
+			// loading model and location information from Server
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					try {
+
+						fgReport.getAllItems();
+
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			
+		}
 
 	// Loading Models data from Server
 	private void loadModel() {
 		// loading model and location information from Server
-		ModelRepositoryImplRetrofit fgModels = new ModelRepositoryImplRetrofit();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
 
-		try {
-			List<Modelbean> items = (ArrayList<Modelbean>) fgModels.getAllItems();
+					fgModels.getAllItems();
 
-			HashMap<String, Modelbean> map = new HashMap<>();
-			for (Modelbean i : items) {
-				map.put(i.ModelNo, i);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
+		});
 
-			Constrant.models = map;
-
-		} catch (NumberFormatException x) {
-			// TODO Auto-generated catch block
-			x.printStackTrace();
-		} catch (Exception x) {
-			// TODO Auto-generated catch block
-			x.printStackTrace();
-		}
 	}
 
 	// Loading Models data from Server
 	private void loadLocatin() {
 		// loading model and location information from Server
-		LocationRepositoryImplRetrofit localModels = new LocationRepositoryImplRetrofit();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
 
-		try {
-			List<Locationbean> items = (ArrayList<Locationbean>) localModels.getAllItems();
+					localModels.getAllItems();
 
-			HashMap<String, Locationbean> map = new HashMap<>();
-			for (Locationbean i : items) {
-				map.put(i.Code, i);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
+		});
+		try {
+			
 
-			Constrant.locations = map;
+			
 
 		} catch (NumberFormatException x) {
 			// TODO Auto-generated catch block

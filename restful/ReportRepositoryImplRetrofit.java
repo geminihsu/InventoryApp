@@ -15,52 +15,54 @@ import spirit.fitness.scanner.model.Modelbean;
 import spirit.fitness.scanner.model.Reportbean;
 import spirit.fitness.scanner.restful.callback.InventoryCallback;
 import spirit.fitness.scanner.restful.callback.ModelCallback;
-import spirit.fitness.scanner.restful.listener.ModelsCallBackFunction;
+import spirit.fitness.scanner.restful.callback.ReportCallback;
+import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.ReportCallBackFunction;
 
 
 
-public class ModelRepositoryImplRetrofit {
+public class ReportRepositoryImplRetrofit {
 
 	// retrieve return code number
-	private ModelsCallBackFunction modelsCallBackFunction;
+	private ReportCallBackFunction reportCallBackFunction;
 
-	public void setinventoryServiceCallBackFunction(ModelsCallBackFunction _modelsCallBackFunction) {
-		modelsCallBackFunction = _modelsCallBackFunction;
+	public void setinventoryServiceCallBackFunction(ReportCallBackFunction _reportCallBackFunction) {
+		reportCallBackFunction = _reportCallBackFunction;
 
 	}
-	
-	public List<Modelbean> getAllItems() throws Exception {
+
+	public List<Reportbean> getAllItems() throws Exception {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl).addConverterFactory(GsonConverterFactory.create())
 				.build();
-		ModelCallback service = retrofit.create(ModelCallback.class);
+		ReportCallback service = retrofit.create(ReportCallback.class);
 		
-		Response<List<Modelbean>> request = service.getAllModels().execute();
+		Response<List<Reportbean>> request = service.getAllReport().execute();
 		int code = request.code();
-		List<Modelbean> result = retriveCode(code,request);
-		
-		return result;
-	}
-	
-	
-	
-	public List<Modelbean> getItemsByModel(Integer modelNo) throws Exception {
-		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl).addConverterFactory(GsonConverterFactory.create())
-				.build();
-		ModelCallback service = retrofit.create(ModelCallback.class);
-		
-		Response<List<Modelbean>> request = service.getItemsByModelNo(modelNo).execute();
-		int code = request.code();
-		List<Modelbean> result = retriveCode(code,request);
+		List<Reportbean> result = retriveCode(code,request);
 		
 		return result;
 	}
 
-	public static void main(String[] args) throws Exception {
-		ModelRepositoryImplRetrofit modelRepository = new ModelRepositoryImplRetrofit();
+	
+	
+	
+	public List<Reportbean> getItemsByModel(Integer modelNo) throws Exception {
+		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl).addConverterFactory(GsonConverterFactory.create())
+				.build();
+		ReportCallback service = retrofit.create(ReportCallback.class);
+		
+		Response<List<Reportbean>> request = service.getItemsByModelNo(modelNo).execute();
+		int code = request.code();
+		List<Reportbean> result = retriveCode(code,request);
+		
+		return result;
+	}
+
+	/*public static void main(String[] args) throws Exception {
+		ReportRepositoryImplRetrofit modelRepository = new ReportRepositoryImplRetrofit();
 		
 	    
-		Modelbean fg = modelRepository.getAllItems().get(0);
+		Reportbean fg = modelRepository.getAllItems().get(0);
 		//Itembean fg = fgRepository.getItemsByModel(Integer.valueOf("158012")).get(0);
 		
 		//Itembean fg = fgRepository.getItemsByLocation(Integer.valueOf("025")).get(0);
@@ -72,16 +74,16 @@ public class ModelRepositoryImplRetrofit {
 		
 		
 		// bookRepository.deleteBook(book.getId());
-	}
+	}*/
 
-	private List<Modelbean> retriveCode(int code, Response<List<Modelbean>> request) {
-		List<Modelbean> resultData = null;
+	private List<Reportbean> retriveCode(int code, Response<List<Reportbean>> request) {
+		List<Reportbean> resultData = null;
 
-		if (modelsCallBackFunction != null) {
-			modelsCallBackFunction.resultCode(code);
+		if (reportCallBackFunction != null) {
+			reportCallBackFunction.resultCode(code);
 			if (code == HttpRequestCode.HTTP_REQUEST_OK) {
 				resultData = request.body();
-				modelsCallBackFunction.getModelsItems(resultData);
+				reportCallBackFunction.getReportItems(resultData);
 			}
 			
 		}

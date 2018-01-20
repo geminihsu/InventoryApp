@@ -5,16 +5,20 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -27,21 +31,32 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ProgressMonitor;
+import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
+import com.mashape.unirest.http.HttpClientHelper;
+import com.mashape.unirest.http.HttpResponse;
+
+import okhttp3.internal.http.HttpHeaders;
+import okhttp3.internal.http1.Http1Codec;
 import spirit.fitness.scanner.AppMenu;
 import spirit.fitness.scanner.common.Constrant;
+import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HttpRestApi;
 import spirit.fitness.scanner.restful.ShippingRepositoryImplRetrofit;
+import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.util.LocationHelper;
+import spirit.fitness.scanner.util.PrinterHelper;
+import spirit.fitness.scanner.zonepannel.ZoneMenu;
 import spirit.fitness.scanner.model.Itembean;
 
-public class ItemsPannel implements ActionListener {
+public class ItemsPannel extends JPanel implements ActionListener, PropertyChangeListener {
 
 	public final static int RECEVING = 0;
 	public final static int MOVING = 1;
@@ -49,14 +64,24 @@ public class ItemsPannel implements ActionListener {
 
 	public JFrame frame;
 	private String items;
+	private int assignType;
+
+	private ProgressMonitor progressMonitor;
+	private JButton btnDone;
+	private Task task;
+
+	private String result ="";
+	
+	private FGRepositoryImplRetrofit fgRepository;
 
 	public ItemsPannel(int type) {
+		assignType = type;
 		initialize(type);
 
 	}
 
 	public ItemsPannel(String content, String location, int type) {
-
+		assignType = type;
 		// initialize();
 		displayTable(content, location, type);
 	}
@@ -73,7 +98,7 @@ public class ItemsPannel implements ActionListener {
 		frame.setBounds(500, 100, 400, 700);
 		JPanel basic = new JPanel();
 		basic.setBackground(new java.awt.Color(235, 240, 255));
-		
+
 		Font font = new Font("Verdana", Font.BOLD, 20);
 		TitledBorder title = new TitledBorder("Please start scanner barcode:");
 		title.setTitleFont(font);
@@ -88,12 +113,12 @@ public class ItemsPannel implements ActionListener {
 		JTextArea inputSN = new JTextArea(20, 15);
 		String content = "";
 
-		for (int i = 1; i < 10; i++) {
-			content += "158012170600710" + i + "\n";
-		}
+		 for (int i = 1; i < 10; i++) {
+		 content += "158012130811120" + i + "\n";
+		 }
 
 		for (int i = 10; i < 50; i++) {
-			content += "15801217110071" + i + "\n";
+			content += "15801213081112" + i + "\n";
 		}
 
 		// for (int i = 3; i < 5; i++) {
@@ -121,7 +146,7 @@ public class ItemsPannel implements ActionListener {
 					JOptionPane.showMessageDialog(null, "Serial Number Error!");
 				}
 
-				System.out.println(e.getLength());
+				//System.out.println(e.getLength());
 			}
 
 			@Override
@@ -137,7 +162,7 @@ public class ItemsPannel implements ActionListener {
 		inputSN.setBounds(0, 387, 50, 23);
 		basic.add(scrollPanel1);
 
-		JButton btnDone = new JButton("Assign");
+		btnDone = new JButton("Assign");
 		btnDone.setFont(font);
 
 		if (type == SHIPPING)
@@ -221,15 +246,54 @@ public class ItemsPannel implements ActionListener {
 		// TODO Auto-generated method stub
 
 	}
+	
+	private void exceuteCallback() {
+		
+		fgRepository = new FGRepositoryImplRetrofit();
+		fgRepository.setinventoryServiceCallBackFunction(new InventoryCallBackFunction() {
 
-	private void displayTable(String items, String location, int type) {
+			@Override
+			public void resultCode(int code) {
+				// TODO Auto-generated method stub
+				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
+					JOptionPane.showMessageDialog(null, "Items already exit.");
+					task.cancel(true);
+					progressMonitor.close();
+				}
+			}
+
+			@Override
+			public void getInventoryItems(List<Itembean> items) {
+				if (!items.isEmpty()) {
+					 progressMonitor.close();
+					 task.done();
+					if (assignType == RECEVING) {
+
+						frame.dispose();
+						frame.setVisible(false);
+						JOptionPane.showMessageDialog(null, "Insert Data Success!");
+
+					} else if (assignType == MOVING) {
+
+						frame.dispose();
+						frame.setVisible(false);
+						JOptionPane.showMessageDialog(null, "Update Data Success!");
+
+					} 
+				}
+			}
+		});
+		
+	}
+
+	private void displayTable(String content, String location, int type) {
 
 		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Item Result");
 		frame.setLocationRelativeTo(null);
 		frame.setBounds(100, 100, 1000, 600);
-		String[] itemList = items.split("\n");
+		String[] itemList = content.split("\n");
 
 		// avoid repeat serial number
 		HashSet<String> set = new HashSet<String>();
@@ -283,13 +347,13 @@ public class ItemsPannel implements ActionListener {
 		JScrollPane scrollPane = new JScrollPane(table);
 		frame.add(scrollPane, BorderLayout.CENTER);
 
-		JButton btnDone = new JButton("Submit");
+		btnDone = new JButton("Submit");
 		btnDone.setFont(font);
-		btnDone.setBounds(312, 387, 89, 23);
+		btnDone.setBounds(312, 387, 89, 50);
 
 		btnDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				
 				// String book =
 				// "{\"Seq\":"+91+",\"SN\":\"1858151709001848\",\"Date\":\"2017-12-13
 				// 16:14:02.343\",\"Location\":\"051\",\"ModelNo\":\"185815\"}";
@@ -300,7 +364,10 @@ public class ItemsPannel implements ActionListener {
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						try {
-
+							btnDone.setEnabled(false);
+							
+							progressMonitor = new ProgressMonitor(ItemsPannel.this, "Please wait...", "", 0, 100);
+							
 							List<Itembean> items = new ArrayList<Itembean>();
 
 							String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
@@ -315,8 +382,14 @@ public class ItemsPannel implements ActionListener {
 								items.add(_item);
 
 							}
-
-							submitServer(type, items, frame);
+							
+							if(type == RECEVING) {
+								PrinterHelper print = new PrinterHelper();
+								print.printItems(content);
+							}
+							exceuteCallback();
+							displayLoadingBar();
+							submitServer(type, items);
 
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -337,46 +410,85 @@ public class ItemsPannel implements ActionListener {
 
 				frame.dispose();
 				frame.setVisible(false);
+				
 			}
 		});
 
 	}
 
-	private void submitServer(int type, List<Itembean> items, JFrame frame) {
+	private void submitServer(int type, List<Itembean> items) {
 		String fg;
 		try {
 			if (type == RECEVING) {
-				FGRepositoryImplRetrofit fgRepository = new FGRepositoryImplRetrofit();
-				fg = fgRepository.createItem(items).get(0).SN;
-				if (!fg.isEmpty()) {
-					frame.dispose();
-					frame.setVisible(false);
-					JOptionPane.showMessageDialog(null, "Insert Data Success!");
-				}
+				result = fgRepository.createItem(items).get(0).SN;
 			} else if (type == MOVING) {
-				FGRepositoryImplRetrofit fgRepository = new FGRepositoryImplRetrofit();
-				fg = fgRepository.updateItem(items).get(0).SN;
+				result = fgRepository.updateItem(items).get(0).SN;
+			} 
 
-				if (!fg.isEmpty()) {
-					frame.dispose();
-					frame.setVisible(false);
-					JOptionPane.showMessageDialog(null, "Update Data Success!");
-				}
-			} else if (type == SHIPPING) {
-
-				ShippingRepositoryImplRetrofit shipping = new ShippingRepositoryImplRetrofit();
-				fg = shipping.createItem(items).get(0).SN;
-
-				if (!fg.isEmpty()) {
-					frame.dispose();
-					frame.setVisible(false);
-					JOptionPane.showMessageDialog(null, "shipping Data Success!");
-				}
-			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+	}
+
+	private void displayLoadingBar() {
+	    progressMonitor.setProgress(0);
+
+		task = new Task();
+		task.addPropertyChangeListener(ItemsPannel.this);
+		task.execute();
+		btnDone.setEnabled(false);
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		if ("progress" == evt.getPropertyName()) {
+			int progress = (Integer) evt.getNewValue();
+			//progressMonitor.setProgress(progress);
+			String message = String.format("Completed %d%%.\n", progress);
+			progressMonitor.setNote(message);
+
+			if (progressMonitor.isCanceled() || task.isDone()) {
+				Toolkit.getDefaultToolkit().beep();
+				if (progressMonitor.isCanceled()) {
+					task.cancel(true);
+					// taskOutput.append("Task canceled.\n");
+				} else {
+					// taskOutput.append("Task completed.\n");
+				}
+				btnDone.setEnabled(true);
+			}
+		}
+
+	}
+
+	class Task extends SwingWorker<Void, Void> {
+		@Override
+		public Void doInBackground() {
+			Random random = new Random();
+			int progress = 0;
+			setProgress(0);
+			try {
+				Thread.sleep(1000);
+				while (progress < 100 && !isCancelled()) {
+					// Sleep for up to one second.
+					Thread.sleep(random.nextInt(1000));
+					// Make random progress.
+					progress += random.nextInt(10);
+					setProgress(Math.min(progress, 100));
+				}
+			} catch (InterruptedException ignore) {
+			}
+			return null;
+		}
+
+		@Override
+		public void done() {
+			Toolkit.getDefaultToolkit().beep();
+			btnDone.setEnabled(true);
+			progressMonitor.close();
+			
+		}
 	}
 }

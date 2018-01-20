@@ -1,4 +1,4 @@
-package spirit.fitness.scanner.receving;
+package spirit.fitness.scanner.zonepannel;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 
 import spirit.fitness.scanner.receving.ItemsPannel;
-import spirit.fitness.scanner.receving.Zone1Location.Zone1CodeCallBackFunction;
+import spirit.fitness.scanner.zonepannel.Zone1Location.Zone1CodeCallBackFunction;
 
 public class Zone2Location implements ActionListener {
 

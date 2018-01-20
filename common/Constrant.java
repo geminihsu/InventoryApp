@@ -6,12 +6,14 @@ import java.util.List;
 
 import spirit.fitness.scanner.model.Locationbean;
 import spirit.fitness.scanner.model.Modelbean;
+import spirit.fitness.scanner.model.Reportbean;
 
 public class Constrant {
 	public static String webUrl = "http://172.16.2.96:5000";
 	
 	public static HashMap<String,Modelbean> models;
 	public static HashMap<String,Locationbean> locations;
+	public static List<Reportbean> reports;
 	 
 	//Zone mapping Table key : zone number, value : location number
     public static int ZONE_CODE_LEN_LIMIT = 3;
@@ -37,7 +39,12 @@ public class Constrant {
     //Shipping
     public static int ZONE_CODE_SHIPPING = 999;
     
+    
+    //Java form color define
     public static Color BACKGROUN_COLOR = new java.awt.Color(235, 240, 255);
     public static Color TABLE_COLOR = new java.awt.Color(255, 255, 255);
     public static Color DISPALY_ITEMS_TABLE_COLOR = new java.awt.Color(255, 255, 240);
+    
+
+    
 }

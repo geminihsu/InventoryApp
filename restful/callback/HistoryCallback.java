@@ -13,6 +13,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import spirit.fitness.scanner.model.Historybean;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Shippingbean;
 
@@ -20,26 +21,26 @@ import spirit.fitness.scanner.model.Shippingbean;
  * Created by User on 5/1/2017.
  */
 
-public interface ShippingCallback {
+public interface HistoryCallback {
     
 	@Headers("Content-Type: application/json")
-	@GET("api/Shippings")
-	Call<List<Shippingbean>> getAllItems();
+	@GET("api/Histories")
+	Call<List<Historybean>> getAllItems();
 
-	@GET("api/Shippings/date/{date}")
-	Call<List<Shippingbean>> getItemsByDate(@Path("date") String location);
+	@GET("api/Histories/date/{date}")
+	Call<List<Historybean>> getItemsByDate(@Path("date") String location);
 	
-	@GET("api/Shippings/model/{modelNo}")
-	Call<List<Shippingbean>> getItemsByModelNo(@Path("modelNo") Integer modelNo);
-	@GET("api/Shippings/salesOrder/{salesOrder}")
-	Call<List<Shippingbean>> getItemsBySalesOrder(@Path("salesOrder") String modelNo);
+	@GET("api/Histories/model/{modelNo}")
+	Call<List<Historybean>> getItemsByModelNo(@Path("modelNo") Integer modelNo);
+	@GET("api/Histories/salesOrder/{salesOrder}")
+	Call<List<Historybean>> getItemsBySalesOrder(@Path("salesOrder") String modelNo);
 	//Post one item
 	/*@POST("/api/FGInventory")
 	Call<Itembean> createItem(@Body Itembean itembean);*/
 	
 	//Post ArrayList items
-	@POST("api/Shippings")
-	Call<List<Shippingbean>> createItem(@Body List<Shippingbean> itembean);
+	@POST("api/Histories")
+	Call<List<Historybean>> createItem(@Body List<Historybean> itembean);
 
 	/*//PUT one item
 	@PUT("/api/FGInventory/{seq}")
@@ -47,11 +48,11 @@ public interface ShippingCallback {
 
 	
 	//PUT more than one item
-	@PUT("/api/Shippings")
-	Call<List<Shippingbean>> updateItem(@Body List<Shippingbean> itembean);
+	@PUT("/api/Histories")
+	Call<List<Historybean>> updateItem(@Body List<Historybean> itembean);
 
 	//Delete no work
-	@DELETE("/api/Shippings/{seq}")
-	Call<Shippingbean> deleteItem(@Path("seq") Integer seq);
+	@DELETE("/api/Histories/{seq}")
+	Call<Historybean> deleteItem(@Path("seq") Integer seq);
 
 }
