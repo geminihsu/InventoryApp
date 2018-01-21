@@ -115,6 +115,7 @@ public class ShippingConfirm extends JPanel implements ActionListener, PropertyC
 	
 	private String orderItemsInfo ="";
 	private String historyItemsInfo ="";
+	private boolean isOrderClosed;
 	
 	private FGRepositoryImplRetrofit fgRepositoryImplRetrofit;
 	private OrdersRepositoryImplRetrofit ordersRepositoryImplRetrofit;
@@ -174,7 +175,7 @@ public class ShippingConfirm extends JPanel implements ActionListener, PropertyC
 		String shippToZip = salesOrderList.get(0).shipToZipCode;
 		String shippToVia = salesOrderList.get(0).shipVia;
 
-		boolean isClosed = salesOrderList.get(0).closed;
+		isOrderClosed = salesOrderList.get(0).closed;
 		// Locationbean title = Constrant.locations.get(locationbead);
 
 		orderFrame = new JFrame();
@@ -348,7 +349,7 @@ public class ShippingConfirm extends JPanel implements ActionListener, PropertyC
 				}
 			});
 
-			if (!isClosed)
+			if (!isOrderClosed)
 				orderFrame.getContentPane().add(scanner);
 			else {
 				// display the items
@@ -445,29 +446,7 @@ public class ShippingConfirm extends JPanel implements ActionListener, PropertyC
 		return items;
 	}
 
-	// delete item into shipping table
-	private List<Itembean> deleteInventory(List<Itembean> datas) {
-		FGRepositoryImplRetrofit fgInventory = new FGRepositoryImplRetrofit();
-		List<Itembean> items = null;
-		try {
-			items = (ArrayList<Itembean>) fgInventory.deleteItem(datas);
-			if (!items.isEmpty()) {
-				System.out.println(items.get(0).SN);
-				frame.dispose();
-				frame.setVisible(false);
-				JOptionPane.showMessageDialog(null, "Insert Data Success!");
-			}
-
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return items;
-	}
+	
 
 	// Insert item into shipping table
 	private void shippingItems(List<Historybean> datas) {
@@ -606,22 +585,22 @@ public class ShippingConfirm extends JPanel implements ActionListener, PropertyC
 		QueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
-				frame.dispose();
-				frame.setVisible(false);
-				
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						try {
+				if (salesOrderNo.getText().equals(""))
+					JOptionPane.showMessageDialog(null, "Please enter Sales Order Number.");
+				else {
+					EventQueue.invokeLater(new Runnable() {
+						public void run() {
+							try {
 
-							querySalesOrder(salesOrderNo.getText().toString().trim());
+								querySalesOrder(salesOrderNo.getText().toString().trim());
 
-						} catch (Exception e) {
-							e.printStackTrace();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
-					}
-				});
-			
-				
+					});
+				}
+
 			}
 		});
 
@@ -948,18 +927,32 @@ public class ShippingConfirm extends JPanel implements ActionListener, PropertyC
 			@Override
 			public void updateSalesOrder(List<CustOrderbean> orders) {
 
-				if (!orders.isEmpty() && !salesOrder.equals("")) {
-					System.out.println("update sucess");
-					if (!orders.get(0).closed)
-						shippingItems(scanItems);
-					else
-						getShippgingItems(orders.get(0).salesOrder, frame);
+				if (orders.isEmpty())
+					JOptionPane.showMessageDialog(null, "The sales order doesn't exit !");
+				else {
+					frame.dispose();
+					frame.setVisible(false);
 
-				} else {
-					salesOrderList = orders;
-					displayOrderInfo();
+					if (!orders.isEmpty() && !salesOrder.equals("")) {
+						System.out.println("update sucess");
+						EventQueue.invokeLater(new Runnable() {
+							public void run() {
+								try {
+									if (!isOrderClosed)
+										shippingItems(scanItems);
+									else
+										getShippgingItems(orders.get(0).salesOrder, frame);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+						});
+					} else {
+						salesOrderList = orders;
+						displayOrderInfo();
+					}
+
 				}
-
 			}
 
 		});

@@ -1,10 +1,8 @@
 package spirit.fitness.scanner.receving;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,11 +24,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
@@ -39,24 +36,18 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
-import com.mashape.unirest.http.HttpClientHelper;
-import com.mashape.unirest.http.HttpResponse;
 
-import okhttp3.internal.http.HttpHeaders;
-import okhttp3.internal.http1.Http1Codec;
-import spirit.fitness.scanner.AppMenu;
 import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
-import spirit.fitness.scanner.restful.HttpRestApi;
-import spirit.fitness.scanner.restful.ShippingRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
+import spirit.fitness.scanner.util.LoadingFrameHelper;
 import spirit.fitness.scanner.util.LocationHelper;
 import spirit.fitness.scanner.util.PrinterHelper;
 import spirit.fitness.scanner.zonepannel.ZoneMenu;
 import spirit.fitness.scanner.model.Itembean;
 
-public class ItemsPannel extends JPanel implements ActionListener, PropertyChangeListener {
+public class ItemsPannel {
 
 	public final static int RECEVING = 0;
 	public final static int MOVING = 1;
@@ -68,9 +59,11 @@ public class ItemsPannel extends JPanel implements ActionListener, PropertyChang
 
 	private ProgressMonitor progressMonitor;
 	private JButton btnDone;
-	private Task task;
 
 	private String result ="";
+	
+	private JProgressBar loading;
+	private LoadingFrameHelper loadingframe;
 	
 	private FGRepositoryImplRetrofit fgRepository;
 
@@ -212,17 +205,12 @@ public class ItemsPannel extends JPanel implements ActionListener, PropertyChang
 					JOptionPane.showMessageDialog(null, "Please scan bar code item!");
 				else {
 					items = inputSN.getText().toString();
+					frame.setVisible(false);
+					frame.dispose();
 
-					if (type == SHIPPING) {
-						displayTable(items, String.valueOf(Constrant.ZONE_CODE_SHIPPING), SHIPPING);
-					} else {
+					ZoneMenu window = new ZoneMenu(items, type);
+					window.frame.setVisible(true);
 
-						frame.setVisible(false);
-						frame.dispose();
-
-						ZoneMenu window = new ZoneMenu(items, type);
-						window.frame.setVisible(true);
-					}
 				}
 			}
 		});
@@ -241,11 +229,7 @@ public class ItemsPannel extends JPanel implements ActionListener, PropertyChang
 
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-
-	}
+	
 	
 	private void exceuteCallback() {
 		
@@ -257,26 +241,24 @@ public class ItemsPannel extends JPanel implements ActionListener, PropertyChang
 				// TODO Auto-generated method stub
 				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
 					JOptionPane.showMessageDialog(null, "Items already exit.");
-					task.cancel(true);
-					progressMonitor.close();
+					//task.cancel(true);
+					//progressMonitor.close();
 				}
 			}
 
 			@Override
 			public void getInventoryItems(List<Itembean> items) {
 				if (!items.isEmpty()) {
-					 progressMonitor.close();
-					 task.done();
+					 //progressMonitor.close();
+					 //task.done();
+					loading.setValue(50);
+					loadingframe.setVisible(false);
+					loadingframe.dispose();
+					
 					if (assignType == RECEVING) {
-
-						frame.dispose();
-						frame.setVisible(false);
 						JOptionPane.showMessageDialog(null, "Insert Data Success!");
 
 					} else if (assignType == MOVING) {
-
-						frame.dispose();
-						frame.setVisible(false);
 						JOptionPane.showMessageDialog(null, "Update Data Success!");
 
 					} 
@@ -360,35 +342,41 @@ public class ItemsPannel extends JPanel implements ActionListener, PropertyChang
 				// String result =
 				// "{\"Seq\":"+92+",\"SN\":\"1858151709001848\",\"Date\":\"2017-12-13
 				// 16:14:02.343\",\"Location\":\"051\",\"ModelNo\":\"185815\"}";
+				btnDone.setEnabled(false);
+				
+				//progressMonitor = new ProgressMonitor(ItemsPannel.this, "Please wait...", "", 0, 100);
+				
+				List<Itembean> items = new ArrayList<Itembean>();
+
+				String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+						.format(Calendar.getInstance().getTime());
+				for (String item : itemList) {
+					Itembean _item = new Itembean();
+
+					_item.SN = item;
+					_item.date = timeStamp;
+					_item.Location = location;
+					_item.ModelNo = item.substring(0, 6);
+					items.add(_item);
+
+				}
+				
+				
+				if(type == RECEVING) {
+					PrinterHelper print = new PrinterHelper();
+					print.printItems(content);
+				}
+				
+				loadingframe =new LoadingFrameHelper();
+				loading = loadingframe.loadingSample("Submit data...");
+		
+				exceuteCallback();
+				//displayLoadingBar();
 
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						try {
-							btnDone.setEnabled(false);
-							
-							progressMonitor = new ProgressMonitor(ItemsPannel.this, "Please wait...", "", 0, 100);
-							
-							List<Itembean> items = new ArrayList<Itembean>();
-
-							String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-									.format(Calendar.getInstance().getTime());
-							for (String item : itemList) {
-								Itembean _item = new Itembean();
-
-								_item.SN = item;
-								_item.date = timeStamp;
-								_item.Location = location;
-								_item.ModelNo = item.substring(0, 6);
-								items.add(_item);
-
-							}
-							
-							if(type == RECEVING) {
-								PrinterHelper print = new PrinterHelper();
-								print.printItems(content);
-							}
-							exceuteCallback();
-							displayLoadingBar();
+						
 							submitServer(type, items);
 
 						} catch (Exception e) {
@@ -435,60 +423,10 @@ public class ItemsPannel extends JPanel implements ActionListener, PropertyChang
 	private void displayLoadingBar() {
 	    progressMonitor.setProgress(0);
 
-		task = new Task();
-		task.addPropertyChangeListener(ItemsPannel.this);
-		task.execute();
-		btnDone.setEnabled(false);
+		
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if ("progress" == evt.getPropertyName()) {
-			int progress = (Integer) evt.getNewValue();
-			//progressMonitor.setProgress(progress);
-			String message = String.format("Completed %d%%.\n", progress);
-			progressMonitor.setNote(message);
-
-			if (progressMonitor.isCanceled() || task.isDone()) {
-				Toolkit.getDefaultToolkit().beep();
-				if (progressMonitor.isCanceled()) {
-					task.cancel(true);
-					// taskOutput.append("Task canceled.\n");
-				} else {
-					// taskOutput.append("Task completed.\n");
-				}
-				btnDone.setEnabled(true);
-			}
-		}
-
-	}
-
-	class Task extends SwingWorker<Void, Void> {
-		@Override
-		public Void doInBackground() {
-			Random random = new Random();
-			int progress = 0;
-			setProgress(0);
-			try {
-				Thread.sleep(1000);
-				while (progress < 100 && !isCancelled()) {
-					// Sleep for up to one second.
-					Thread.sleep(random.nextInt(1000));
-					// Make random progress.
-					progress += random.nextInt(10);
-					setProgress(Math.min(progress, 100));
-				}
-			} catch (InterruptedException ignore) {
-			}
-			return null;
-		}
-
-		@Override
-		public void done() {
-			Toolkit.getDefaultToolkit().beep();
-			btnDone.setEnabled(true);
-			progressMonitor.close();
-			
-		}
-	}
+	
+	
+	
 }

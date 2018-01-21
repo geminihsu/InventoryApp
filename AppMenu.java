@@ -1,5 +1,6 @@
 package spirit.fitness.scanner;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -20,16 +21,19 @@ import java.util.List;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.border.Border;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -54,15 +58,17 @@ import spirit.fitness.scanner.restful.listener.ModelsCallBackFunction;
 import spirit.fitness.scanner.restful.listener.ReportCallBackFunction;
 import spirit.fitness.scanner.shipping.ShippingConfirm;
 import spirit.fitness.scanner.util.EmailHelper;
+import spirit.fitness.scanner.util.LoadingFrameHelper;
 
 public class AppMenu implements ActionListener {
 
-	/**
-	 * Create the application.
-	 */
 
 	private JButton btnRecving, btnMoving, btnInQuiry, btnShipping, btnReport, btnModelQuantity;
 	private JFrame frame;
+	
+	private JProgressBar loading;
+	private LoadingFrameHelper loadingframe;
+	
 	private ReportRepositoryImplRetrofit fgReport;
 	private ModelRepositoryImplRetrofit fgModels;
 	private LocationRepositoryImplRetrofit localModels;
@@ -72,6 +78,8 @@ public class AppMenu implements ActionListener {
 		//EmailHelper.sendMail();
 		//JOptionPane.showMessageDialog(null, "Model 15516 less than 50. Please move more item from Zone 1.");
 		exceuteCallback();
+		loadingframe =new LoadingFrameHelper();
+		loading = loadingframe.loadingSample("Loading Data from Server...");
 		initialize();
 		loadReport();
 		loadModel();
@@ -208,7 +216,7 @@ public class AppMenu implements ActionListener {
 			@Override
 			public void getReportItems(List<Reportbean> items) {
 				Constrant.reports = items;
-
+				loading.setValue(30);
 			}
 
 		});
@@ -233,7 +241,8 @@ public class AppMenu implements ActionListener {
 				}
 
 				Constrant.models = map;
-
+				loading.setValue(60);
+				
 			}
 
 		});
@@ -257,7 +266,9 @@ public class AppMenu implements ActionListener {
 				}
 
 				Constrant.locations = map;
-
+				loading.setValue(80);
+				loadingframe.setVisible(false);
+				loadingframe.dispose();
 			}
 
 		});
@@ -326,5 +337,7 @@ public class AppMenu implements ActionListener {
 			x.printStackTrace();
 		}
 	}
+	
+	
 
 }

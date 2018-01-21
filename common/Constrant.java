@@ -9,7 +9,7 @@ import spirit.fitness.scanner.model.Modelbean;
 import spirit.fitness.scanner.model.Reportbean;
 
 public class Constrant {
-	public static String webUrl = "http://172.16.2.96:5000";
+	public static String webUrl = "http://172.16.80.1:5000";
 	
 	public static HashMap<String,Modelbean> models;
 	public static HashMap<String,Locationbean> locations;
