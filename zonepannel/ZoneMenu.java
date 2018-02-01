@@ -1,5 +1,7 @@
 package spirit.fitness.scanner.zonepannel;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.EventQueue;
@@ -10,12 +12,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.receving.ItemsPannel;
 import spirit.fitness.scanner.zonepannel.Zone2Location.Zone2CodeCallBackFunction;
 
@@ -43,12 +49,22 @@ public class ZoneMenu implements ActionListener {
 	 */
 	private void initialize() {
 
-		JFrame.setDefaultLookAndFeelDecorated(false);
-	    JDialog.setDefaultLookAndFeelDecorated(false);
+		//JFrame.setDefaultLookAndFeelDecorated(false);
+	    //JDialog.setDefaultLookAndFeelDecorated(false);
 		frame = new JFrame("FG Inventory App");
 		frame.setSize(600, 300);
 		frame.setLocationRelativeTo(null);
+		frame.setUndecorated (true);
+		frame.setResizable(false);
 		frame.setVisible(true);
+		
+		JPanel borderedPanel = new JPanel();
+
+	    //Use any border you want, eg a nice blue one
+	    borderedPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Constrant.FRAME_BORDER_BACKGROUN_COLOR));
+
+	    frame.setContentPane(borderedPanel);
+		
 		Container cp = frame.getContentPane();
 		cp.setLayout(new GridLayout(0, 2));
 
@@ -75,6 +91,48 @@ public class ZoneMenu implements ActionListener {
 		cp.add(btnReturn);
 		cp.add(btnDisplayRoom);
 
+		
+		JPanel exitControl = new JPanel();
+		exitControl.setLayout(new GridLayout(0, 3));
+		JButton exit = new JButton(new AbstractAction("Prev"){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				frame.setVisible(false);
+				
+				ItemsPannel window = new ItemsPannel(ItemsPannel.RECEVING);
+				window.frame.setVisible(true);
+			}
+		});
+		
+		JButton backButton = new JButton(new AbstractAction("Exit") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				frame.setVisible(false);
+			}
+		});
+		backButton.setBounds(500,20,50,50);
+		backButton.setFont(font);
+		backButton.setBackground(Constrant.BUTTON_BACKGROUN_COLOR);
+		
+		exit.setBounds(0,20,50,50);
+		exit.setFont(font);
+		exit.setBackground(Constrant.BUTTON_BACKGROUN_COLOR);
+		backButton.setBounds(0,20,50,50);
+		backButton.setFont(font);
+		
+		exitControl.add(exit);
+		exitControl.add(backButton);
+		
+		
+		
+		exitControl.setBackground(Constrant.TABLE_COLOR);
+		frame.getContentPane().setBackground(Constrant.TABLE_COLOR);
+		frame.getContentPane().add(exitControl);
+		
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -112,13 +170,15 @@ public class ZoneMenu implements ActionListener {
 
 		} else if (e.getSource() == btnDisplayRoom) {
 			if (showRoomCodeCallBackFunction != null) {
+				this.frame.setVisible(false);
+				this.frame.dispose();
 				showRoomCodeCallBackFunction.getZoneCode("888");
 			} else {
 				this.frame.setVisible(false);
 				this.frame.dispose();
 
 				ItemsPannel window = new ItemsPannel(items, "888", assignType);
-				window.frame.setVisible(true);
+				window.dialogFrame.setVisible(true);
 			}
 
 		}

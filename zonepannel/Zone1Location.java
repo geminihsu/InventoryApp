@@ -10,12 +10,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.receving.ItemsPannel;
 import spirit.fitness.scanner.zonepannel.ReturnLocation.ZoneCodeReturnCallBackFunction;
 
@@ -42,19 +46,28 @@ public class Zone1Location implements ActionListener {
 	 */
 	private void initialize() {
 
-		JFrame.setDefaultLookAndFeelDecorated(false);
-	    JDialog.setDefaultLookAndFeelDecorated(false);
 		frame = new JFrame("Zone 1 Layout");
-		frame.setSize(800, 600);
+		frame.setSize(900, 600);
 		frame.setLocationRelativeTo(null);
+		frame.setUndecorated (true);
+		frame.setResizable(false);
+		frame.setVisible(true);
+		
+		JPanel borderedPanel = new JPanel();
+
+	    //Use any border you want, eg a nice blue one
+	    borderedPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Constrant.FRAME_BORDER_BACKGROUN_COLOR));
+
+	    frame.setContentPane(borderedPanel);
+
 		frame.setVisible(true);
 		Container cp = frame.getContentPane();
-		cp.setLayout(new GridLayout(7, 10));
+		cp.setLayout(new GridLayout(0, 10));
 
 		btnZoneCode = new JButton[70];
 		Font font = new Font("Verdana", Font.BOLD, 18);
 
-		int index = 0;
+		int index = 1;
 
 		for (JButton btn : btnZoneCode) {
 			String label = "";
@@ -65,7 +78,14 @@ public class Zone1Location implements ActionListener {
 				label = "0";
 			btn = new JButton(label + String.valueOf(index));
 			btn.setFont(font);
+			
 			final String content = label + String.valueOf(index);
+			if(content.equals("070")) 
+			{
+				//btn.setForeground(Color.RED);
+				btn.setText("");
+				btn.setEnabled(false);
+			}
 			// btn.addActionListener(this);
 			btn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -78,8 +98,8 @@ public class Zone1Location implements ActionListener {
 						frame.dispose();
 						frame.setVisible(false);
 
-						ItemsPannel window = new ItemsPannel(items, content, assignType);
-						window.frame.setVisible(true);
+                        ItemsPannel window = new ItemsPannel(items, content, assignType);
+						window.dialogFrame.setVisible(true);
 					}
 
 				}
@@ -89,6 +109,50 @@ public class Zone1Location implements ActionListener {
 
 		}
 
+		JPanel exitControl = new JPanel();
+		exitControl.setLayout(new GridLayout(0, 1));
+		JButton exit = new JButton(new AbstractAction("Prev"){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				frame.setVisible(false);
+				
+				ZoneMenu window = new ZoneMenu(items, assignType);
+				window.frame.setVisible(true);
+			}
+		});
+		
+		JPanel backControl = new JPanel();
+		backControl.setLayout(new GridLayout(0, 1));
+		JButton backButton = new JButton(new AbstractAction("Exit") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				frame.setVisible(false);
+			}
+		});
+		backButton.setBounds(500,20,50,50);
+		backButton.setFont(font);
+		backButton.setBackground(Constrant.BUTTON_BACKGROUN_COLOR);
+		
+		exit.setBounds(0,20,50,50);
+		exit.setFont(font);
+		exit.setBackground(Constrant.BUTTON_BACKGROUN_COLOR);
+		backButton.setBounds(0,20,50,50);
+		backButton.setFont(font);
+		
+		exitControl.add(exit);
+		backControl.add(backButton);
+		
+		
+		
+		exitControl.setBackground(Constrant.TABLE_COLOR);
+		backControl.setBackground(Constrant.TABLE_COLOR);
+		frame.getContentPane().setBackground(Constrant.TABLE_COLOR);
+		frame.getContentPane().add(exitControl);
+		frame.getContentPane().add(backControl);
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {

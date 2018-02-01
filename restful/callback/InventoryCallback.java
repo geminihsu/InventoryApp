@@ -24,12 +24,25 @@ public interface InventoryCallback {
 	@Headers("Content-Type: application/json")
 	@GET("api/FGInventory")
 	Call<List<Itembean>> getAllItems();
+	
+	@PUT("api/FGInventory/SN/LocationInfo")
+	Call<List<Itembean>> getItemsLocationBySNList(@Body List<Itembean> itembean);
 
 	@GET("api/FGInventory/location/{location}")
 	Call<List<Itembean>> getItemsByLocation(@Path("location") Integer location);
 	
 	@GET("api/FGInventory/model/{modelNo}")
 	Call<List<Itembean>> getItemsByModelNo(@Path("modelNo") Integer modelNo);
+	
+	@GET("api/FGInventory/model/{modelNo}/location/{location}")
+	Call<List<Itembean>> getItemsByModelNoAndLocation(@Path("modelNo") Integer modelNo,@Path("location") Integer location);
+	
+	
+	@GET("api/FGInventory/model/{modelNo}/count/{count}")
+	Call<List<Itembean>> getItemsByModelNoAndCount(@Path("modelNo") Integer modelNo,@Path("count") Integer count);
+	
+	@GET("api/FGInventory/model/{modelNo}/date/{date}")
+	Call<List<Itembean>> getItemsByModelNoAndDate(@Path("modelNo") Integer modelNo,@Path("date") String date);
 	//Post one item
 	/*@POST("/api/FGInventory")
 	Call<Itembean> createItem(@Body Itembean itembean);*/

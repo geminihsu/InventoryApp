@@ -7,12 +7,16 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -61,7 +65,7 @@ public class QueryPannel implements ActionListener{
 	private FGRepositoryImplRetrofit fgRepository;
 
 	public QueryPannel() {
-		
+		QueryResult.isQueryRepeat = false;
 		initialZoneCodeCallback();
 		initialize();
 
@@ -84,14 +88,17 @@ public class QueryPannel implements ActionListener{
 					JOptionPane.showMessageDialog(null, "No Items");
 			   }else 
 			   {
+				   frame.dispose();
+				   frame.setVisible(false);
 				   
 				   QueryResult window = new QueryResult();
 				   if (queryType == QueryResult.QUERY_LOCATION)
 						window.setContent(QueryResult.QUERY_LOCATION, items);
-					else
+					else 
 						window.setContent(QueryResult.QUERY_MODEL, items);
 
-					window.frame.setVisible(true);
+				    if(window.resultFrame != null)
+				    	window.resultFrame.setVisible(true);
 				   
 			   }
 			}
@@ -143,19 +150,19 @@ public class QueryPannel implements ActionListener{
 	 */
 	public void initialize() {
 		
-		JFrame.setDefaultLookAndFeelDecorated(false);
-		JDialog.setDefaultLookAndFeelDecorated(false);
+		//JFrame.setDefaultLookAndFeelDecorated(false);
+		//JDialog.setDefaultLookAndFeelDecorated(false);
 		frame = new JFrame("Query Pannel");
 		// Setting the width and height of frame
 		frame.setSize(600, 400);
 		frame.setLocationRelativeTo(null);
-		 
-		/*
-		 * Creating panel. This is same as a div tag in HTML We can create several
-		 * panels and add them to specific positions in a JFrame. Inside panels we can
-		 * add text fields, buttons and other components.
-		 */
+		frame.setLocationRelativeTo(null);
+		frame.setUndecorated (true);
+		frame.setResizable(false); 
+		
 		JPanel panel = new JPanel();
+		panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Constrant.FRAME_BORDER_BACKGROUN_COLOR));
+		
 		panel.setBackground(Constrant.BACKGROUN_COLOR);
 		// adding panel to frame
 		frame.add(panel);
@@ -203,6 +210,11 @@ public class QueryPannel implements ActionListener{
 		modelLabel.setBounds(100, 100, 200, 25);
 		modelLabel.setFont(font);
 		panel.add(modelLabel);
+		
+		JLabel ltotal = new JLabel("");
+		ltotal.setFont(font);
+		ltotal.setBounds(230, 150, 250, 50);
+		panel.add(ltotal);
 
 		/*
 		 * Creating text field where user is supposed to enter user name.
@@ -210,23 +222,53 @@ public class QueryPannel implements ActionListener{
 		JTextField modelText = new JTextField(20);
 		modelText.setFont(font);
 		modelText.setBounds(230, 100, 320, 50);
+		modelText.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent event) {
+				System.out.println(modelText.getText().toString());
+
+				if (modelText.getText().toString().length() >= 6) {
+					String modelNo = modelText.getText().toString().substring(0,6);
+					Modelbean model = Constrant.models.get(modelNo);
+					if (model != null)
+						ltotal.setText(model.Model);
+					else
+						ltotal.setText("No model can be find.");
+				}
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent event) {
+				// System.out.println("key released");
+			}
+
+			@Override
+			public void keyPressed(KeyEvent event) {
+				// System.out.println("key pressed");
+			}
+		});
 		panel.add(modelText);
 
 		// Same process for password label and text field.
 		JLabel locationLabel = new JLabel("Location");
 		locationLabel.setFont(font);
-		locationLabel.setBounds(100, 150, 200, 50);
+		locationLabel.setBounds(100, 200, 200, 50);
 		panel.add(locationLabel);
 
 		locationText = new JTextField(20);
 		locationText.setFont(font);
-		locationText.setBounds(230, 150, 250, 50);
+		locationText.setBounds(230, 200, 250, 50);
+		
 		panel.add(locationText);
+		
+		
 
 		// Creating Map button
 		JButton MapButton = new JButton("Map");
 		MapButton.setFont(font);
-		MapButton.setBounds(470, 150, 80, 50);
+		MapButton.setBounds(470, 200, 80, 50);
 
 		MapButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -237,10 +279,10 @@ public class QueryPannel implements ActionListener{
 		panel.add(MapButton);
 
 		// Creating Query button
-		JButton QueryButton = new JButton("Query");
-		QueryButton.setFont(font);
-		QueryButton.setBounds(230, 250, 150, 50);
-		QueryButton.addActionListener(new ActionListener() {
+		JButton queryButton = new JButton("Find");
+		queryButton.setFont(font);
+		queryButton.setBounds(230, 260, 150, 50);
+		queryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
 				if (!verifyText(modelText.getText().toString(), locationText.getText().toString()))
@@ -263,31 +305,63 @@ public class QueryPannel implements ActionListener{
 
 			}
 		});
-		panel.add(QueryButton);
+		panel.add(queryButton);
 
 		// Creating Query button
-		JButton ResetButton = new JButton("Reset");
-		ResetButton.setFont(font);
-		ResetButton.setBounds(400, 250, 150, 50);
-		ResetButton.addActionListener(new ActionListener() {
+		JButton resetButton = new JButton("Clear");
+		resetButton.setFont(font);
+		resetButton.setBounds(400, 260, 150, 50);
+		resetButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				modelText.setText("");
 				locationText.setText("");
+				ltotal.setText("");
 			}
 		});
 
-		panel.add(ResetButton);
+		panel.add(resetButton);
+		
+		
+		// Creating Query button
+		JButton exitButton = new JButton("Exit");
+		exitButton.setFont(font);
+		exitButton.setBounds(230, 320, 320, 50);
+		exitButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				clearZoneCodeCallback();
+
+				frame.dispose();
+				frame.setVisible(false);
+			}
+		});
+
+		panel.add(exitButton);
 	}
 
 	private void passQueryResult(String modelNo, String Location) {
-		
-		queryType = (modelNo.equals("") && !Location.equals("")) ? QueryResult.QUERY_LOCATION: QueryResult.QUERY_MODEL;
+		if ((!modelNo.equals("") && !Location.equals("")))
+			queryType = QueryResult.QUERY_MODEL_LOCATION;
+		else
+			queryType = (modelNo.equals("") && !Location.equals("")) ? QueryResult.QUERY_LOCATION
+					: QueryResult.QUERY_MODEL;
 
-		if (queryType == QueryResult.QUERY_LOCATION) {
-		
+		if (queryType == QueryResult.QUERY_MODEL_LOCATION) {
+			try {
+				fgRepository.getItemsByModelAndLocation(Integer.valueOf(modelNo),Integer.valueOf(Location));
+
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} else if (queryType == QueryResult.QUERY_LOCATION) {
+
 			try {
 				fgRepository.getItemsByLocation(Integer.valueOf(Location));
-			
+
 			} catch (NumberFormatException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -304,7 +378,7 @@ public class QueryPannel implements ActionListener{
 
 			try {
 				fgRepository.getItemsByModel(Integer.valueOf(modelNo));
-				
+
 			} catch (NumberFormatException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

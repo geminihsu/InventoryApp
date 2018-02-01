@@ -55,6 +55,8 @@ public class JAVASwingFormExample {
 		frame.setBounds(100, 100, 730, 489);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		frame.setUndecorated (true);
+		frame.setResizable(false);
 	
 		textField = new JTextField();
 		textField.setBounds(128, 28, 86, 20);

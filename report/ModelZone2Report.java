@@ -30,6 +30,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -38,8 +39,6 @@ import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -56,46 +55,50 @@ import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HttpRestApi;
+import spirit.fitness.scanner.restful.ModelZoneMapRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.ShippingRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
+import spirit.fitness.scanner.restful.listener.ModelZone2CallBackFunction;
 import spirit.fitness.scanner.util.ExcelHelper;
+import spirit.fitness.scanner.util.LoadingFrameHelper;
 import spirit.fitness.scanner.util.LocationHelper;
 import spirit.fitness.scanner.util.PrinterHelper;
 import spirit.fitness.scanner.zonepannel.ZoneMenu;
 import spirit.fitness.scanner.model.Itembean;
+import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Reportbean;
 
-public class DailyReport  {
+public class ModelZone2Report {
 
 	public final static int REPORT = 0;
 	public final static int MIN_QUANTITY = 1;
 
 	public JFrame frame;
-	private String items;
+	private LoadingFrameHelper loadingframe;
+	private JProgressBar loading;
 
-	private ProgressMonitor progressMonitor;
-	private JButton btnDone;
+	private JButton btnDone, refreshDone;
 
-	private String result;
+	private ModelZoneMapRepositoryImplRetrofit fgModelZone2;
 
-	private int type;
-
-	public DailyReport(List<Reportbean> data, int _type) {
-		type = _type;
-
-		displayTable(data);
+	public ModelZone2Report(List<ModelZone2bean> data) {
+		loadingframe = new LoadingFrameHelper();
+		loading = loadingframe.loadingSample("Loading Data from Server...");
+		intialCallback();
+		loadModelZone2Map();
 
 	}
 
-	private void displayTable(List<Reportbean> data) {
+	private void displayTable(List<ModelZone2bean> data) {
 
 		JFrame.setDefaultLookAndFeelDecorated(false);
 		JDialog.setDefaultLookAndFeelDecorated(false);
+
 		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Item Result");
 		frame.setLocationRelativeTo(null);
-		frame.setBounds(50, 50, 1200, 600);
+		frame.setBounds(100, 100, 1000, 600);
 		frame.setUndecorated(true);
 		frame.setResizable(false);
 
@@ -106,7 +109,8 @@ public class DailyReport  {
 		frame.add(panel);
 
 		placeComponents(panel, data);
-
+		loadingframe.setVisible(false);
+		loadingframe.dispose();
 		// frame.setLocationRelativeTo(null);
 		// frame.setSize(1000, 500);
 		frame.setVisible(true);
@@ -122,7 +126,7 @@ public class DailyReport  {
 
 	}
 
-	private void placeComponents(JPanel panel, List<Reportbean> data) {
+	private void placeComponents(JPanel panel, List<ModelZone2bean> data) {
 
 		/*
 		 * We will discuss about layouts in the later sections of this tutorial. For now
@@ -138,76 +142,25 @@ public class DailyReport  {
 
 		String timeStamp = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 
-		Object rowDataReport[][] = new Object[10][12];
+		Object rowDataReport[][] = new Object[data.size()][5];
 		System.out.println(data.size());
 
-		int prevTotal = 0;
-		int shippedTotal = 0;
-		int receivedTotal = 0;
-		int scrappedTotal = 0;
-		int shippableOnHandTotal = 0;
-		int returnUnshippableTotal = 0;
-		int showroom = 0;
-		int reworkTotal = 0;
-		int qcTotal = 0;
-		int Total = 0;
-		
-		for (int i = 0; i < 10; i++) {
-
-			/*if (i == 10) {
-				for (int j = 0; j < 12; j++) {
-					rowDataReport[i][0] = " TOTAL";
-					rowDataReport[i][1] = "";
-					rowDataReport[i][2] = prevTotal;
-					rowDataReport[i][3] = shippedTotal;
-					rowDataReport[i][4] = receivedTotal;
-					rowDataReport[i][5] = scrappedTotal;
-					rowDataReport[i][6] = shippableOnHandTotal;
-					rowDataReport[i][7] = returnUnshippableTotal;
-					;
-					rowDataReport[i][8] = showroom;
-					rowDataReport[i][9] = reworkTotal;
-					rowDataReport[i][10] = qcTotal;
-					rowDataReport[i][11] = Total;
-				}
-			} else {*/
-				for (int j = 0; j < 12; j++) {
-					rowDataReport[i][0] = " " + data.get(i).Model;
-					rowDataReport[i][1] = data.get(i).FG;
-					rowDataReport[i][2] = data.get(i).total;
-					rowDataReport[i][3] = data.get(i).unshippable;
-					rowDataReport[i][4] = data.get(i).zone1;
-					rowDataReport[i][5] = data.get(i).unshippable;
-					rowDataReport[i][6] = data.get(i).zone1;
-					rowDataReport[i][7] = data.get(i).returnItem;
-
-					rowDataReport[i][8] = data.get(i).showRoom;
-					rowDataReport[i][9] = data.get(i).total;
-					rowDataReport[i][10] = data.get(i).showRoom;
-					rowDataReport[i][11] = data.get(i).total;
-					
-					prevTotal += data.get(i).total;
-					shippedTotal += data.get(i).unshippable;
-					receivedTotal += data.get(i).zone1;
-					scrappedTotal += data.get(i).unshippable;
-					shippableOnHandTotal += data.get(i).zone1;
-					returnUnshippableTotal += data.get(i).returnItem;
-					showroom += data.get(i).showRoom;
-					reworkTotal += data.get(i).total;
-					qcTotal += data.get(i).showRoom;
-					Total += data.get(i).total;
-					
-				//}
+		for (int i = 0; i < data.size(); i++) {
+			for (int j = 0; j < 5; j++) {
+				rowDataReport[i][0] = " "+data.get(i).Model;
+				rowDataReport[i][1] = " "+data.get(i).FG;
+				rowDataReport[i][2] = data.get(i).Z2CurtQty;
+				rowDataReport[i][3] = data.get(i).Zone1Code;
+				rowDataReport[i][4] = data.get(i).Zone2Code;
 			}
 		}
 
 		String zone = "";
 
-		Object columnNames[] = { "Model#", "FG", "Previous", "Shipped", "Received", "Scrapped", "Shippable/On Hand", "Return/Unshippable",
-				"ShowRoom", "Rework","QC","Total" };
-		Font font = new Font("Verdana", Font.BOLD, 15);
-		final Class[] columnClass = new Class[] { String.class, String.class, Integer.class, Integer.class,
-				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class };
+		Object columnNames[] = { "Model#", "FG", "Quantity", "From(Zone 1)", "To(Zone 2)" };
+		Font font = new Font("Verdana", Font.BOLD, 18);
+		final Class[] columnClass = new Class[] { String.class, String.class, Integer.class, String.class,
+				String.class };
 
 		DefaultTableModel model = new DefaultTableModel(rowDataReport, columnNames) {
 			@Override
@@ -222,10 +175,6 @@ public class DailyReport  {
 			}
 		};
 
-	
-
-		
-
 		JTable table = new JTable(model);
 		table.getTableHeader().setFont(font);
 		table.getTableHeader().setBackground(Constrant.DISPALY_ITEMS_TABLE_COLOR);
@@ -233,61 +182,31 @@ public class DailyReport  {
 		table.setFont(font);
 		table.setRowHeight(40);
 		TableColumn modelNo = table.getColumnModel().getColumn(0);
-		modelNo.setPreferredWidth(90);
+		modelNo.setPreferredWidth(20);
 		TableColumn modelTitle = table.getColumnModel().getColumn(1);
-		modelTitle.setPreferredWidth(180);
-		TableColumn prevCcolumn = table.getColumnModel().getColumn(2);
-		prevCcolumn.setPreferredWidth(90);
-		TableColumn shippingColumn = table.getColumnModel().getColumn(3);
-		shippingColumn.setPreferredWidth(90);
-		TableColumn receivedColumn = table.getColumnModel().getColumn(4);
-		receivedColumn.setPreferredWidth(100);
-		TableColumn scrappedColumn = table.getColumnModel().getColumn(5);
-		scrappedColumn.setPreferredWidth(100);
-		TableColumn onHand = table.getColumnModel().getColumn(6);
-		onHand.setPreferredWidth(200);
-		TableColumn returnQty = table.getColumnModel().getColumn(7);
-		returnQty.setPreferredWidth(200);
-		TableColumn column = table.getColumnModel().getColumn(8);
-		column.setPreferredWidth(120);
-		
-		TableColumn qCcolumn = table.getColumnModel().getColumn(10);
-		qCcolumn.setPreferredWidth(50);
+		modelTitle.setPreferredWidth(200);
+		TableColumn qtycolumn = table.getColumnModel().getColumn(2);
+		qtycolumn.setPreferredWidth(10);
 		table.setCellSelectionEnabled(false);
 		table.setColumnSelectionAllowed(false);
 		table.setEnabled(false);
 
-	
 		int heigh = 0;
-
-		if (50 * rowDataReport.length + 20 > 530)
+		System.out.println(""+50 * rowDataReport.length + 20);
+		if (50 * rowDataReport.length + 20 > 55020)
 			heigh = 530;
 		else
-			heigh = 430;
-		scrollZonePane.setBounds(5, 5, 1190, 427);
-		
+			heigh = 40 * rowDataReport.length + 32;
+
+		scrollZonePane.setBounds(10, 10, 980, heigh);
 		scrollZonePane.setViewportView(table);
 
 		panel.add(scrollZonePane);
-		
-		Border border = LineBorder.createBlackLineBorder();
-		
-		JLabel modelLabel = new JLabel(" Total                                          "+prevTotal+"             "+shippedTotal+"      "+receivedTotal+"               "+shippedTotal+"                       "+receivedTotal+"                                "+shippedTotal+"                   "+shippedTotal + "  "+receivedTotal+"       "+shippedTotal+ " "+receivedTotal);
-		
-		modelLabel.setBounds(5, 418, 1190, 50);
-		modelLabel.setOpaque(true);
-		modelLabel.setBackground(Constrant.DISPALY_ITEMS_TABLE_COLOR);
-		modelLabel.setFont(font);
-		modelLabel.setBorder(border);
-		panel.add(modelLabel);
-		
-		Font btnFont = new Font("Verdana", Font.BOLD, 18);
-		btnDone = new JButton("Export To Excel");
-		btnDone.setFont(btnFont);
-		btnDone.setBounds(5, 520, 200, 50);
 
-		if (type == MIN_QUANTITY)
-			btnDone.setText("Update Model Quantity");
+		btnDone = new JButton("Export To Excel");
+		btnDone.setFont(font);
+		btnDone.setBounds(5, 540, 200, 50);
+
 		btnDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -296,13 +215,12 @@ public class DailyReport  {
 						try {
 							ExcelHelper exp = new ExcelHelper();
 
-							if (type == REPORT) {
-								exp.fillData(table,
-										new File("C:\\Users\\geminih\\Downloads\\" + timeStamp + "_report.xls"));
+							exp.fillData(table,
+									new File("C:\\Users\\geminih\\Downloads\\" + timeStamp + "_report.xls"));
 
-								JOptionPane.showMessageDialog(null, "Export " + timeStamp + ".xls' successfully",
-										"Message", JOptionPane.INFORMATION_MESSAGE);
-							}
+							JOptionPane.showMessageDialog(null, "Export " + timeStamp + ".xls' successfully", "Message",
+									JOptionPane.INFORMATION_MESSAGE);
+
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -313,9 +231,27 @@ public class DailyReport  {
 		});
 		panel.add(btnDone);
 
+		refreshDone = new JButton("Refresh");
+		refreshDone.setFont(font);
+		refreshDone.setBounds(220, 540, 200, 50);
+
+		refreshDone.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				refreshDone.setEnabled(false);
+				loadingframe = new LoadingFrameHelper();
+				loading = loadingframe.loadingSample("Loading Data from Server...");
+				loading.setValue(50);
+				frame.dispose();
+				frame.setVisible(false);
+				frame = null;
+				loadModelZone2Map();
+			}
+		});
+		panel.add(refreshDone);
+
 		JButton exitDone = new JButton("Exit");
-		exitDone.setFont(btnFont);
-		exitDone.setBounds(220, 520, 200, 50);
+		exitDone.setFont(font);
+		exitDone.setBounds(430, 540, 200, 50);
 
 		exitDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -324,8 +260,59 @@ public class DailyReport  {
 			}
 		});
 		panel.add(exitDone);
+
 	}
 
+	private void intialCallback() {
+		fgModelZone2 = new ModelZoneMapRepositoryImplRetrofit();
+		fgModelZone2.setinventoryServiceCallBackFunction(new ModelZone2CallBackFunction() {
+
+			@Override
+			public void resultCode(int code) {
+				// TODO Auto-generated method stub
+				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
+
+				}
+			}
+
+			@Override
+			public void getReportItems(List<ModelZone2bean> items) {
+
+				if (refreshDone != null)
+					refreshDone.setEnabled(true);
+				loading.setValue(100);
+				Constrant.modelZone2List = items;
+				displayTable(items);
+				java.awt.EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						frame.toFront();
+						frame.repaint();
+					}
+				});
+			}
+
+		});
+	}
+
+	// Loading Models data from Server
+	private void loadModelZone2Map() {
+
+		// loading model and location information from Server
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+
+					fgModelZone2.getAllItems();
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+	}
+	
 	
 
 }

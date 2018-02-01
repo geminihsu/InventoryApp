@@ -5,16 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 
 import spirit.fitness.scanner.model.Locationbean;
+import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Modelbean;
 import spirit.fitness.scanner.model.Reportbean;
 
 public class Constrant {
-	public static String webUrl = "http://172.16.80.1:5000";
+	public static String webUrl = "http://172.16.2.96:5000";
 	
 	public static HashMap<String,Modelbean> models;
 	public static HashMap<String,Locationbean> locations;
 	public static List<Reportbean> reports;
-	 
+	public static List<ModelZone2bean> modelZone2List;
+
+	
 	//Zone mapping Table key : zone number, value : location number
     public static int ZONE_CODE_LEN_LIMIT = 3;
     public static int ZONE_CODE_1 = 1;
@@ -42,9 +45,13 @@ public class Constrant {
     
     //Java form color define
     public static Color BACKGROUN_COLOR = new java.awt.Color(235, 240, 255);
+    public static Color FRAME_BORDER_BACKGROUN_COLOR = new java.awt.Color(94, 134, 193);
     public static Color TABLE_COLOR = new java.awt.Color(255, 255, 255);
     public static Color DISPALY_ITEMS_TABLE_COLOR = new java.awt.Color(255, 255, 240);
+    public static Color BUTTON_PANEL_BACKGROUND_COLOR = new java.awt.Color(230, 230, 250);
+    public static Color BUTTON_BACKGROUN_COLOR = new java.awt.Color(255, 255, 240);
     
+     
 
     
 }

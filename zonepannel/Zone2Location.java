@@ -10,12 +10,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.receving.ItemsPannel;
 import spirit.fitness.scanner.zonepannel.Zone1Location.Zone1CodeCallBackFunction;
 
@@ -43,11 +47,22 @@ public class Zone2Location implements ActionListener {
 	 */
 	private void initialize() {
 
-		JFrame.setDefaultLookAndFeelDecorated(false);
-	    JDialog.setDefaultLookAndFeelDecorated(false);
+		//JFrame.setDefaultLookAndFeelDecorated(false);
+	    //JDialog.setDefaultLookAndFeelDecorated(false);
 		frame = new JFrame("Zone 2 Layout");
-		frame.setSize(600, 600);
+		frame.setSize(600, 780);
 		frame.setLocationRelativeTo(null);
+		frame.setUndecorated (true);
+		frame.setResizable(false);
+		frame.setVisible(true);
+		
+		JPanel borderedPanel = new JPanel();
+
+	    //Use any border you want, eg a nice blue one
+	    borderedPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Constrant.FRAME_BORDER_BACKGROUN_COLOR));
+
+	    frame.setContentPane(borderedPanel);
+
 		frame.setVisible(true);
 		Container cp = frame.getContentPane();
 		cp.setLayout(new GridLayout(0, 2));
@@ -87,6 +102,7 @@ public class Zone2Location implements ActionListener {
 			});
 
 			if (index == 722 || index == 772) {
+				btn.setText("");
 				btn.setEnabled(false);
 			}
 
@@ -101,7 +117,46 @@ public class Zone2Location implements ActionListener {
 			}
 
 		}
+		
+		JPanel exitControl = new JPanel();
+		exitControl.setLayout(new GridLayout(0, 2));
+		JButton exit = new JButton(new AbstractAction("Prev"){
 
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				frame.setVisible(false);
+				
+				ZoneMenu window = new ZoneMenu(items, assignType);
+				window.frame.setVisible(true);
+			}
+		});
+		
+		JButton backButton = new JButton(new AbstractAction("Exit") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				frame.setVisible(false);
+			}
+		});
+		backButton.setBounds(500,20,50,80);
+		backButton.setFont(font);
+		backButton.setBackground(Constrant.BUTTON_BACKGROUN_COLOR);
+		
+		exit.setBounds(0,20,50,50);
+		exit.setFont(font);
+		exit.setBackground(Constrant.BUTTON_BACKGROUN_COLOR);
+		backButton.setBounds(0,20,50,80);
+		backButton.setFont(font);
+		
+		exitControl.add(exit);
+		exitControl.add(backButton);
+		
+		
+		exitControl.setBackground(Constrant.TABLE_COLOR);
+		frame.getContentPane().setBackground(Constrant.TABLE_COLOR);
+		frame.getContentPane().add(exitControl);
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {

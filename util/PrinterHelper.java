@@ -89,7 +89,8 @@ public class PrinterHelper {
 	    PageFormat pf = new PageFormat();
 	    Paper paperSize = new Paper();
 	    paperSize.setSize(594.936, 841.536);
-	    pf.setOrientation(PageFormat.PORTRAIT);
+	    pf.setOrientation(PageFormat.LANDSCAPE);
+	   
 	 
 	    job.setPrintable(new PrintFunction(content));
 	    boolean doPrint = job.printDialog();
