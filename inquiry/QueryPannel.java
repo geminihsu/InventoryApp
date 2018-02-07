@@ -52,7 +52,7 @@ import spirit.fitness.scanner.zonepannel.ZoneMenu;
 import spirit.fitness.scanner.zonepannel.ReturnLocation.ZoneCodeReturnCallBackFunction;
 
 public class QueryPannel implements ActionListener{
-
+	public final static int INQUIRY = 3;
 	public JFrame frame;
 	private JTextField locationText;
 	private ReturnLocation zoneCodeReturn;
@@ -88,6 +88,7 @@ public class QueryPannel implements ActionListener{
 					JOptionPane.showMessageDialog(null, "No Items");
 			   }else 
 			   {
+				   clearZoneCodeCallback();
 				   frame.dispose();
 				   frame.setVisible(false);
 				   
@@ -101,6 +102,12 @@ public class QueryPannel implements ActionListener{
 				    	window.resultFrame.setVisible(true);
 				   
 			   }
+			}
+
+			@Override
+			public void checkInventoryItems(List<Itembean> items) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		zoneCodeReturn = new ReturnLocation(null,-1);
@@ -272,7 +279,7 @@ public class QueryPannel implements ActionListener{
 
 		MapButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ZoneMenu window = new ZoneMenu(null, 0);
+				ZoneMenu window = new ZoneMenu(null, INQUIRY);
 				window.frame.setVisible(true);
 			}
 		});
@@ -347,6 +354,11 @@ public class QueryPannel implements ActionListener{
 
 		if (queryType == QueryResult.QUERY_MODEL_LOCATION) {
 			try {
+				if (modelNo.length() > 6) {
+					// from scanner
+					modelNo = modelNo.substring(0, 6);
+				}
+				
 				fgRepository.getItemsByModelAndLocation(Integer.valueOf(modelNo),Integer.valueOf(Location));
 
 			} catch (NumberFormatException e) {
@@ -428,6 +440,17 @@ public class QueryPannel implements ActionListener{
 		if(showRoom.getShowRoomCodeCallBackFunction()!=null)
 			showRoom.clearShowRoomCodeCallBackFunction();
 		
+		if(ZoneMenu.showRoomCodeCallBackFunction != null)
+			ZoneMenu.showRoomCodeCallBackFunction = null;
+		
+		if(ZoneMenu.qcCodeCallBackFunction != null)
+			ZoneMenu.qcCodeCallBackFunction = null;
+		
+		if(ZoneMenu.reworkCodeCallBackFunction != null)
+			ZoneMenu.reworkCodeCallBackFunction = null;
+		
+		if(ZoneMenu.scrappedCodeCallbackFunction != null)
+			ZoneMenu.scrappedCodeCallbackFunction = null;
 		
 	}
 	

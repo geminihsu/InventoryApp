@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import spirit.fitness.scanner.model.Locationbean;
+import spirit.fitness.scanner.model.ModelDailyReportbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Modelbean;
 import spirit.fitness.scanner.model.Reportbean;
@@ -15,6 +16,7 @@ public class Constrant {
 	public static HashMap<String,Modelbean> models;
 	public static HashMap<String,Locationbean> locations;
 	public static List<Reportbean> reports;
+	public static List<ModelDailyReportbean> dailyReport;
 	public static List<ModelZone2bean> modelZone2List;
 
 	
@@ -24,6 +26,10 @@ public class Constrant {
     public static int ZONE_CODE_2 = 2;
     public static int ZONE_CODE_3 = 3;
     public static int ZONE_CODE_4 = 4;
+    public static int ZONE_CODE_5 = 5;
+    public static int ZONE_CODE_6 = 6;
+    public static int ZONE_CODE_7 = 7;
+    
     //Zone 1 range
     public static int ZONE_CODE_1_MIN = 0;
     public static int ZONE_CODE_1_MAX = 69;
@@ -38,6 +44,15 @@ public class Constrant {
     public static int ZONE_CODE_3_D = 911;
     //Zone 4 range
     public static int ZONE_CODE_4_ONE = 888;
+    
+    //Rework range
+    public static int ZONE_CODE_5_ONE = 555;
+    
+    //QC range
+    public static int ZONE_CODE_6_ONE = 666;
+    
+    //Scrapped range
+    public static int ZONE_CODE_7_ONE = 777;
     
     //Shipping
     public static int ZONE_CODE_SHIPPING = 999;

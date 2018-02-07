@@ -70,6 +70,7 @@ public class ItemsPannel {
 	public JFrame frame;
 	public JFrame scanResultFrame;
 	public JFrame dialogFrame;
+	private JTextArea inputSN;
 	private String items;
 	private String result;
 	private int assignType;
@@ -84,7 +85,7 @@ public class ItemsPannel {
 	public ItemsPannel(int type) {
 		assignType = type;
 		// initialize(type);
-		scanInfo(type);
+		scanInfo("",type);
 
 	}
 
@@ -97,7 +98,7 @@ public class ItemsPannel {
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	public void scanInfo(int type) {
+	public void scanInfo(String prevTxt,int type) {
 
 		scanResultFrame = new JFrame("");
 		// Setting the width and height of frame
@@ -112,7 +113,7 @@ public class ItemsPannel {
 		// adding panel to frame
 		scanResultFrame.add(panel);
 
-		scanPannel(panel, type);
+		scanPannel(panel,prevTxt, type);
 
 		scanResultFrame.setBackground(Color.WHITE);
 		scanResultFrame.setVisible(true);
@@ -128,7 +129,7 @@ public class ItemsPannel {
 
 	}
 
-	private void scanPannel(JPanel panel, int type) {
+	private void scanPannel(JPanel panel,String prevTxt, int type) {
 
 		panel.setLayout(null);
 		Font font = new Font("Verdana", Font.BOLD, 18);
@@ -138,7 +139,7 @@ public class ItemsPannel {
 		ltotal.setBounds(35, 550, 200, 50);
 		panel.add(ltotal);
 
-		JTextArea inputSN = new JTextArea(20, 15);
+		inputSN = new JTextArea(20, 15);
 		String content = "";
 
 		for (int i = 1; i < 10; i++) {
@@ -152,7 +153,7 @@ public class ItemsPannel {
 		}
 		content += "1580121308111250\n";
 
-		// inputSN.setText(content);
+		inputSN.setText(prevTxt);
 
 		InputMap input = inputSN.getInputMap();
 		KeyStroke enter = KeyStroke.getKeyStroke("ENTER");
@@ -166,7 +167,7 @@ public class ItemsPannel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// submitText();
-				//System.out.println(TEXT_SUBMIT);
+				// System.out.println(TEXT_SUBMIT);
 				inputSN.setText(inputSN.getText().toString() + "\n");
 				String prev = inputSN.getText().toString();
 				String[] item = inputSN.getText().toString().split("\n");
@@ -181,8 +182,6 @@ public class ItemsPannel {
 
 				}
 
-				
-
 				if (lenError) {
 
 					inputSN.setText(prev);
@@ -195,58 +194,7 @@ public class ItemsPannel {
 			}
 		});
 
-		/*
-		 * inputSN.addKeyListener(new KeyListener() {
-		 * 
-		 * @Override public void keyTyped(KeyEvent event) { String prev =
-		 * inputSN.getText().toString(); String[] item =
-		 * inputSN.getText().toString().split("\n"); HashSet<String> set = new
-		 * HashSet<String>();
-		 * 
-		 * boolean lenError = false; for (String s : item) { // if(s.length() == 16)
-		 * set.add(s); // else // lenError = true; }
-		 * 
-		 * // if(lenError) // { // prev = prev.substring(0,prev.length() -
-		 * (item[item.length-1].length())); // inputSN.setText(prev); //
-		 * ltotal.setForeground(Color.RED); //
-		 * ltotal.setText("<html>"+item[item.length-1] +"</br> size Error.</html>"); //
-		 * }else { ltotal.setForeground(Color.BLACK); ltotal.setText("Total: " +
-		 * set.size()); } }
-		 * 
-		 * @Override public void keyReleased(KeyEvent event) {
-		 * //System.out.println("key released"); }
-		 * 
-		 * @Override public void keyPressed(KeyEvent event) { //
-		 * System.out.println("key pressed"); } });
-		 */
-
-		// inputSN.getDocument().addDocumentListener(new DocumentListener() {
-		//
-		// @Override
-		// public void removeUpdate(DocumentEvent e) {
-		// ltotal.setText("Total: " + inputSN.getLineCount());
-		// }
-		//
-		// @Override
-		// public void insertUpdate(DocumentEvent e) {
-		// String[] item = inputSN.getText().toString().split("\n");
-		// if (item.length > 1)
-		// ltotal.setText("Total: " + item.length);
-		// else
-		// ltotal.setText("0");
-		// if (e.getLength() > 1 && e.getLength() < 16) {
-		// JOptionPane.showMessageDialog(null, "Serial Number Error!");
-		// }
-		//
-		// // System.out.println(e.getLength());
-		// }
-		//
-		// @Override
-		// public void changedUpdate(DocumentEvent arg0) {
-		//
-		// }
-		// });
-
+		
 		JScrollPane scrollPanel1 = new JScrollPane(inputSN);
 		scrollPanel1.setBounds(35, 50, 265, 500);
 		inputSN.setFont(font);
@@ -260,16 +208,9 @@ public class ItemsPannel {
 			public void actionPerformed(ActionEvent arg0) {
 
 				if (inputSN.getText().isEmpty())
-					JOptionPane.showMessageDialog(null, "Please scan barcode.");
+					JOptionPane.showMessageDialog(null, "Please scan serial number.");
 				else {
-					/*
-					 * int result = JOptionPane.showConfirmDialog(frame,
-					 * "Do you want to assign the all item to 000 location?",
-					 * "The app will be close", JOptionPane.YES_NO_OPTION,
-					 * JOptionPane.WARNING_MESSAGE); if (result == JOptionPane.YES_OPTION) {
-					 * //displayTable(inputSN.getText().toString(), "000", type);
-					 * disScanResultFrame(inputSN.getText().toString(), "000", type); }
-					 */
+					
 					displayScanResultFrame(inputSN.getText().toString(), "000", type);
 				}
 			}
@@ -284,15 +225,43 @@ public class ItemsPannel {
 		locateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (inputSN.getText().isEmpty())
-					JOptionPane.showMessageDialog(null, "Please scan bar code item!");
+					JOptionPane.showMessageDialog(null, "Please scan serial number.");
 				else {
 
 					items = inputSN.getText().toString();
 					scanResultFrame.setVisible(false);
 					scanResultFrame.dispose();
 
-					ZoneMenu window = new ZoneMenu(items, type);
-					window.frame.setVisible(true);
+					if (type == MOVING) {
+						loadingframe = new LoadingFrameHelper();
+						loading = loadingframe.loadingSample("Checking data...");
+
+						String[] itemList = items.split("\n");
+						
+						if(itemList.length == 0 && !inputSN.getText().toString().equals(""))
+						{
+							itemList = new String[0];
+							itemList[0] = inputSN.getText().toString();
+						}	
+							
+						List<Itembean> items = new ArrayList<Itembean>();
+
+						String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+								.format(Calendar.getInstance().getTime());
+						for (String item : itemList) {
+							Itembean _item = new Itembean();
+
+							_item.SN = item;
+							_item.ModelNo = item.substring(0, 6);
+							items.add(_item);
+
+						}
+						exceuteCallback();
+						checkItemExits(items);
+					} else {
+						ZoneMenu window = new ZoneMenu(items, type);
+						window.frame.setVisible(true);
+					}
 
 				}
 			}
@@ -358,6 +327,9 @@ public class ItemsPannel {
 
 			@Override
 			public void getInventoryItems(List<Itembean> items) {
+				
+				
+				
 				if (!items.isEmpty()) {
 					// progressMonitor.close();
 					// task.done();
@@ -368,7 +340,9 @@ public class ItemsPannel {
 					if (assignType == RECEVING) {
 						JOptionPane.showMessageDialog(null, "Insert Data Success!");
 
-					} else if (assignType == MOVING) {
+					}
+					
+					if (assignType == MOVING) {
 						JOptionPane.showMessageDialog(null, "Update Data Success!");
 
 					}
@@ -378,9 +352,28 @@ public class ItemsPannel {
 						scanResultFrame.setVisible(false);
 					}
 
-					dialogFrame.dispose();
-					dialogFrame.setVisible(false);
+					if (dialogFrame != null) {
+						dialogFrame.dispose();
+						dialogFrame.setVisible(false);
+					}
 				}
+			}
+
+			@Override
+			public void checkInventoryItems(List<Itembean> items) {
+				if (assignType == MOVING) {
+					loadingframe.setVisible(false);
+					loadingframe.dispose();
+					// JOptionPane.showMessageDialog(null, "Update Data Success!");
+					if (items.size() == 0) {
+						
+						ZoneMenu window = new ZoneMenu(inputSN.getText().toString(), MOVING);
+						window.frame.setVisible(true);
+					} else {
+						checkScanResultFrame(items);
+					}
+				}
+				
 			}
 		});
 
@@ -556,8 +549,10 @@ public class ItemsPannel {
 			result = "SN : " + Integer.valueOf(((String) sortedList.get(0)).substring(10, 16)) + "~"
 					+ Integer.valueOf(((String) sortedList.get(sortedList.size() - 1)).substring(10, 16));
 		// else if (noContinue.size() == 0 && sortedList.size() > 1)
-		//result = "SN : " + Integer.valueOf(((String) sortedList.get(0)).substring(10, 16)) + "~"
-		//		+ Integer.valueOf(((String) sortedList.get(sortedList.size() - 1)).substring(10, 16));
+		// result = "SN : " + Integer.valueOf(((String) sortedList.get(0)).substring(10,
+		// 16)) + "~"
+		// + Integer.valueOf(((String) sortedList.get(sortedList.size() -
+		// 1)).substring(10, 16));
 		// else {
 		// result = "SN : " + Integer.valueOf(((String) sortedList.get(0)).substring(10,
 		// 16)) + "~" + (skip - 1);
@@ -608,7 +603,7 @@ public class ItemsPannel {
 		panel.add(modelLabel);
 
 		JButton ok = new JButton("Confirm");
-		ok.setBounds(50, 330, 200, 50);
+		ok.setBounds(50, 330, 150, 50);
 		ok.setFont(font);
 		panel.add(ok);
 
@@ -665,8 +660,22 @@ public class ItemsPannel {
 			}
 		});
 
-		JButton cancel = new JButton("Cancel");
-		cancel.setBounds(350, 330, 200, 50);
+		JButton prev = new JButton("Prev");
+		prev.setBounds(220, 330, 150, 50);
+		prev.setFont(font);
+		panel.add(prev);
+
+		prev.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dialogFrame.dispose();
+				dialogFrame.setVisible(false);
+				dialogFrame = null;
+				scanInfo(content,assignType);
+			}
+		});
+		
+		JButton cancel = new JButton("Exit");
+		cancel.setBounds(400, 330, 150, 50);
 		cancel.setFont(font);
 		panel.add(cancel);
 
@@ -676,6 +685,98 @@ public class ItemsPannel {
 				dialogFrame.setVisible(false);
 			}
 		});
+
+		// frame.setUndecorated(true);
+		// frame.getRootPane().setWindowDecorationStyle(JRootPane.COLOR_CHOOSER_DIALOG);
+		dialogFrame.setBackground(Color.WHITE);
+		dialogFrame.setVisible(true);
+		// frame.setDefaultLookAndFeelDecorated(true);
+		dialogFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		dialogFrame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+
+				dialogFrame.dispose();
+				dialogFrame.setVisible(false);
+			}
+		});
+	}
+
+	private void checkScanResultFrame(List<Itembean> _items) {
+
+		JFrame dialogFrame = new JFrame("Check Serial number");
+		// Setting the width and height of frame
+		dialogFrame.setSize(600, 400);
+		dialogFrame.setLocationRelativeTo(null);
+		dialogFrame.setUndecorated(true);
+		dialogFrame.setResizable(false);
+
+		JPanel panel = new JPanel();
+		panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Constrant.FRAME_BORDER_BACKGROUN_COLOR));
+
+		panel.setBackground(Constrant.BACKGROUN_COLOR);
+		// adding panel to frame
+		dialogFrame.add(panel);
+
+		panel.setLayout(null);
+		Font font = new Font("Verdana", Font.BOLD, 18);
+
+		String content = "";
+		
+		
+		
+		for(Itembean i : _items) 
+		{
+			content += ""+i.SN +"<br/>";
+			
+		}
+		
+		
+	
+		// Creating JLabel
+		JLabel modelLabel = new JLabel("<html>These serial number does not exits :" + " <br/>"+content+"<html>");
+
+		/*
+		 * This method specifies the location and size of component. setBounds(x, y,
+		 * width, height) here (x,y) are cordinates from the top left corner and
+		 * remaining two arguments are the width and height of the component.
+		 */
+		modelLabel.setBounds(30, 0, 500, 200);
+		modelLabel.setFont(font);
+		panel.add(modelLabel);
+
+		JButton ok = new JButton("OK");
+		ok.setBounds(200, 330, 200, 50);
+		ok.setFont(font);
+		panel.add(ok);
+
+		ok.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				dialogFrame.setVisible(false);
+				dialogFrame.dispose();
+				
+				if(scanResultFrame != null) 
+				{
+					String[] checkItem = items.split("\n");
+					String updateTxt = "";
+					for(String s : checkItem) 
+					{
+						for(Itembean i : _items) 
+						{
+							if(i.SN.equals(s))
+								continue;
+							updateTxt +=s+"\n";
+						}
+					}
+					
+					inputSN.setText(items);
+					scanResultFrame.setVisible(true);
+				}
+
+			}
+		});
+
+		
 
 		// frame.setUndecorated(true);
 		// frame.getRootPane().setWindowDecorationStyle(JRootPane.COLOR_CHOOSER_DIALOG);
@@ -706,6 +807,15 @@ public class ItemsPannel {
 			e.printStackTrace();
 		}
 
+	}
+
+	private void checkItemExits(List<Itembean> items) {
+		try {
+			fgRepository.getItemsLocationBySNList(items);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

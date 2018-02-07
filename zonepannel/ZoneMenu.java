@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import spirit.fitness.scanner.common.Constrant;
+import spirit.fitness.scanner.inquiry.QueryPannel;
 import spirit.fitness.scanner.receving.ItemsPannel;
 import spirit.fitness.scanner.zonepannel.Zone2Location.Zone2CodeCallBackFunction;
 
@@ -31,7 +32,7 @@ public class ZoneMenu implements ActionListener {
 	 * Create the application.
 	 */
 
-	private JButton btnZone1, btnZone2, btnReturn, btnDisplayRoom;
+	private JButton btnZone1, btnZone2, btnReturn, btnDisplayRoom, btnScrapped, btnRework, btnQC;
 	public JFrame frame;
 	private String items;
 	private int assignType;
@@ -49,22 +50,22 @@ public class ZoneMenu implements ActionListener {
 	 */
 	private void initialize() {
 
-		//JFrame.setDefaultLookAndFeelDecorated(false);
-	    //JDialog.setDefaultLookAndFeelDecorated(false);
+		// JFrame.setDefaultLookAndFeelDecorated(false);
+		// JDialog.setDefaultLookAndFeelDecorated(false);
 		frame = new JFrame("FG Inventory App");
 		frame.setSize(600, 300);
 		frame.setLocationRelativeTo(null);
-		frame.setUndecorated (true);
+		frame.setUndecorated(true);
 		frame.setResizable(false);
 		frame.setVisible(true);
-		
+
 		JPanel borderedPanel = new JPanel();
 
-	    //Use any border you want, eg a nice blue one
-	    borderedPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Constrant.FRAME_BORDER_BACKGROUN_COLOR));
+		// Use any border you want, eg a nice blue one
+		borderedPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Constrant.FRAME_BORDER_BACKGROUN_COLOR));
 
-	    frame.setContentPane(borderedPanel);
-		
+		frame.setContentPane(borderedPanel);
+
 		Container cp = frame.getContentPane();
 		cp.setLayout(new GridLayout(0, 2));
 
@@ -78,6 +79,15 @@ public class ZoneMenu implements ActionListener {
 		btnDisplayRoom = new JButton("Show Room");
 		btnDisplayRoom.setFont(font);
 
+		btnScrapped = new JButton("Scrapped");
+		btnScrapped.setFont(font);
+
+		btnRework = new JButton("Rework");
+		btnRework.setFont(font);
+
+		btnQC = new JButton("QC");
+		btnQC.setFont(font);
+
 		btnZone1.setMnemonic('O');
 		btnZone2.setMnemonic('C');
 		btnReturn.setMnemonic('Q');
@@ -85,27 +95,59 @@ public class ZoneMenu implements ActionListener {
 		btnZone2.addActionListener(this);
 		btnReturn.addActionListener(this);
 		btnDisplayRoom.addActionListener(this);
+		btnScrapped.addActionListener(this);
+		btnRework.addActionListener(this);
+		btnQC.addActionListener(this);
 
-		cp.add(btnZone1);
-		cp.add(btnZone2);
-		cp.add(btnReturn);
-		cp.add(btnDisplayRoom);
+		if (assignType == ItemsPannel.MOVING) {
+			cp.add(btnZone1);
+			cp.add(btnZone2);
+			cp.add(btnReturn);
+			cp.add(btnDisplayRoom);
+			cp.add(btnScrapped);
+			cp.add(btnRework);
+			cp.add(btnQC);
+		}else if (assignType == ItemsPannel.RECEVING) 
+		{
+			cp.add(btnZone1);
+			cp.add(btnReturn);
+			
+		}
+		else 
+		{
+			cp.add(btnZone1);
+			cp.add(btnZone2);
+			cp.add(btnReturn);
+			cp.add(btnDisplayRoom);
+		}
 
-		
 		JPanel exitControl = new JPanel();
-		exitControl.setLayout(new GridLayout(0, 3));
-		JButton exit = new JButton(new AbstractAction("Prev"){
+		exitControl.setLayout(new GridLayout(0, 2));
+		JButton exit = new JButton(new AbstractAction("Prev") {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				frame.dispose();
 				frame.setVisible(false);
+
+				if(assignType == ItemsPannel.RECEVING) 
+				{
+					ItemsPannel window = new ItemsPannel(ItemsPannel.RECEVING);
+					window.frame.setVisible(true);
+					
+				}else if(assignType == ItemsPannel.MOVING) 
+				{
+					ItemsPannel window = new ItemsPannel(ItemsPannel.MOVING);
+					window.frame.setVisible(true);
+				}else if(assignType == QueryPannel.INQUIRY) 
+				{
+					//QueryPannel window = new QueryPannel();
+					//window.frame.setVisible(true);
+				}
 				
-				ItemsPannel window = new ItemsPannel(ItemsPannel.RECEVING);
-				window.frame.setVisible(true);
 			}
 		});
-		
+
 		JButton backButton = new JButton(new AbstractAction("Exit") {
 
 			@Override
@@ -114,30 +156,36 @@ public class ZoneMenu implements ActionListener {
 				frame.setVisible(false);
 			}
 		});
-		backButton.setBounds(500,20,50,50);
+		backButton.setBounds(500, 20, 50, 50);
 		backButton.setFont(font);
 		backButton.setBackground(Constrant.BUTTON_BACKGROUN_COLOR);
-		
-		exit.setBounds(0,20,50,50);
+
+		exit.setBounds(0, 20, 50, 50);
 		exit.setFont(font);
 		exit.setBackground(Constrant.BUTTON_BACKGROUN_COLOR);
-		backButton.setBounds(0,20,50,50);
+		backButton.setBounds(0, 20, 50, 50);
 		backButton.setFont(font);
-		
+
 		exitControl.add(exit);
 		exitControl.add(backButton);
-		
-		
-		
+
 		exitControl.setBackground(Constrant.TABLE_COLOR);
 		frame.getContentPane().setBackground(Constrant.TABLE_COLOR);
 		frame.getContentPane().add(exitControl);
-		
+
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				frame.dispose();
 				frame.setVisible(false);
+			}
+		});
+		
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				frame.toFront();
+				frame.repaint();
 			}
 		});
 
@@ -181,20 +229,58 @@ public class ZoneMenu implements ActionListener {
 				window.dialogFrame.setVisible(true);
 			}
 
+		}else if (e.getSource() == btnRework) {
+			if (reworkCodeCallBackFunction != null) {
+				this.frame.setVisible(false);
+				this.frame.dispose();
+				reworkCodeCallBackFunction.getZoneCode("555");
+			} else {
+				this.frame.setVisible(false);
+				this.frame.dispose();
+
+				ItemsPannel window = new ItemsPannel(items, "555", assignType);
+				window.dialogFrame.setVisible(true);
+			}
+
+		}else if (e.getSource() == btnQC) {
+			if (qcCodeCallBackFunction != null) {
+				this.frame.setVisible(false);
+				this.frame.dispose();
+				qcCodeCallBackFunction.getZoneCode("666");
+			} else {
+				this.frame.setVisible(false);
+				this.frame.dispose();
+
+				ItemsPannel window = new ItemsPannel(items, "666", assignType);
+				window.dialogFrame.setVisible(true);
+			}
+
+		}else if (e.getSource() == btnScrapped) {
+			if (scrappedCodeCallbackFunction != null) {
+				this.frame.setVisible(false);
+				this.frame.dispose();
+				scrappedCodeCallbackFunction.getZoneCode("777");
+			} else {
+				this.frame.setVisible(false);
+				this.frame.dispose();
+
+				ItemsPannel window = new ItemsPannel(items, "777", assignType);
+				window.dialogFrame.setVisible(true);
+			}
+
 		}
 
 	}
 
 	// retrieve return code number
-	private static ShowRoomCodeCallBackFunction showRoomCodeCallBackFunction;
+	public static ShowRoomCodeCallBackFunction showRoomCodeCallBackFunction;
 
 	public void setShowRoomCodeCallBackFunction(ShowRoomCodeCallBackFunction _showRoomCodeCallBackFunction) {
 		showRoomCodeCallBackFunction = _showRoomCodeCallBackFunction;
 
 	}
 
-	public ShowRoomCodeCallBackFunction getShowRoomCodeCallBackFunction() 
-	{
+	public ShowRoomCodeCallBackFunction getShowRoomCodeCallBackFunction() {
 		return showRoomCodeCallBackFunction;
 	}
 
@@ -206,5 +292,69 @@ public class ZoneMenu implements ActionListener {
 		public void getZoneCode(String code);
 
 	}
+
+	// retrieve return code number
+	public static ReworkCodeCallBackFunction reworkCodeCallBackFunction;
+
+	public void setShowRoomCodeCallBackFunction(ReworkCodeCallBackFunction _reworkCodeCallBackFunction) {
+		reworkCodeCallBackFunction = _reworkCodeCallBackFunction;
+
+	}
+
+	public ReworkCodeCallBackFunction getReworkCodeCallBackFunction() {
+		return reworkCodeCallBackFunction;
+	}
+
+	public void clearReworkCallBackFunction() {
+		reworkCodeCallBackFunction = null;
+	}
+
+	public interface ReworkCodeCallBackFunction {
+		public void getZoneCode(String code);
+
+	}
+	
+	// retrieve return code number
+	public static QCCodeCallBackFunction qcCodeCallBackFunction;
+
+	public void setQCCodeCallBackFunction(QCCodeCallBackFunction _qcCodeCallBackFunction) {
+		qcCodeCallBackFunction = _qcCodeCallBackFunction;
+
+	}
+
+	public QCCodeCallBackFunction getQCCodeCallBackFunction() {
+		return qcCodeCallBackFunction;
+	}
+
+	public void clearQCCodeCallBackFunction() {
+		qcCodeCallBackFunction = null;
+	}
+
+	public interface QCCodeCallBackFunction {
+		public void getZoneCode(String code);
+
+	}
+	
+	// retrieve return code number
+	public static ScrappedCodeCallBackFunction scrappedCodeCallbackFunction;
+
+	public void setQCCodeCallBackFunction(ScrappedCodeCallBackFunction _scrappedCodeCallbackFunction) {
+		scrappedCodeCallbackFunction = _scrappedCodeCallbackFunction;
+
+	}
+
+	public ScrappedCodeCallBackFunction getScrappedCodeCall() {
+		return scrappedCodeCallbackFunction;
+	}
+
+	public void clearScrappedCodeCallBackFunction() {
+		scrappedCodeCallbackFunction = null;
+	}
+
+	public interface ScrappedCodeCallBackFunction {
+		public void getZoneCode(String code);
+
+	}
+
 
 }

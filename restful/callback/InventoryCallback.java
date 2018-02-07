@@ -25,9 +25,7 @@ public interface InventoryCallback {
 	@GET("api/FGInventory")
 	Call<List<Itembean>> getAllItems();
 	
-	@PUT("api/FGInventory/SN/LocationInfo")
-	Call<List<Itembean>> getItemsLocationBySNList(@Body List<Itembean> itembean);
-
+	
 	@GET("api/FGInventory/location/{location}")
 	Call<List<Itembean>> getItemsByLocation(@Path("location") Integer location);
 	
@@ -60,6 +58,10 @@ public interface InventoryCallback {
 	@PUT("/api/FGInventory")
 	Call<List<Itembean>> updateItem(@Body List<Itembean> itembean);
 
+	@PUT("api/FGInventory/SN/NotExist")
+	Call<List<Itembean>> getItemsLocationBySNExits(@Body List<Itembean> itembean);
+
+	
 	//Delete no work
 	@DELETE("/api/FGInventory")
 	Call<List<Itembean>> deleteItem(@Body List<Itembean> itembean);

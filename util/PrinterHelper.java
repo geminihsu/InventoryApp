@@ -230,7 +230,7 @@ public class PrinterHelper {
           0.25 * POINTS_PER_INCH);
 
       //--- Set the width of the TextLayout box
-      double width = 100;//each character 6.25, total 16 character. 16*2.5
+      double width = 350;//each character 6.25, total 16 character. 16*2.5
 
       //--- Create an attributed string from the text string. We are
       // creating an

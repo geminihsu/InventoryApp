@@ -88,9 +88,15 @@ public class FGRepositoryImplRetrofit {
 				.addConverterFactory(GsonConverterFactory.create()).build();
 		InventoryCallback service = retrofit.create(InventoryCallback.class);
 		
-		Response<List<Itembean>> request = service.getItemsLocationBySNList(items).execute();
+		Response<List<Itembean>> request = service.getItemsLocationBySNExits(items).execute();
 		int code = request.code();
-		List<Itembean> result = retriveCode(code,request);
+		
+		List<Itembean> result = null;
+		if (code == HttpRequestCode.HTTP_REQUEST_OK) 
+		      result = request.body();
+		
+		if (inventoryServiceCallBackFunction != null)
+			inventoryServiceCallBackFunction.checkInventoryItems(result);
 		
 		return result;
 	}

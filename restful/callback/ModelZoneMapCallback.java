@@ -14,6 +14,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import spirit.fitness.scanner.model.Itembean;
+import spirit.fitness.scanner.model.ModelDailyReportbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Modelbean;
 import spirit.fitness.scanner.model.Reportbean;
@@ -26,7 +27,10 @@ public interface ModelZoneMapCallback {
     
 	@Headers("Content-Type: application/json")
 	@GET("api/ModelZoneMaps/Qty")
-	Call<List<ModelZone2bean>> getAllReport();
+	Call<List<ModelZone2bean>> getAllModelQtyReport();
+	
+	@GET("api/ModelZoneMaps/DailyReport/date/{date}")
+	Call<List<ModelDailyReportbean>> getAllModelDailyReport(@Path("date") String date);
 	
 	@GET("api/ModelZoneMaps/{modelNo}")
 	Call<List<ModelZone2bean>> getItemsByModelNo(@Path("modelNo") Integer modelNo);

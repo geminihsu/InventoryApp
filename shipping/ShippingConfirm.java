@@ -398,7 +398,14 @@ public class ShippingConfirm {
 				}
 
 				JScrollPane JScrollPane = getShippgingItemsJScrollPane(items);
-				JScrollPane.setBounds(30, 500, 400, 50 * items.size() + 20);
+				
+				
+				int tableSize = 50 * items.size() + 20;
+				if (tableSize > 200)
+					tableSize = 200;
+				
+				JScrollPane.setBounds(40, 520, 300, tableSize);
+				
 				orderDisplayPanel.add(JScrollPane);
 				orderDisplayPanel.remove(scanner);
 				orderDisplayPanel.add(print);
@@ -682,11 +689,11 @@ public class ShippingConfirm {
 
 			prev = new JButton("Prev");
 			prev.setFont(font);
-			prev.setBounds(820, 700, 90, 50);
+			prev.setBounds(820, 730, 90, 50);
 
 			exit = new JButton("Exit");
 			exit.setFont(font);
-			exit.setBounds(920, 700, 90, 50);
+			exit.setBounds(920, 730, 90, 50);
 
 			print.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -1418,6 +1425,12 @@ public class ShippingConfirm {
 							displayPickingOrderInfo(_items);
 					}
 				}
+			}
+
+			@Override
+			public void checkInventoryItems(List<Itembean> items) {
+				// TODO Auto-generated method stub
+				
 			}
 
 		});

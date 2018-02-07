@@ -30,6 +30,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -56,13 +57,18 @@ import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HttpRestApi;
+import spirit.fitness.scanner.restful.ModelZoneMapRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.ShippingRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
+import spirit.fitness.scanner.restful.listener.ModelZone2CallBackFunction;
 import spirit.fitness.scanner.util.ExcelHelper;
+import spirit.fitness.scanner.util.LoadingFrameHelper;
 import spirit.fitness.scanner.util.LocationHelper;
 import spirit.fitness.scanner.util.PrinterHelper;
 import spirit.fitness.scanner.zonepannel.ZoneMenu;
 import spirit.fitness.scanner.model.Itembean;
+import spirit.fitness.scanner.model.ModelDailyReportbean;
+import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Reportbean;
 
 public class DailyReport  {
@@ -75,19 +81,22 @@ public class DailyReport  {
 
 	private ProgressMonitor progressMonitor;
 	private JButton btnDone;
+	private ModelZoneMapRepositoryImplRetrofit fgModelZone2;
+	
+	private LoadingFrameHelper loadingframe;
+	private JProgressBar loading;
 
-	private String result;
+	public DailyReport(List<ModelDailyReportbean> data) {
 
-	private int type;
-
-	public DailyReport(List<Reportbean> data, int _type) {
-		type = _type;
-
-		displayTable(data);
+		loadingframe = new LoadingFrameHelper();
+		loading = loadingframe.loadingSample("Loading Data from Server...");
+		intialCallback();
+		loadModelZone2Map();
+		
 
 	}
 
-	private void displayTable(List<Reportbean> data) {
+	private void displayTable(List<ModelDailyReportbean> data) {
 
 		JFrame.setDefaultLookAndFeelDecorated(false);
 		JDialog.setDefaultLookAndFeelDecorated(false);
@@ -95,7 +104,7 @@ public class DailyReport  {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Item Result");
 		frame.setLocationRelativeTo(null);
-		frame.setBounds(50, 50, 1200, 600);
+		frame.setBounds(50, 50, 1200, 700);
 		frame.setUndecorated(true);
 		frame.setResizable(false);
 
@@ -122,7 +131,7 @@ public class DailyReport  {
 
 	}
 
-	private void placeComponents(JPanel panel, List<Reportbean> data) {
+	private void placeComponents(JPanel panel, List<ModelDailyReportbean> data) {
 
 		/*
 		 * We will discuss about layouts in the later sections of this tutorial. For now
@@ -138,7 +147,7 @@ public class DailyReport  {
 
 		String timeStamp = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 
-		Object rowDataReport[][] = new Object[10][12];
+		Object rowDataReport[][] = new Object[data.size()][12];
 		System.out.println(data.size());
 
 		int prevTotal = 0;
@@ -152,7 +161,7 @@ public class DailyReport  {
 		int qcTotal = 0;
 		int Total = 0;
 		
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < data.size(); i++) {
 
 			/*if (i == 10) {
 				for (int j = 0; j < 12; j++) {
@@ -172,33 +181,35 @@ public class DailyReport  {
 				}
 			} else {*/
 				for (int j = 0; j < 12; j++) {
-					rowDataReport[i][0] = " " + data.get(i).Model;
-					rowDataReport[i][1] = data.get(i).FG;
-					rowDataReport[i][2] = data.get(i).total;
-					rowDataReport[i][3] = data.get(i).unshippable;
-					rowDataReport[i][4] = data.get(i).zone1;
-					rowDataReport[i][5] = data.get(i).unshippable;
-					rowDataReport[i][6] = data.get(i).zone1;
-					rowDataReport[i][7] = data.get(i).returnItem;
+					rowDataReport[i][0] = " " + data.get(i).ModelNo;
+					rowDataReport[i][1] = data.get(i).ModelFG;
+					rowDataReport[i][2] = data.get(i).Previous;
+					rowDataReport[i][3] = data.get(i).Shipped;
+					rowDataReport[i][4] = data.get(i).Received;
+					rowDataReport[i][5] = data.get(i).Scrapped;
+					rowDataReport[i][6] = data.get(i).OnHand;
+					rowDataReport[i][7] = data.get(i).ReturnItem;
 
-					rowDataReport[i][8] = data.get(i).showRoom;
-					rowDataReport[i][9] = data.get(i).total;
-					rowDataReport[i][10] = data.get(i).showRoom;
-					rowDataReport[i][11] = data.get(i).total;
+					rowDataReport[i][8] = data.get(i).ShowRoom;
+					rowDataReport[i][9] = data.get(i).Rework;
+					rowDataReport[i][10] = data.get(i).QC;
+					rowDataReport[i][11] = data.get(i).Total;
 					
-					prevTotal += data.get(i).total;
-					shippedTotal += data.get(i).unshippable;
-					receivedTotal += data.get(i).zone1;
-					scrappedTotal += data.get(i).unshippable;
-					shippableOnHandTotal += data.get(i).zone1;
-					returnUnshippableTotal += data.get(i).returnItem;
-					showroom += data.get(i).showRoom;
-					reworkTotal += data.get(i).total;
-					qcTotal += data.get(i).showRoom;
-					Total += data.get(i).total;
+					
 					
 				//}
 			}
+				
+				prevTotal += data.get(i).Previous;
+				shippedTotal += data.get(i).Shipped;
+				receivedTotal += data.get(i).Received;
+				scrappedTotal += data.get(i).Scrapped;
+				shippableOnHandTotal += data.get(i).OnHand;
+				returnUnshippableTotal += data.get(i).ReturnItem;
+				showroom += data.get(i).ShowRoom;
+				reworkTotal += data.get(i).Rework;
+				qcTotal += data.get(i).QC;
+				Total += data.get(i).Total;
 		}
 
 		String zone = "";
@@ -260,34 +271,33 @@ public class DailyReport  {
 	
 		int heigh = 0;
 
-		if (50 * rowDataReport.length + 20 > 530)
-			heigh = 530;
+		if (50 * rowDataReport.length + 20 > 630)
+			heigh = 630;
 		else
 			heigh = 430;
-		scrollZonePane.setBounds(5, 5, 1190, 427);
+		scrollZonePane.setBounds(5, 5, 1190, heigh);
 		
 		scrollZonePane.setViewportView(table);
 
 		panel.add(scrollZonePane);
 		
-		Border border = LineBorder.createBlackLineBorder();
+		//Border border = LineBorder.createBlackLineBorder();
 		
-		JLabel modelLabel = new JLabel(" Total                                          "+prevTotal+"             "+shippedTotal+"      "+receivedTotal+"               "+shippedTotal+"                       "+receivedTotal+"                                "+shippedTotal+"                   "+shippedTotal + "  "+receivedTotal+"       "+shippedTotal+ " "+receivedTotal);
+		/*JLabel modelLabel = new JLabel(" Total                                                  "+prevTotal+"            "+shippedTotal+"        "+receivedTotal+"                 "+scrappedTotal+"                       "+shippableOnHandTotal+"                                "+returnUnshippableTotal+"                   "+showroom + "           "+reworkTotal+"        "+qcTotal+ "   "+Total);
 		
 		modelLabel.setBounds(5, 418, 1190, 50);
 		modelLabel.setOpaque(true);
 		modelLabel.setBackground(Constrant.DISPALY_ITEMS_TABLE_COLOR);
 		modelLabel.setFont(font);
 		modelLabel.setBorder(border);
-		panel.add(modelLabel);
+		panel.add(modelLabel);*/
 		
 		Font btnFont = new Font("Verdana", Font.BOLD, 18);
 		btnDone = new JButton("Export To Excel");
 		btnDone.setFont(btnFont);
-		btnDone.setBounds(5, 520, 200, 50);
+		btnDone.setBounds(5, 640, 200, 50);
 
-		if (type == MIN_QUANTITY)
-			btnDone.setText("Update Model Quantity");
+	
 		btnDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -296,13 +306,13 @@ public class DailyReport  {
 						try {
 							ExcelHelper exp = new ExcelHelper();
 
-							if (type == REPORT) {
+							
 								exp.fillData(table,
 										new File("C:\\Users\\geminih\\Downloads\\" + timeStamp + "_report.xls"));
 
 								JOptionPane.showMessageDialog(null, "Export " + timeStamp + ".xls' successfully",
 										"Message", JOptionPane.INFORMATION_MESSAGE);
-							}
+							
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -315,7 +325,7 @@ public class DailyReport  {
 
 		JButton exitDone = new JButton("Exit");
 		exitDone.setFont(btnFont);
-		exitDone.setBounds(220, 520, 200, 50);
+		exitDone.setBounds(220, 640, 200, 50);
 
 		exitDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -326,6 +336,62 @@ public class DailyReport  {
 		panel.add(exitDone);
 	}
 
+	private void intialCallback() {
+		fgModelZone2 = new ModelZoneMapRepositoryImplRetrofit();
+		fgModelZone2.setinventoryServiceCallBackFunction(new ModelZone2CallBackFunction() {
+
+			@Override
+			public void resultCode(int code) {
+				// TODO Auto-generated method stub
+				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
+
+				}
+			}
+
+			@Override
+			public void getReportItems(List<ModelZone2bean> items) {
+
+				//if (refreshDone != null)
+				//	refreshDone.setEnabled(true);
+			
+			}
+
+			@Override
+			public void getModelDailyReportItems(List<ModelDailyReportbean> items) {
+				loading.setValue(100);
+				loadingframe.setVisible(false);
+				loadingframe.dispose();
+				Constrant.dailyReport = items;
+				displayTable(items);
+				java.awt.EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						frame.toFront();
+						frame.repaint();
+					}
+				});
+				
+			}
+
+		});
+	}
 	
+	// Loading Models data from Server
+		private void loadModelZone2Map() {
+
+			// loading model and location information from Server
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					try {
+
+						fgModelZone2.getAllItems("2018-02-01");
+
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+
+		}
 
 }

@@ -28,6 +28,26 @@ public class PrintTableUtil {
         return tableString;
 	}
 	
+	public static String printModelQuantityReport(List<String> headersList,List<List<String>> rowsList) 
+	{
+		
+        Board board = new Board(200);
+        Table table = new Table(board, 75, headersList, rowsList);
+        table.setGridMode(Table.GRID_COLUMN);
+        //setting width and data-align of columns
+        List<Integer> colWidthsList = Arrays.asList(8, 20, 8, 12,10);
+        List<Integer> colAlignList = Arrays.asList(Block.DATA_CENTER, Block.DATA_CENTER, Block.DATA_CENTER, Block.DATA_CENTER, Block.DATA_CENTER);
+        table.setColWidthsList(colWidthsList);
+        table.setColAlignsList(colAlignList);
+        
+        Block tableBlock = table.tableToBlocks();
+        board.setInitialBlock(tableBlock);
+        board.build();
+        String tableString = board.getPreview();
+        return tableString;
+	}
+	
+	
 	public static String noBorad(List<String> headersList,List<List<String>> rowsList) {
 		
 		   

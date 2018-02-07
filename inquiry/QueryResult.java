@@ -95,7 +95,7 @@ public class QueryResult {
 
 		resultFrame = new JFrame("");
 		// Setting the width and height of frame
-		resultFrame.setSize(780, 600);
+		resultFrame.setSize(780, 700);
 		resultFrame.setLocationRelativeTo(null);
 		resultFrame.setUndecorated(true);
 		resultFrame.setResizable(false);
@@ -205,7 +205,7 @@ public class QueryResult {
 		// display Zone 4
 		JLabel zone4 = new JLabel("Show Room");
 
-		zone4.setBounds(30, 360, 300, 50);
+		zone4.setBounds(30, 500, 300, 50);
 		zone4.setFont(font);
 		zone4.setBackground(Constrant.BACKGROUN_COLOR);
 		panel.add(zone4);
@@ -225,9 +225,9 @@ public class QueryResult {
 		scrollZone3Pane.setBounds(33, 300, 700, 200);
 		panel.add(scrollZone3Pane);
 
-		// ScrollPane for Zone3
+		// ScrollPane for Zone4
 		JScrollPane scrollZone4Pane = new JScrollPane();
-		scrollZone4Pane.setBounds(33, 300, 700, 200);
+		scrollZone4Pane.setBounds(33, 500, 700, 200);
 		panel.add(scrollZone4Pane);
 
 		// Table
@@ -379,7 +379,7 @@ public class QueryResult {
 
 		if (zone4Data != null) {
 			zone4.setText("Show Room : " + zoneCount.get(4));
-			scrollZone4Pane.setBounds(33, 420, 700, 50 * zone4Data.length + 20);
+			scrollZone4Pane.setBounds(33, 550, 700, 70);
 			scrollZone4Pane.setBackground(Constrant.TABLE_COLOR);
 
 			zone4Table = new JTable(model4);
@@ -437,8 +437,8 @@ public class QueryResult {
 
 		prev.setFont(font);
 		exit.setFont(font);
-		prev.setBounds(33, 520, 100, 50);
-		exit.setBounds(150, 520, 100, 50);
+		prev.setBounds(33, 630, 100, 50);
+		exit.setBounds(150, 630, 100, 50);
 		panel.add(prev);
 	    panel.add(exit);
 
@@ -686,6 +686,12 @@ public class QueryResult {
 					System.out.println(queryType);
 					setContentQueryLayOut(items);
 				}
+			}
+
+			@Override
+			public void checkInventoryItems(List<Itembean> items) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 

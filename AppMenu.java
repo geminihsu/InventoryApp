@@ -44,16 +44,21 @@ import spirit.fitness.scanner.inquiry.QueryPannel;
 import spirit.fitness.scanner.inquiry.QueryResult;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Locationbean;
+import spirit.fitness.scanner.model.ModelDailyReportbean;
+import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Modelbean;
 import spirit.fitness.scanner.model.Reportbean;
 import spirit.fitness.scanner.receving.ItemsPannel;
 import spirit.fitness.scanner.report.DailyReport;
+import spirit.fitness.scanner.report.ModelZone2Report;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.LocationRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.ModelRepositoryImplRetrofit;
+import spirit.fitness.scanner.restful.ModelZoneMapRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.ReportRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.LocationCallBackFunction;
+import spirit.fitness.scanner.restful.listener.ModelZone2CallBackFunction;
 import spirit.fitness.scanner.restful.listener.ModelsCallBackFunction;
 import spirit.fitness.scanner.restful.listener.ReportCallBackFunction;
 import spirit.fitness.scanner.shipping.ShippingConfirm;
@@ -63,13 +68,13 @@ import spirit.fitness.scanner.util.LoadingFrameHelper;
 public class AppMenu implements ActionListener {
 
 
-	private JButton btnRecving, btnMoving, btnInQuiry, btnShipping, btnReport, btnModelQuantity;
+	private JButton btnRecving, btnMoving, btnInQuiry, btnShipping, btnReport, btnModelQuantity,btnPickingList,btnReplenishment,btnConfiguration;
 	private JFrame frame;
 	
 	private JProgressBar loading;
 	private LoadingFrameHelper loadingframe;
 	
-	private ReportRepositoryImplRetrofit fgReport;
+	private ModelZoneMapRepositoryImplRetrofit fgModelZone2;
 	private ModelRepositoryImplRetrofit fgModels;
 	private LocationRepositoryImplRetrofit localModels;
 
@@ -81,7 +86,8 @@ public class AppMenu implements ActionListener {
 		loadingframe =new LoadingFrameHelper();
 		loading = loadingframe.loadingSample("Loading Data from Server...");
 		initialize();
-		loadReport();
+		//loadReport();
+		//loadModelZone2Map();
 		loadModel();
 		loadLocatin();
 	}
@@ -108,28 +114,36 @@ public class AppMenu implements ActionListener {
 	 */
 	private void initialize() {
 
-		JFrame.setDefaultLookAndFeelDecorated(false);
-	    JDialog.setDefaultLookAndFeelDecorated(false);
+		
 		frame = new JFrame("FG Inventory App");
-		frame.setSize(1000, 600);
+		frame.setSize(1200, 600);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		Container cp = frame.getContentPane();
-		cp.setLayout(new GridLayout(0, 3));
+		cp.setLayout(new GridLayout(2, 3));
 
 		Font font = new Font("Verdana", Font.BOLD, 30);
 		btnRecving = new JButton("Receiving");
 		btnRecving.setFont(font);
 		btnMoving = new JButton("Moving");
 		btnMoving.setFont(font);
-		btnInQuiry = new JButton("InQuiry");
+		btnInQuiry = new JButton("Inquiry");
 		btnInQuiry.setFont(font);
-		btnShipping = new JButton("Shipping");
-		btnShipping.setFont(font);
 		btnReport = new JButton("Daily Report");
 		btnReport.setFont(font);
-		btnModelQuantity = new JButton("Model Quantity");
-		btnModelQuantity.setFont(font);
+		btnShipping = new JButton("Shipping");
+		btnShipping.setFont(font);
+		//btnModelQuantity = new JButton("Model Quantity");
+		//btnModelQuantity.setFont(font);
+		btnPickingList = new JButton("Picking");
+		btnPickingList.setFont(font);
+		
+		btnReplenishment= new JButton("Replenishment");
+		btnReplenishment.setFont(font);
+		btnConfiguration= new JButton("Configuration");
+		btnConfiguration.setFont(font);
+		//btnModelQuantity = new JButton("Model Quantity");
+		//btnModelQuantity.setFont(font);
 		// btnRecving.setBounds(20,20,100,40);
 		// btnMoving.setBounds(150,20,100,40);
 		// btnInQuiry.setBounds(280,20,100,40);
@@ -141,16 +155,21 @@ public class AppMenu implements ActionListener {
 		btnMoving.addActionListener(this);
 		btnShipping.addActionListener(this);
 		btnInQuiry.addActionListener(this);
-		btnModelQuantity.addActionListener(this);
+		//btnModelQuantity.addActionListener(this);
 		btnReport.addActionListener(this);
+		btnPickingList.addActionListener(this);
+		btnReplenishment.addActionListener(this);
+		btnConfiguration.addActionListener(this);
 		cp.add(btnRecving);
 		cp.add(btnMoving);
 		cp.add(btnInQuiry);
+		cp.add(btnPickingList);
 		cp.add(btnShipping);
 		cp.add(btnReport);
-	    cp.add(btnModelQuantity);
+		cp.add(btnReplenishment);
+	    cp.add(btnConfiguration);
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		frame.setDefaultLookAndFeelDecorated(true);
+		
 
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -179,31 +198,35 @@ public class AppMenu implements ActionListener {
 			window.frame.setVisible(true);
 
 		} else if (e.getSource() == btnShipping) {
-			ShippingConfirm window = new ShippingConfirm();
+			ShippingConfirm window = new ShippingConfirm(false);
 			window.frame.setVisible(true);
 
 		}else if (e.getSource() == btnReport) {
 			
 			//JOptionPane.showMessageDialog(null, "Model 15516 less than 50. Please move more item from Zone 1.");
 
-			DailyReport window = new DailyReport(Constrant.reports, DailyReport.REPORT);
+			DailyReport window = new DailyReport(Constrant.dailyReport);
 			window.frame.setVisible(true);
  
-		}else if (e.getSource() == btnModelQuantity) {
-			JOptionPane.showMessageDialog(null, "Model 15516 less than 50 in Zone 2. Please move more item from Zone 1.");
-
-			DailyReport window = new DailyReport(Constrant.reports,DailyReport.MIN_QUANTITY);
+		}else if (e.getSource() == btnPickingList) {
+			
+			ShippingConfirm window = new ShippingConfirm(true);
 			window.frame.setVisible(true);
- 
+		}else if (e.getSource() == btnReplenishment) {
+			
+			ModelZone2Report window = new ModelZone2Report(Constrant.modelZone2List);
+			//window.frame.setVisible(true);
 		}
+		
 
 
 	}
 
 	private void exceuteCallback() {
 
-		fgReport = new ReportRepositoryImplRetrofit();
-		fgReport.setinventoryServiceCallBackFunction(new ReportCallBackFunction() {
+		
+		fgModelZone2 = new ModelZoneMapRepositoryImplRetrofit();
+		fgModelZone2.setinventoryServiceCallBackFunction(new ModelZone2CallBackFunction() {
 
 			@Override
 			public void resultCode(int code) {
@@ -214,10 +237,18 @@ public class AppMenu implements ActionListener {
 			}
 
 			@Override
-			public void getReportItems(List<Reportbean> items) {
-				Constrant.reports = items;
-				loading.setValue(30);
+			public void getReportItems(List<ModelZone2bean> items) {
+				Constrant.modelZone2List = items;
+				loading.setValue(60);
+				
 			}
+
+			@Override
+			public void getModelDailyReportItems(List<ModelDailyReportbean> items) {
+				
+				Constrant.dailyReport = items;
+			}
+
 
 		});
 
@@ -274,8 +305,26 @@ public class AppMenu implements ActionListener {
 		});
 
 	}
+	
 	// Loading Models data from Server
-		private void loadReport() {
+	private void loadReport() {
+
+		// loading model and location information from Server
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+
+					fgModelZone2.getAllItems("2018-01-01");
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+	}
+	// Loading Models data from Server
+		private void loadModelZone2Map() {
 			
 			
 			// loading model and location information from Server
@@ -283,7 +332,7 @@ public class AppMenu implements ActionListener {
 				public void run() {
 					try {
 
-						fgReport.getAllItems();
+						fgModelZone2.getAllItems();
 
 					} catch (Exception e) {
 						e.printStackTrace();

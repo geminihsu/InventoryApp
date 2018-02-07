@@ -16,6 +16,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
@@ -62,9 +63,11 @@ import spirit.fitness.scanner.restful.listener.ModelZone2CallBackFunction;
 import spirit.fitness.scanner.util.ExcelHelper;
 import spirit.fitness.scanner.util.LoadingFrameHelper;
 import spirit.fitness.scanner.util.LocationHelper;
+import spirit.fitness.scanner.util.PrintTableUtil;
 import spirit.fitness.scanner.util.PrinterHelper;
 import spirit.fitness.scanner.zonepannel.ZoneMenu;
 import spirit.fitness.scanner.model.Itembean;
+import spirit.fitness.scanner.model.ModelDailyReportbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Reportbean;
 
@@ -73,15 +76,19 @@ public class ModelZone2Report {
 	public final static int REPORT = 0;
 	public final static int MIN_QUANTITY = 1;
 
+	private List<String> resultModelItem;
+	
 	public JFrame frame;
 	private LoadingFrameHelper loadingframe;
 	private JProgressBar loading;
 
 	private JButton btnDone, refreshDone;
+	
 
 	private ModelZoneMapRepositoryImplRetrofit fgModelZone2;
 
 	public ModelZone2Report(List<ModelZone2bean> data) {
+		resultModelItem = new ArrayList<String>();
 		loadingframe = new LoadingFrameHelper();
 		loading = loadingframe.loadingSample("Loading Data from Server...");
 		intialCallback();
@@ -146,13 +153,16 @@ public class ModelZone2Report {
 		System.out.println(data.size());
 
 		for (int i = 0; i < data.size(); i++) {
+			String printItem = "";
 			for (int j = 0; j < 5; j++) {
 				rowDataReport[i][0] = " "+data.get(i).Model;
 				rowDataReport[i][1] = " "+data.get(i).FG;
 				rowDataReport[i][2] = data.get(i).Z2CurtQty;
 				rowDataReport[i][3] = data.get(i).Zone1Code;
 				rowDataReport[i][4] = data.get(i).Zone2Code;
+				printItem = data.get(i).Model +"\n" +data.get(i).FG +"\n" +data.get(i).Z2CurtQty+"\n" +data.get(i).Zone1Code+"\n" + data.get(i).Zone2Code;  
 			}
+			resultModelItem.add(printItem);
 		}
 
 		String zone = "";
@@ -193,8 +203,8 @@ public class ModelZone2Report {
 
 		int heigh = 0;
 		System.out.println(""+50 * rowDataReport.length + 20);
-		if (50 * rowDataReport.length + 20 > 55020)
-			heigh = 530;
+		if (50 * rowDataReport.length + 20 > 500)
+			heigh = 500;
 		else
 			heigh = 40 * rowDataReport.length + 32;
 
@@ -203,35 +213,20 @@ public class ModelZone2Report {
 
 		panel.add(scrollZonePane);
 
-		btnDone = new JButton("Export To Excel");
+		btnDone = new JButton("Print");
 		btnDone.setFont(font);
 		btnDone.setBounds(5, 540, 200, 50);
 
 		btnDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						try {
-							ExcelHelper exp = new ExcelHelper();
-
-							exp.fillData(table,
-									new File("C:\\Users\\geminih\\Downloads\\" + timeStamp + "_report.xls"));
-
-							JOptionPane.showMessageDialog(null, "Export " + timeStamp + ".xls' successfully", "Message",
-									JOptionPane.INFORMATION_MESSAGE);
-
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				});
+				printer();
 				// HttpRestApi.postData(result);
 			}
 		});
 		panel.add(btnDone);
 
-		refreshDone = new JButton("Refresh");
+		/*refreshDone = new JButton("Refresh");
 		refreshDone.setFont(font);
 		refreshDone.setBounds(220, 540, 200, 50);
 
@@ -247,11 +242,11 @@ public class ModelZone2Report {
 				loadModelZone2Map();
 			}
 		});
-		panel.add(refreshDone);
+		panel.add(refreshDone);*/
 
 		JButton exitDone = new JButton("Exit");
 		exitDone.setFont(font);
-		exitDone.setBounds(430, 540, 200, 50);
+		exitDone.setBounds(220, 540, 200, 50);
 
 		exitDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -278,8 +273,8 @@ public class ModelZone2Report {
 			@Override
 			public void getReportItems(List<ModelZone2bean> items) {
 
-				if (refreshDone != null)
-					refreshDone.setEnabled(true);
+				//if (refreshDone != null)
+				//	refreshDone.setEnabled(true);
 				loading.setValue(100);
 				Constrant.modelZone2List = items;
 				displayTable(items);
@@ -290,6 +285,12 @@ public class ModelZone2Report {
 						frame.repaint();
 					}
 				});
+			}
+
+			@Override
+			public void getModelDailyReportItems(List<ModelDailyReportbean> items) {
+				// TODO Auto-generated method stub
+				
 			}
 
 		});
@@ -313,6 +314,25 @@ public class ModelZone2Report {
 
 	}
 	
-	
+	private void printer() {
+
+		
+		List<String> headersList = Arrays.asList("Model#", "FG", "Quantity", "From(Zone 1)", "To(Zone 2)");
+
+		List<List<String>> rowsList = new ArrayList<List<String>>();
+		for (String s : resultModelItem) {
+			String[] rowdata = s.split("\n");
+			rowsList.add(Arrays.asList(rowdata));
+		}
+
+		// String result = PrintTableUtil.printReport(headersList, rowsList);
+		String result = PrintTableUtil.printModelQuantityReport(headersList, rowsList);
+		//content += result + itemsInfo;
+	    System.out.println(result);
+
+		PrinterHelper print = new PrinterHelper();
+		print.printItems(result);
+
+	}
 
 }
