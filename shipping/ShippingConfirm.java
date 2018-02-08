@@ -1483,7 +1483,7 @@ public class ShippingConfirm {
 							// System.out.println("item.ItemID:" + item.ItemID);
 
 							if (item.ItemID != null) {
-								if (map.containsKey(item.ItemID)) {
+								if (map.containsKey(item.ItemID) && item.ItemID.length() == 6) {
 
 									if (!item.ItemID.contains("PL")) {
 										count += map.get(item.ItemID);
@@ -1492,7 +1492,7 @@ public class ShippingConfirm {
 									}
 								} else {
 
-									if (!item.ItemID.contains("PL")) {
+									if (!item.ItemID.contains("PL")&& item.ItemID.length() == 6) {
 										orderTotalCount += count;
 										map.put(item.ItemID, count);
 										OrderModelmap.put(item.ItemID, item.description);
@@ -1513,7 +1513,7 @@ public class ShippingConfirm {
 									try {
 										loading.setValue(50);
 										for (CustOrderbean _order : orders) {
-											if (_order.ItemID == null || _order.ItemID.indexOf("PL") != -1)
+											if (_order.ItemID == null || _order.ItemID.indexOf("PL") != -1 || _order.ItemID.length() != 6)
 												continue;
 											else
 												queryByModelAndCount(_order.ItemID, map.get(_order.ItemID));

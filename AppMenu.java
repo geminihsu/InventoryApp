@@ -62,6 +62,7 @@ import spirit.fitness.scanner.restful.listener.ModelZone2CallBackFunction;
 import spirit.fitness.scanner.restful.listener.ModelsCallBackFunction;
 import spirit.fitness.scanner.restful.listener.ReportCallBackFunction;
 import spirit.fitness.scanner.shipping.ShippingConfirm;
+import spirit.fitness.scanner.shipping.ShippingPicking;
 import spirit.fitness.scanner.util.EmailHelper;
 import spirit.fitness.scanner.util.LoadingFrameHelper;
 
@@ -210,8 +211,9 @@ public class AppMenu implements ActionListener {
  
 		}else if (e.getSource() == btnPickingList) {
 			
-			ShippingConfirm window = new ShippingConfirm(true);
+			ShippingPicking window = new ShippingPicking();
 			window.frame.setVisible(true);
+			
 		}else if (e.getSource() == btnReplenishment) {
 			
 			ModelZone2Report window = new ModelZone2Report(Constrant.modelZone2List);
