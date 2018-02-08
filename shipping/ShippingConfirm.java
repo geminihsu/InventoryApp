@@ -30,31 +30,17 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import javax.print.Doc;
-import javax.print.DocFlavor;
-import javax.print.DocPrintJob;
-import javax.print.PrintException;
-import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
-import javax.print.SimpleDoc;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.Copies;
-import javax.print.attribute.standard.MediaSize;
-import javax.print.attribute.standard.Sides;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -70,12 +56,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import com.mashape.unirest.http.HttpClientHelper;
-import com.mashape.unirest.http.HttpResponse;
 
-import okhttp3.internal.http.HttpHeaders;
-import okhttp3.internal.http1.Http1Codec;
-import spirit.fitness.scanner.AppMenu;
 import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.inquiry.QueryResult;
@@ -88,17 +69,14 @@ import spirit.fitness.scanner.restful.listener.CustOrderCallBackFunction;
 import spirit.fitness.scanner.restful.listener.HistoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.util.LoadingFrameHelper;
-import spirit.fitness.scanner.util.LocationHelper;
 import spirit.fitness.scanner.util.PrintTableUtil;
 import spirit.fitness.scanner.util.PrinterHelper;
-import spirit.fitness.scanner.zonepannel.ZoneMenu;
 import spirit.fitness.scanner.model.CustOrderbean;
 import spirit.fitness.scanner.model.Historybean;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Locationbean;
 import spirit.fitness.scanner.model.PickingItem;
-import spirit.fitness.scanner.model.Shippingbean;
-import spirit.fitness.scanner.receving.ItemsPannel;
+
 
 public class ShippingConfirm {
 
@@ -123,8 +101,6 @@ public class ShippingConfirm {
 
 	private String prevContent = "";
 
-	private boolean isPackingList = false;
-
 	// Key:modelID, value:quality
 	private LinkedHashMap<String, Integer> map;
 
@@ -137,9 +113,7 @@ public class ShippingConfirm {
 	// Key:Location, value:quantity
 	private LinkedHashMap<String, LinkedHashMap<String, Integer>> locMap = new LinkedHashMap<String, LinkedHashMap<String, Integer>>();
 	
-	// Key:modelID, value:all location and quantityInfo
-	private LinkedHashMap<String, String> modelMapLocationInfo = new LinkedHashMap<String, String>();
-
+	
 	private int orderTotalCount = 0;
 	// private List<CustOrderbean> salesOrderList;
 	private List<CustOrderbean> salesOrderList;
@@ -147,8 +121,7 @@ public class ShippingConfirm {
 
 	private JProgressBar loading;
 	private LoadingFrameHelper loadingframe;
-	private JTable packingTable;
-	private DefaultTableModel packingModel;
+
 
 	private List<Historybean> items;
 	private List<Historybean> scanItems;
@@ -159,10 +132,7 @@ public class ShippingConfirm {
 
 	private List<String> resultModelItem = new ArrayList<String>();
 
-	public ShippingConfirm(boolean _isPackingList) {
-
-		// initialize();
-		isPackingList = _isPackingList;
+	public ShippingConfirm() {
 		exceuteCallback();
 		orderInfo();
 	}
@@ -220,10 +190,8 @@ public class ShippingConfirm {
 			// adding panel to frame
 			orderFrame.add(orderDisplayPanel);
 		}
-		if (!isPackingList)
-			placeOrderInfo();
-		else
-			placeOrderInfoAndInventoryLocation();
+		
+		placeOrderInfo();
 
 		orderFrame.getContentPane().setBackground(Constrant.BACKGROUN_COLOR);
 		orderFrame.setVisible(true);
@@ -237,37 +205,6 @@ public class ShippingConfirm {
 		});
 	}
 	
-	private void displayPickingOrderInfo(List<Itembean> items) {
-
-		// Locationbean title = Constrant.locations.get(locationbead);
-
-		orderFrame = new JFrame();
-		orderFrame.setBounds(100, 50, 1050, 800);
-		orderFrame.setLocationRelativeTo(null);
-		orderFrame.setUndecorated(true);
-		orderFrame.setResizable(false);
-
-		orderDisplayPanel = new JPanel();
-		orderDisplayPanel
-				.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Constrant.FRAME_BORDER_BACKGROUN_COLOR));
-
-		orderDisplayPanel.setBackground(Constrant.BACKGROUN_COLOR);
-		// adding panel to frame
-		orderFrame.add(orderDisplayPanel);
-
-		placeOrderInfoAndInventoryLocation();
-
-		orderFrame.getContentPane().setBackground(Constrant.BACKGROUN_COLOR);
-		orderFrame.setVisible(true);
-
-		orderFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		orderFrame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				orderFrame.dispose();
-				orderFrame.setVisible(false);
-			}
-		});
-	}
 
 	private void querySalesOrder(String orderNo) {
 
@@ -284,72 +221,10 @@ public class ShippingConfirm {
 
 	}
 
-	private void queryByModel(String modelNo) {
+	
 
-		try {
-			List<Itembean> itemsQuery = fgRepositoryImplRetrofit.getItemsByModel(Integer.valueOf(modelNo));
-
-			if (!isPackingList) {
-				if (!itemsQuery.isEmpty()) {
-					QueryResult window = new QueryResult();
-					window.setContent(QueryResult.QUERY_MODEL, itemsQuery);
-				} else
-					JOptionPane.showMessageDialog(null, "No Items");
-			}
-
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private void queryByModelAndCount(String modelNo, int count) {
-
-		try {
-			List<Itembean> itemsQuery = fgRepositoryImplRetrofit.getItemsByModelAndCount(Integer.valueOf(modelNo),
-					count);
-
-			if (!isPackingList) {
-				if (!itemsQuery.isEmpty()) {
-					QueryResult window = new QueryResult();
-					window.setContent(QueryResult.QUERY_MODEL, itemsQuery);
-				} else
-					JOptionPane.showMessageDialog(null, "No Items");
-			}
-
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private void queryByModelAndDate(String modelNo, String date) {
-
-		try {
-			List<Itembean> itemsQuery = fgRepositoryImplRetrofit.getItemsByModelAndDate(Integer.valueOf(modelNo), date);
-
-			if (!isPackingList) {
-				if (!itemsQuery.isEmpty()) {
-					QueryResult window = new QueryResult();
-					window.setContent(QueryResult.QUERY_MODEL, itemsQuery);
-				} else
-					JOptionPane.showMessageDialog(null, "No Items");
-			}
-
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	
+	
 
 	// update salesOrder date and tracking number
 	private List<CustOrderbean> updateSalesOrder() {
@@ -612,9 +487,6 @@ public class ShippingConfirm {
 					orderModelItems[rowIndex][1] = salesOrderList.get(rowIndex).ItemID;
 					orderModelItems[rowIndex][2] = salesOrderList.get(rowIndex).description;
 
-					if (isPackingList) {
-						orderModelItems[rowIndex][3] = salesOrderList.get(rowIndex).description;
-					}
 					OrderModelmap.put(salesOrderList.get(rowIndex).ItemID, salesOrderList.get(rowIndex).description);
 				}
 
@@ -720,7 +592,7 @@ public class ShippingConfirm {
 					orderFrame.dispose();
 					orderFrame.setVisible(false);
 
-					ShippingConfirm window = new ShippingConfirm(false);
+					ShippingConfirm window = new ShippingConfirm();
 					window.frame.setVisible(true);
 				}
 			});
@@ -740,7 +612,7 @@ public class ShippingConfirm {
 			orderDisplayPanel.add(prev);
 			orderDisplayPanel.add(exit);
 
-			if (!isPackingList) {
+			
 				if (!isOrderClosed)
 					orderDisplayPanel.add(scanner);
 				else {
@@ -762,163 +634,13 @@ public class ShippingConfirm {
 								+ salesOrderList.get(rowIndex).description + "\n" + items.get(0).trackingNo + "\n");
 						rowIndex++;
 					}
-				}
+				
 			}
 		}
 
 	}
 
-	private void placeOrderInfoAndInventoryLocation() {
-
-		
-		salesOrder = salesOrderList.get(0).salesOrder;
-
-		isOrderClosed = salesOrderList.get(0).closed;
-		orderDisplayPanel.setLayout(null);
-
-		Font font = new Font("Verdana", Font.BOLD, 18);
-
-		// ScrollPane for Result
-		JScrollPane scrollZonePane = new JScrollPane();
-
-		scrollZonePane.setBackground(Constrant.TABLE_COLOR);
-		orderDisplayPanel.add(scrollZonePane);
-
-		JLabel total = new JLabel("Total: ");
-
-		total.setBounds(900, 450, 90, 50);
-		total.setFont(font);
-		total.setBackground(Constrant.BACKGROUN_COLOR);
-		orderDisplayPanel.add(total);
-
-		if (!salesOrderList.isEmpty()) {
-
-			fillModelMapLocation();
-
-			// Display the all items into table
-
-			int colsize = 4;
-
-			
-			final Object[][] orderModelItems = new Object[pickingItems.size()][colsize];
-
-			int rowIndex = 0;
-			for (PickingItem item : pickingItems) {
-				String[] zoneCode = null;
-				String zoneDes = "";
-				HashMap<String, Integer> loc = locMap.get(item.modelID);
-				for (int j = 0; j < colsize; j++) {
-					orderModelItems[rowIndex][0] = loc.get(item.location);
-					orderModelItems[rowIndex][1] = item.modelID;
-					orderModelItems[rowIndex][2] = item.modelDes;
-
-					orderModelItems[rowIndex][3] = "  ["+LocationHelper.DisplayZoneCode(LocationHelper.MapZoneCode(item.location))+"] " +item.location;
-
-				}
-				rowIndex++;
-			}
-
-			// modelLabel.setText("SalesOrder : "+_items.get(0).SalesOrder);
-			// modelText.setText(" TOTAL: "+totalCount);
-			final Class[] packingColumnClass = new Class[] { Integer.class, String.class, String.class, String.class };
-
-			Object packingColumnNames[] = { "Qty", "ItemID", "Description", "Location" };
-
-			DefaultTableModel packingModel = new DefaultTableModel(orderModelItems, packingColumnNames) {
-				@Override
-				public boolean isCellEditable(int row, int column) {
-					return false;
-				}
-
-				@Override
-				public Class<?> getColumnClass(int columnIndex) {
-					return packingColumnClass[columnIndex];
-				}
-			};
-
-			// if(packingTable == null)
-			JTable packingTable = new JTable(packingModel);
-			// else
-			// packingModel.fireTableDataChanged();
-			TableColumn quantity = packingTable.getColumnModel().getColumn(0);
-			quantity.setPreferredWidth(20);
-			TableColumn itemId = packingTable.getColumnModel().getColumn(1);
-			itemId.setPreferredWidth(50);
-			TableColumn modelTitle = packingTable.getColumnModel().getColumn(2);
-			modelTitle.setPreferredWidth(500);
-			TableColumn locationCol = packingTable.getColumnModel().getColumn(3);
-			locationCol.setPreferredWidth(100);
-			packingTable.setCellSelectionEnabled(false);
-			packingTable.setColumnSelectionAllowed(false);
-			packingTable.setFocusable(false);
-
-			packingTable.getTableHeader().setBackground(Constrant.TABLE_COLOR);
-			packingTable.getTableHeader().setFont(font);
-
-			packingTable.setBackground(Constrant.TABLE_COLOR);
-			packingTable.setRowHeight(40);
-			packingTable.setFont(font);
-
-			int tableSize = 50 * orderModelItems.length + 20;
-			if (tableSize > 400)
-				tableSize = 400;
-
-			scrollZonePane.setBounds(33, 20, 900, tableSize);
-
-			scrollZonePane.setViewportView(packingTable);
-
-			int txtSize = 280 + 50 * orderModelItems.length;
-			if (txtSize > 430)
-				txtSize = 430;
-			total.setBounds(30, txtSize, 200, 50);
-			total.setText("Total : " + String.valueOf(orderTotalCount));
-			orderDisplayPanel.add(scrollZonePane);
-
-			// modelLabel.setText("SalesOrder : "+_items.get(0).SalesOrder);
-			// modelText.setText(" TOTAL: "+totalCount);
-
-			total.setText("Total : " + String.valueOf(orderTotalCount));
-
-			prev = new JButton("Prev");
-			prev.setFont(font);
-			prev.setBounds(820, 700, 90, 50);
-
-			exit = new JButton("Exit");
-			exit.setFont(font);
-			exit.setBounds(920, 700, 90, 50);
-
-			prev.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					if (scanResultFrame != null) {
-						scanResultFrame.dispose();
-						scanResultFrame.setVisible(false);
-					}
-					orderFrame.dispose();
-					orderFrame.setVisible(false);
-
-					ShippingConfirm window = new ShippingConfirm(true);
-					window.frame.setVisible(true);
-				}
-			});
-
-			exit.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					if (scanResultFrame != null) {
-						scanResultFrame.dispose();
-						scanResultFrame.setVisible(false);
-					}
-
-					orderFrame.dispose();
-					orderFrame.setVisible(false);
-				}
-			});
-
-			orderDisplayPanel.add(prev);
-			orderDisplayPanel.add(exit);
-
-		}
-
-	}
+	
 
 	private void placeOrderInfoDetail() {
 
@@ -1395,36 +1117,7 @@ public class ShippingConfirm {
 
 			@Override
 			public void getInventoryItems(List<Itembean> _items) {
-				if (!_items.isEmpty() && isPackingList) {
-
-					for (Itembean i : _items) {
-						if (inventoryModelmap.containsKey(i.ModelNo)) {
-							List<Itembean> list = inventoryModelmap.get(i.ModelNo);
-							list.add(i);
-							inventoryModelmap.put(i.ModelNo, list);
-						} else {
-							List<Itembean> list = new ArrayList<Itembean>();
-							list.add(i);
-							inventoryModelmap.put(i.ModelNo, list);
-						}
-					}
-
-					 //System.out.println("call back, map.size():" + map.size());
-					 //System.out.println("call back, inventoryModelmap.size():" +
-					 //inventoryModelmap.size());
-					if (inventoryModelmap.size() == map.size()) {
-						if (loading != null)
-							loading.setValue(100);
-
-						if (loadingframe != null) {
-							loadingframe.setVisible(false);
-							loadingframe.dispose();
-						}
-						
-						if(orderFrame == null)
-							displayPickingOrderInfo(_items);
-					}
-				}
+				
 			}
 
 			@Override
@@ -1501,37 +1194,10 @@ public class ShippingConfirm {
 							}
 						}
 
-						if (!isPackingList) {
-							displayOrderInfo(null);
-						} else if (!salesOrderList.get(0).closed) {
-							inventoryModelmap = new LinkedHashMap<String, List<Itembean>>();
-							loadingframe = new LoadingFrameHelper();
-							loading = loadingframe.loadingSample("Loading data...");
-
-							EventQueue.invokeLater(new Runnable() {
-								public void run() {
-									try {
-										loading.setValue(50);
-										for (CustOrderbean _order : orders) {
-											if (_order.ItemID == null || _order.ItemID.indexOf("PL") != -1 || _order.ItemID.length() != 6)
-												continue;
-											else
-												queryByModelAndCount(_order.ItemID, map.get(_order.ItemID));
-											
-											// queryByModel(_order.ItemID);
-											// queryByModel(_order.ItemID);
-											// queryByModelAndDate(_order.ItemID, "2015-01-01");
-										}
-
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
-								}
-							});
-						} else
-							JOptionPane.showMessageDialog(null, "The sales order is closed !");
+						
+						displayOrderInfo(null);
+						
 					}
-
 				}
 			}
 

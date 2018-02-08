@@ -199,7 +199,7 @@ public class AppMenu implements ActionListener {
 			window.frame.setVisible(true);
 
 		} else if (e.getSource() == btnShipping) {
-			ShippingConfirm window = new ShippingConfirm(false);
+			ShippingConfirm window = new ShippingConfirm();
 			window.frame.setVisible(true);
 
 		}else if (e.getSource() == btnReport) {
