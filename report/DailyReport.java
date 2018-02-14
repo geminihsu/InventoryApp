@@ -383,8 +383,9 @@ public class DailyReport  {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					try {
-
-						fgModelZone2.getAllItems("2018-02-01");
+						String timeStamp = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+						//fgModelZone2.getAllItems("2018-02-12");
+						fgModelZone2.getAllItems(timeStamp);
 
 					} catch (Exception e) {
 						e.printStackTrace();

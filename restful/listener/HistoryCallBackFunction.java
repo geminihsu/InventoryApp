@@ -9,5 +9,6 @@ import spirit.fitness.scanner.model.Itembean;
 
 public interface HistoryCallBackFunction {
 	public void resultCode(int code);
+	public void checkHistoryItemsBySalesOrder(List<Historybean> items);
 	public void getHistoryItems(List<Historybean> items);
 }

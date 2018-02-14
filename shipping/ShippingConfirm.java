@@ -56,7 +56,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-
 import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.inquiry.QueryResult;
@@ -76,7 +75,6 @@ import spirit.fitness.scanner.model.Historybean;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Locationbean;
 import spirit.fitness.scanner.model.PickingItem;
-
 
 public class ShippingConfirm {
 
@@ -109,11 +107,10 @@ public class ShippingConfirm {
 
 	// Key:modelID, value:response items
 	private LinkedHashMap<String, List<Itembean>> inventoryModelmap;
-	
+
 	// Key:Location, value:quantity
 	private LinkedHashMap<String, LinkedHashMap<String, Integer>> locMap = new LinkedHashMap<String, LinkedHashMap<String, Integer>>();
-	
-	
+
 	private int orderTotalCount = 0;
 	// private List<CustOrderbean> salesOrderList;
 	private List<CustOrderbean> salesOrderList;
@@ -121,7 +118,6 @@ public class ShippingConfirm {
 
 	private JProgressBar loading;
 	private LoadingFrameHelper loadingframe;
-
 
 	private List<Historybean> items;
 	private List<Historybean> scanItems;
@@ -133,6 +129,7 @@ public class ShippingConfirm {
 	private List<String> resultModelItem = new ArrayList<String>();
 
 	public ShippingConfirm() {
+		loadingframe = new LoadingFrameHelper();
 		exceuteCallback();
 		orderInfo();
 	}
@@ -190,7 +187,7 @@ public class ShippingConfirm {
 			// adding panel to frame
 			orderFrame.add(orderDisplayPanel);
 		}
-		
+
 		placeOrderInfo();
 
 		orderFrame.getContentPane().setBackground(Constrant.BACKGROUN_COLOR);
@@ -204,7 +201,6 @@ public class ShippingConfirm {
 			}
 		});
 	}
-	
 
 	private void querySalesOrder(String orderNo) {
 
@@ -220,11 +216,6 @@ public class ShippingConfirm {
 		}
 
 	}
-
-	
-
-	
-	
 
 	// update salesOrder date and tracking number
 	private List<CustOrderbean> updateSalesOrder() {
@@ -249,8 +240,7 @@ public class ShippingConfirm {
 
 		try {
 			items = (ArrayList<Historybean>) historyRepositoryImplRetrofit.createItem(datas);
-			if (!items.isEmpty())
-				getShippgingItems(salesOrder);
+
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -261,37 +251,19 @@ public class ShippingConfirm {
 
 	}
 
-	private List<Historybean> getShippgingItems(String salesOrder) {
-		List<Historybean> items = null;
+	// Get items from History table
+	private List<Historybean> getShippgingItems(String salesOrder, boolean isDisplay) {
+		//List<Historybean> items = null;
 		try {
 			items = historyRepositoryImplRetrofit.getItemsBySalesOrder(salesOrder);
-			if (!items.isEmpty()) {
 
-				if (scanResultFrame != null) {
-					scanResultFrame.dispose();
-					scanResultFrame.setVisible(false);
-				}
-
-				JScrollPane JScrollPane = getShippgingItemsJScrollPane(items);
-				
-				
-				int tableSize = 50 * items.size() + 20;
-				if (tableSize > 200)
-					tableSize = 200;
-				
-				JScrollPane.setBounds(40, 520, 300, tableSize);
-				
-				orderDisplayPanel.add(JScrollPane);
-				orderDisplayPanel.remove(scanner);
-				orderDisplayPanel.add(print);
-
-				
-				orderFrame.invalidate();
-				orderFrame.validate();
-				orderFrame.repaint();
-
-			}
-
+			if (isDisplay)
+				displayItemsfromHistory(items);
+			//else if (items.size() == 0)
+			//else
+			//	querySalesOrder(salesOrder);
+			//else
+			//	JOptionPane.showMessageDialog(null, "The sales order is closed !");
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -301,6 +273,43 @@ public class ShippingConfirm {
 		}
 
 		return items;
+	}
+
+	private void displayItemsfromHistory(List<Historybean> items) {
+		if (!items.isEmpty()) {
+
+			frame.dispose();
+			frame.setVisible(false);
+			
+			if (scanResultFrame != null) {
+				scanResultFrame.dispose();
+				scanResultFrame.setVisible(false);
+			}
+
+			
+			
+			JScrollPane JScrollPane = getShippgingItemsJScrollPane(items);
+
+			int tableSize = 50 * items.size() + 20;
+			if (tableSize > 150)
+				tableSize = 150;
+
+			JScrollPane.setBounds(40, 600, 300, tableSize);
+
+			orderDisplayPanel.add(JScrollPane);
+			orderDisplayPanel.remove(scanner);
+			orderDisplayPanel.add(print);
+
+			if (loadingframe != null) {
+				loadingframe.setVisible(false);
+				loadingframe.dispose();
+			}
+			
+			orderFrame.invalidate();
+			orderFrame.validate();
+			orderFrame.repaint();
+
+		}
 	}
 
 	private JScrollPane getShippgingItemsJScrollPane(List<Historybean> list) {
@@ -402,9 +411,12 @@ public class ShippingConfirm {
 					EventQueue.invokeLater(new Runnable() {
 						public void run() {
 							try {
-
-								querySalesOrder(salesOrderNo.getText().toString().trim());
-
+								loadingframe = new LoadingFrameHelper();
+								loading = loadingframe.loadingSample("Loading data...");
+								
+								salesOrder = salesOrderNo.getText().toString().trim();
+								//querySalesOrder(salesOrder);
+								getShippgingItems(salesOrder,false);
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -456,7 +468,7 @@ public class ShippingConfirm {
 		String shippToZip = salesOrderList.get(0).shipToZipCode;
 		String shippToVia = salesOrderList.get(0).shipVia;
 
-		isOrderClosed = salesOrderList.get(0).closed;
+		//isOrderClosed = salesOrderList.get(0).closed;
 		orderDisplayPanel.setLayout(null);
 
 		Font font = new Font("Verdana", Font.BOLD, 18);
@@ -561,14 +573,15 @@ public class ShippingConfirm {
 
 			prev = new JButton("Prev");
 			prev.setFont(font);
-			prev.setBounds(820, 730, 90, 50);
+			prev.setBounds(820, 700, 90, 50);
 
 			exit = new JButton("Exit");
 			exit.setFont(font);
-			exit.setBounds(920, 730, 90, 50);
+			exit.setBounds(920, 700, 90, 50);
 
 			print.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					
 					String shipToAddress = billToTitle + "\n              " + shippToAdddress + "\n              "
 							+ shippToCity + "  " + shippToState + "\n              " + shippToZip + "    "
 							+ shippToCountry;
@@ -612,35 +625,33 @@ public class ShippingConfirm {
 			orderDisplayPanel.add(prev);
 			orderDisplayPanel.add(exit);
 
-			
-				if (!isOrderClosed)
-					orderDisplayPanel.add(scanner);
-				else {
-					// display the items
-					orderDisplayPanel.add(print);
+			if (!isOrderClosed)
+				orderDisplayPanel.add(scanner);
+			else {
+				// display the items
+				orderDisplayPanel.add(print);
 
-					List<Historybean> items = getShippgingItems(salesOrder);
-
-					for (Historybean h : items) {
-						historyItemsInfo += h.SN + "\n";
-					}
-					rowIndex = 0;
-					for (Map.Entry<String, Integer> location : map.entrySet()) {
-						// orderItemsInfo += location.getValue() +" " +
-						// salesOrderList.get(rowIndex).ItemID +" "+
-						// salesOrderList.get(rowIndex).description + " "+ items.get(0).trackingNo
-						// +"\n";
-						resultModelItem.add(location.getValue() + "\n" + salesOrderList.get(rowIndex).ItemID + "\n"
-								+ salesOrderList.get(rowIndex).description + "\n" + items.get(0).trackingNo + "\n");
-						rowIndex++;
-					}
+				//List<Historybean> items = getShippgingItems(salesOrder, true);
+				displayItemsfromHistory(items);
 				
+				for (Historybean h : items) {
+					historyItemsInfo += h.SN + "\n";
+				}
+				rowIndex = 0;
+				for (Map.Entry<String, Integer> location : map.entrySet()) {
+					// orderItemsInfo += location.getValue() +" " +
+					// salesOrderList.get(rowIndex).ItemID +" "+
+					// salesOrderList.get(rowIndex).description + " "+ items.get(0).trackingNo
+					// +"\n";
+					resultModelItem.add(location.getValue() + "\n" + salesOrderList.get(rowIndex).ItemID + "\n"
+							+ salesOrderList.get(rowIndex).description + "\n" + items.get(0).trackingNo + "\n");
+					rowIndex++;
+				}
+
 			}
 		}
 
 	}
-
-	
 
 	private void placeOrderInfoDetail() {
 
@@ -713,7 +724,7 @@ public class ShippingConfirm {
 		JDialog.setDefaultLookAndFeelDecorated(false);
 		frame = new JFrame("Query Pannel");
 		// Setting the width and height of frame
-		frame.setSize(800, 630);
+		frame.setSize(800, 700);
 		frame.setLocationRelativeTo(null);
 		frame.setUndecorated(true);
 		frame.setResizable(false);
@@ -815,7 +826,11 @@ public class ShippingConfirm {
 		table.setFont(font);
 		table.setRowHeight(40);
 
-		scrollZonePane.setBounds(33, 100, 750, 50 * rowData.length + 20);
+		
+		int tableSize = 50 * rowData.length + 20;
+		if (tableSize > 450)
+			tableSize = 450;
+		scrollZonePane.setBounds(33, 100, 750, tableSize);
 		scrollZonePane.setViewportView(table);
 
 		panel.add(scrollZonePane);
@@ -823,74 +838,82 @@ public class ShippingConfirm {
 		// Creating Report button
 		report = new JButton("Report");
 		report.setFont(font);
-		report.setBounds(600, 400, 180, 50);
+		report.setBounds(600, 570, 180, 50);
 		report.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
+				if (loadingframe != null) { 
+					loading = loadingframe.loadingSample("Report data...");
+					loading.setValue(80);
+					loadingframe.setVisible(true);
+				}
+				
+				isOrderClosed = true;
+				report.setEnabled(false);
+				scanItems = new ArrayList<Historybean>();
+				String SalesOrder = salesOrderList.get(0).salesOrder;
+				String date = salesOrderList.get(0).shippingDate;
+				String billToTitle = salesOrderList.get(0).bill_to;
+				String custPO = salesOrderList.get(0).customerPO;
+				String shippToAdddress = salesOrderList.get(0).shipToAddress;
+				String shippToCity = salesOrderList.get(0).shipToCity;
+				String shippToCountry = salesOrderList.get(0).shipToCountry;
+				String shippToState = salesOrderList.get(0).shipToState;
+				String shippToZip = salesOrderList.get(0).shipToZipCode;
+				String shippToVia = salesOrderList.get(0).shipVia;
+
+				String timeStamp = new SimpleDateFormat("yyyy-MM-dd")
+						.format(Calendar.getInstance().getTime());
+				for (String item : itemList) {
+					Historybean _item = new Historybean();
+
+					_item.SN = item;
+					_item.date = timeStamp;
+					_item.location = "999";
+					_item.modelNo = item.substring(0, 6);
+				
+					_item.salesOrder = salesOrder;
+					_item.trackingNo = pro;
+					_item.billTo = billToTitle;
+					_item.shipCity = shippToCity;
+					_item.shipState = shippToState;
+					_item.shipVia = shippToVia;
+
+					scanItems.add(_item);
+
+				}
+
+				for (int i = 0; i < salesOrderList.size(); i++) {
+					CustOrderbean order = salesOrderList.get(i);
+					order.shippingDate = timeStamp;
+					order.closed = true;
+					// order.TrackingNo = proNumber.getText().toString();
+					salesOrderList.set(i, order);
+				}
+
+				int rowIndex = 0;
+				for (Map.Entry<String, Integer> location : map.entrySet()) {
+					// orderItemsInfo += location.getValue() +" " +
+					// salesOrderList.get(rowIndex).ItemID +" "+
+					// salesOrderList.get(rowIndex).description + " "+ scanItems.get(0).trackingNo
+					// +"\n";
+					rowIndex++;
+				}
+
+				for (Historybean h : scanItems) {
+					historyItemsInfo += h.SN + "\n";
+				}
+
+				
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
-						report.setEnabled(false);
-						scanItems = new ArrayList<Historybean>();
-						String SalesOrder = salesOrderList.get(0).salesOrder;
-						String date = salesOrderList.get(0).shippingDate;
-						String billToTitle = salesOrderList.get(0).bill_to;
-						String custPO = salesOrderList.get(0).customerPO;
-						String shippToAdddress = salesOrderList.get(0).shipToAddress;
-						String shippToCity = salesOrderList.get(0).shipToCity;
-						String shippToCountry = salesOrderList.get(0).shipToCountry;
-						String shippToState = salesOrderList.get(0).shipToState;
-						String shippToZip = salesOrderList.get(0).shipToZipCode;
-						String shippToVia = salesOrderList.get(0).shipVia;
-
-						String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-								.format(Calendar.getInstance().getTime());
-						for (String item : itemList) {
-							Historybean _item = new Historybean();
-
-							_item.SN = item;
-							_item.date = timeStamp;
-							_item.location = "999";
-							_item.modelNo = item.substring(0, 6);
-							_item.date = date;
-							_item.salesOrder = salesOrder;
-							_item.trackingNo = pro;
-							_item.billTo = billToTitle;
-							_item.custPO = custPO;
-							_item.shipCity = shippToCity;
-							_item.shipState = shippToState;
-							_item.shipVia = shippToVia;
-							_item.IsPurchaseImported = false;
-
-							scanItems.add(_item);
-
-						}
-
-						for (int i = 0; i < salesOrderList.size(); i++) {
-							CustOrderbean order = salesOrderList.get(i);
-							order.shippingDate = timeStamp;
-							order.closed = true;
-							// order.TrackingNo = proNumber.getText().toString();
-							salesOrderList.set(i, order);
-						}
-
-						int rowIndex = 0;
-						for (Map.Entry<String, Integer> location : map.entrySet()) {
-							// orderItemsInfo += location.getValue() +" " +
-							// salesOrderList.get(rowIndex).ItemID +" "+
-							// salesOrderList.get(rowIndex).description + " "+ scanItems.get(0).trackingNo
-							// +"\n";
-							rowIndex++;
-						}
-
-						for (Historybean h : scanItems) {
-							historyItemsInfo += h.SN + "\n";
-						}
-
+						
 						// displayLoadingBar();
-						loadingframe = new LoadingFrameHelper();
-						loading = loadingframe.loadingSample("Report data...");
-
-						updateSalesOrder();
+						
+					
+						shippingItems(scanItems);
+						//getShippgingItems(salesOrder, false);
+						// updateSalesOrder();
 
 					}
 				});
@@ -903,7 +926,7 @@ public class ShippingConfirm {
 		// Creating Report button
 		JButton prev = new JButton("Prev");
 		prev.setFont(font);
-		prev.setBounds(600, 500, 80, 50);
+		prev.setBounds(600, 630, 80, 50);
 		prev.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
@@ -919,7 +942,7 @@ public class ShippingConfirm {
 		// Creating Report button
 		JButton exit = new JButton("Exit");
 		exit.setFont(font);
-		exit.setBounds(700, 500, 80, 50);
+		exit.setBounds(700, 630, 80, 50);
 		exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				scanner.setEnabled(true);
@@ -1006,7 +1029,7 @@ public class ShippingConfirm {
 
 				boolean lenError = false;
 				if (!set.contains(item[item.length - 1]) && item[item.length - 1].length() == 16
-						&& set.size() <= orderTotalCount &&map.containsKey(item[item.length - 1].substring(0,6))) {
+						&& set.size() <= orderTotalCount && map.containsKey(item[item.length - 1].substring(0, 6))) {
 
 					set.add(item[item.length - 1]);
 				} else {
@@ -1026,7 +1049,7 @@ public class ShippingConfirm {
 				}
 			}
 		});
-		
+
 		panel.add(scrollPanel1);
 
 		InputMap inputPro = proNumber.getInputMap();
@@ -1041,7 +1064,6 @@ public class ShippingConfirm {
 				inputSN.grabFocus();
 			}
 		});
-		
 
 		// Creating Query button
 		JButton queryButton = new JButton("Add");
@@ -1084,7 +1106,7 @@ public class ShippingConfirm {
 
 		panel.add(resetButton);
 
-		// Creating clear button
+		// Creating Exit button
 		JButton exitButton = new JButton("Exit");
 		exitButton.setFont(font);
 		exitButton.setBounds(50, 670, 180, 50);
@@ -1117,13 +1139,13 @@ public class ShippingConfirm {
 
 			@Override
 			public void getInventoryItems(List<Itembean> _items) {
-				
+
 			}
 
 			@Override
 			public void checkInventoryItems(List<Itembean> items) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 		});
@@ -1150,54 +1172,42 @@ public class ShippingConfirm {
 					frame.dispose();
 					frame.setVisible(false);
 
-					if (!orders.isEmpty() && !salesOrder.equals("")) {
-						// System.out.println("update sucess");
-						EventQueue.invokeLater(new Runnable() {
-							public void run() {
-								try {
-									loading.setValue(50);
-									if (!isOrderClosed)
-										shippingItems(scanItems);
-									else
-										getShippgingItems(orders.get(0).salesOrder);
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-							}
-						});
-					} else {
+					//if (isOrderClosed) {
 						pickingItems = new ArrayList<PickingItem>();
 						salesOrderList = new ArrayList<CustOrderbean>();
 						map = new LinkedHashMap<String, Integer>();
 						OrderModelmap = new TreeMap<String, String>();
-						salesOrderList = orders;
-						for (CustOrderbean item : salesOrderList) {
+						// salesOrderList = orders;
+						for (CustOrderbean item : orders) {
 							int count = Integer.valueOf(item.quantity);
 							// System.out.println("item.ItemID:" + item.ItemID);
 
-							if (item.ItemID != null) {
-								if (map.containsKey(item.ItemID) && item.ItemID.length() == 6) {
+							if (item.ItemID != null && !item.ItemID.contains("PL") && item.ItemID.length() == 6) {
+								salesOrderList.add(item);
+								if (map.containsKey(item.ItemID)) {
 
-									if (!item.ItemID.contains("PL")) {
-										count += map.get(item.ItemID);
-										map.put(item.ItemID, count);
-										orderTotalCount += count;
-									}
+									count += map.get(item.ItemID);
+									map.put(item.ItemID, count);
+									orderTotalCount += count;
+
 								} else {
 
-									if (!item.ItemID.contains("PL")&& item.ItemID.length() == 6) {
-										orderTotalCount += count;
-										map.put(item.ItemID, count);
-										OrderModelmap.put(item.ItemID, item.description);
-									}
+									orderTotalCount += count;
+									map.put(item.ItemID, count);
+									OrderModelmap.put(item.ItemID, item.description);
+
 								}
 							}
 						}
-
+						
+						if (loadingframe != null) {
+							loadingframe.setVisible(false);
+							loadingframe.dispose();
+						}
 						
 						displayOrderInfo(null);
 						
-					}
+
 				}
 			}
 
@@ -1216,22 +1226,50 @@ public class ShippingConfirm {
 			}
 
 			@Override
-			public void getHistoryItems(List<Historybean> items) {
-				if (!items.isEmpty() && !isOrderClosed) {
-					// progressMonitor.close();
-					// task.done();
-					isOrderClosed = true;
-
-					loading.setValue(50);
-					loadingframe.setVisible(false);
-					loadingframe.dispose();
-
-					frame.dispose();
-					frame.setVisible(false);
-
-					JOptionPane.showMessageDialog(null, "Insert Data Success!");
+			public void getHistoryItems(List<Historybean> _items) {
+				
+				if (!_items.isEmpty()) 
+				{
+					JOptionPane.showMessageDialog(null, "Report data success.");
+					
+					//if(orderFrame != null)
+					//	orderFrame.setVisible(true);
+					int rowIndex = 0;
+					for (Map.Entry<String, Integer> location : map.entrySet()) {
+						// orderItemsInfo += location.getValue() +" " +
+						// salesOrderList.get(rowIndex).ItemID +" "+
+						// salesOrderList.get(rowIndex).description + " "+ items.get(0).trackingNo
+						// +"\n";
+						resultModelItem.add(location.getValue() + "\n" + salesOrderList.get(rowIndex).ItemID + "\n"
+								+ salesOrderList.get(rowIndex).description + "\n" + scanItems.get(0).trackingNo + "\n");
+						rowIndex++;
+					}
+					
+					displayItemsfromHistory(scanItems);
+					
 				}
+			}
 
+			@Override
+			public void checkHistoryItemsBySalesOrder(List<Historybean> _items) {
+				if (!_items.isEmpty()) {
+					isOrderClosed = true;
+					items = _items;
+				
+				}	//Check SaleOrder Info
+				
+				//if(!isOrderClosed)
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							querySalesOrder(salesOrder);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				
+				
 			}
 
 		});
@@ -1266,77 +1304,7 @@ public class ShippingConfirm {
 		return true;
 	}
 
-	private void fillModelMapLocation() {
 	
-
-		for (Map.Entry<String, List<Itembean>> location : inventoryModelmap.entrySet()) {
-			LinkedHashMap<String, Integer> locModelMap = new LinkedHashMap<String, Integer>();
-			
-			String locInfo = "";
-			int orderCount = map.get(location.getKey());
-			String model = location.getKey();
-			for (Itembean item : location.getValue()) {
-
-				if (locModelMap.containsKey(item.Location)) {
-					int itemlist = locModelMap.get(item.Location);
-					if (itemlist < orderCount) {
-						itemlist = itemlist + 1;
-						locModelMap.put(item.Location, itemlist);
-					} else
-						break;
-				} else {
-					PickingItem pickItem = new PickingItem();
-					pickItem.quantity = 1;
-					pickItem.modelID = item.ModelNo;
-					pickItem.modelDes =OrderModelmap.get(pickItem.modelID);
-					pickItem.location = item.Location;
-					pickingItems.add(pickItem);
-					System.out.println(location.getKey());
-					locModelMap.put(item.Location, 1);
-				}
-
-			}
-			
-			locMap.put(model, locModelMap);
-			int zone2Cnt = 0;
-			
-			/*for (Map.Entry<String, Integer> code : locMap.entrySet()) {
-				if (LocationHelper.MapZoneCode(code.getKey()) == 2) {
-					zone2Cnt +=code.getValue();
-					// locInfo = "[" + code.getKey() + "]:" + code.getValue() + "," + locInfo;
-					// } else {
-					locInfo += "[Zone 2]" + "[" + code.getKey() + "]:" + code.getValue() + ",";
-				}
-				
-				if(zone2Cnt < orderCount && LocationHelper.MapZoneCode(code.getKey()) == 1) 
-				{
-					zone2Cnt +=code.getValue();
-					// locInfo = "[" + code.getKey() + "]:" + code.getValue() + "," + locInfo;
-					// } else {
-					locInfo += "[Zone 1]" + "[" + code.getKey() + "]:" + code.getValue() + ",";
-					//map.put(location.getKey()+"1", code.getValue());
-				}
-			}
-
-			if (locInfo.length() > 0)
-				locInfo = locInfo.substring(0, locInfo.length() - 1);
-			else {
-				for (Map.Entry<String, Integer> code : locMap.entrySet()) {
-					if (LocationHelper.MapZoneCode(code.getKey()) != 2) {
-						// locInfo = "[" + code.getKey() + "]:" + code.getValue() + "," + locInfo;
-						// } else {
-						locInfo += "[" + LocationHelper.DisplayZoneCode(LocationHelper.MapZoneCode(code.getKey())) + "]"
-								+ "[" + code.getKey() + "]:" + code.getValue() + ",";
-					}
-				}
-
-				locInfo = locInfo.substring(0, locInfo.length() - 1);
-			}*/
-
-			//modelMapLocationInfo.put(location.getKey(), locInfo);
-		}
-
-	}
 
 	private void printer(String saleOrder, String date, String billTo, String shipTo, String itemsInfo) {
 

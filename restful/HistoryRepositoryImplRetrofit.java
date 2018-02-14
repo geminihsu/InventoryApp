@@ -99,9 +99,15 @@ public class HistoryRepositoryImplRetrofit {
 		Response<List<Historybean>> request = service.getItemsBySalesOrder(salesOrder).execute();
 		int code = request.code();
 		
-		List<Historybean> result = retriveCode(code,request);
+		List<Historybean> resultData = null;
 		
-		return result;
+		if(code == HttpRequestCode.HTTP_REQUEST_OK)
+			resultData = request.body();
+		
+		if (historyServiceCallBackFunction != null) 
+			historyServiceCallBackFunction.checkHistoryItemsBySalesOrder(resultData);
+		
+		return resultData;
 	}
 
 	/*public static void main(String[] args) throws Exception {

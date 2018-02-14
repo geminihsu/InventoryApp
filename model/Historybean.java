@@ -19,7 +19,7 @@ public class Historybean {
     public Integer seq;
     @SerializedName("SN")
     public String SN;
-    @SerializedName("date")
+    @SerializedName("Date")
     public String date;
     @SerializedName("Location")
     public String location;
@@ -37,10 +37,6 @@ public class Historybean {
     public String shipState;
     @SerializedName("ShipCity")
     public String shipCity;
-    @SerializedName("CustPO")
-    public String custPO;
-    @SerializedName("IsPurchaseImported")
-    public Boolean IsPurchaseImported;
   
     @Override
     public String toString() {

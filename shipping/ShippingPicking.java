@@ -140,6 +140,7 @@ public class ShippingPicking {
 	// private List<CustOrderbean> salesOrderList;
 	private List<CustOrderbean> salesOrderList;
 	private List<PickingItem> pickingItems;
+	private List<Historybean> items;
 
 	private JProgressBar loading;
 	private LoadingFrameHelper loadingframe;
@@ -204,6 +205,24 @@ public class ShippingPicking {
 
 	}
 
+	// Get items from History table
+	private List<Historybean> getShippgingItems(String salesOrder) {
+		//List<Historybean> items = null;
+		try {
+			items = historyRepositoryImplRetrofit.getItemsBySalesOrder(salesOrder);
+
+			//else
+			//	JOptionPane.showMessageDialog(null, "The sales order is closed !");
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return items;
+	}
 
 
 	private void queryByModelAndCount(String modelNo, int count) {
@@ -285,8 +304,9 @@ public class ShippingPicking {
 						public void run() {
 							try {
 
-								querySalesOrder(salesOrderNo.getText().toString().trim());
-
+								salesOrder = (salesOrderNo.getText().toString().trim());
+								//querySalesOrder(salesOrderNo.getText().toString().trim());
+								getShippgingItems(salesOrder);
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -529,6 +549,13 @@ public class ShippingPicking {
 						if(orderFrame == null)
 							displayPickingOrderInfo(_items);
 					}
+				}else
+					{
+					if (loadingframe != null) {
+						loadingframe.setVisible(false);
+						loadingframe.dispose();
+					}
+					JOptionPane.showMessageDialog(null, "Items not enough in zone 1.");
 				}
 			}
 
@@ -590,7 +617,7 @@ public class ShippingPicking {
 						}
 					}
 
-					if (!salesOrderList.get(0).closed) {
+					if (!isOrderClosed) {
 						inventoryModelmap = new LinkedHashMap<String, List<Itembean>>();
 						loadingframe = new LoadingFrameHelper();
 						loading = loadingframe.loadingSample("Loading data...");
@@ -624,6 +651,41 @@ public class ShippingPicking {
 
 		});
 
+		historyRepositoryImplRetrofit = new HistoryRepositoryImplRetrofit();
+		historyRepositoryImplRetrofit.setHistoryServiceCallBackFunction(new HistoryCallBackFunction() {
+
+			@Override
+			public void resultCode(int code) {
+				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
+					JOptionPane.showMessageDialog(null, "Items already exit.");
+
+				}
+
+			}
+
+			@Override
+			public void getHistoryItems(List<Historybean> _items) {
+				
+				// else
+				//
+
+			}
+
+			@Override
+			public void checkHistoryItemsBySalesOrder(List<Historybean> _items) {
+				if (!_items.isEmpty()) {
+					isOrderClosed = true;
+					JOptionPane.showMessageDialog(null, "The sales order is closed !");
+				} else {
+
+					items = _items;
+					// Check SaleOrder Info
+					querySalesOrder(salesOrder);
+				}
+				
+			}
+
+		});
 		
 	}
 

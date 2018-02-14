@@ -21,4 +21,10 @@ public class ModelZone2bean {
 	
 	@SerializedName("Z2CurtQty")
 	public Integer Z2CurtQty;
+	
+	@SerializedName("Z2MaxQty")
+	public Integer Z2MaxQty;
+	
+	@SerializedName("PalletNum")
+	public Integer PalletNum;
 }
