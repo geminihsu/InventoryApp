@@ -99,9 +99,12 @@ public class ShippingConfirm {
 
 	private String prevContent = "";
 
-	// Key:modelID, value:quality
+	// Key:modelID, value:quality 
 	private LinkedHashMap<String, Integer> map;
 
+	// Key:modelID, value:current scanner quality
+	private LinkedHashMap<String, Integer> modelScanCurMap;
+	
 	// Key:modelID, value:description
 	private TreeMap<String, String> OrderModelmap;
 
@@ -1002,9 +1005,12 @@ public class ShippingConfirm {
 			len = item.length;
 		}
 		// Creating JLabel
-		JLabel modelLabel = new JLabel("Total : " + len + "/" + String.valueOf(orderTotalCount));
-
-		modelLabel.setBounds(50, 150, 200, 100);
+		JLabel modelLabel = new JLabel("");
+          
+		
+		modelLabel.setText(setModelScanCountLabel(len));
+		
+		modelLabel.setBounds(50, 150, 200, 500);
 		modelLabel.setFont(font);
 		panel.add(modelLabel);
 
@@ -1028,9 +1034,12 @@ public class ShippingConfirm {
 				String[] item = inputSN.getText().toString().split("\n");
 
 				boolean lenError = false;
+				String model = item[item.length - 1].substring(0, 6);
+				int curModelCnt = modelScanCurMap.get(model);
 				if (!set.contains(item[item.length - 1]) && item[item.length - 1].length() == 16
-						&& set.size() <= orderTotalCount && map.containsKey(item[item.length - 1].substring(0, 6))) {
-
+						&& set.size() <= orderTotalCount && map.containsKey(model) && curModelCnt < map.get(model)) {
+					
+					modelScanCurMap.put(model, modelScanCurMap.get(model) + 1);
 					set.add(item[item.length - 1]);
 				} else {
 					lenError = true;
@@ -1044,7 +1053,7 @@ public class ShippingConfirm {
 				} else {
 
 					modelLabel.setForeground(Color.BLACK);
-					modelLabel.setText("Total: " + set.size() + "/" + String.valueOf(orderTotalCount));
+					modelLabel.setText(setModelScanCountLabel(set.size()));
 
 				}
 			}
@@ -1097,7 +1106,12 @@ public class ShippingConfirm {
 							JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 					if (result == JOptionPane.YES_OPTION) {
 						inputSN.setText("");
-						modelLabel.setText("Total: " + "0/" + String.valueOf(orderTotalCount));
+						set.clear();
+						for (Map.Entry<String, Integer> location : modelScanCurMap.entrySet()) 
+						{
+							modelScanCurMap.put(location.getKey(), 0);
+						}
+						modelLabel.setText(setModelScanCountLabel(0));
 						modelLabel.setForeground(Color.BLACK);
 					}
 				}
@@ -1176,6 +1190,7 @@ public class ShippingConfirm {
 						pickingItems = new ArrayList<PickingItem>();
 						salesOrderList = new ArrayList<CustOrderbean>();
 						map = new LinkedHashMap<String, Integer>();
+						modelScanCurMap = new LinkedHashMap<String, Integer>();
 						OrderModelmap = new TreeMap<String, String>();
 						// salesOrderList = orders;
 						for (CustOrderbean item : orders) {
@@ -1195,7 +1210,7 @@ public class ShippingConfirm {
 									orderTotalCount += count;
 									map.put(item.ItemID, count);
 									OrderModelmap.put(item.ItemID, item.description);
-
+									modelScanCurMap.put(item.ItemID, 0);
 								}
 							}
 						}
@@ -1279,7 +1294,7 @@ public class ShippingConfirm {
 	private boolean checkOrder(String content) {
 
 		String[] sn = content.toString().split("\n");
-
+		System.out.println("SN size :"+sn.length);
 		if (sn.length != orderTotalCount) {
 			JOptionPane.showMessageDialog(null, "Quantity Error! Please confirm the items quantiy.");
 			return false;
@@ -1306,6 +1321,15 @@ public class ShippingConfirm {
 
 	
 
+	private String setModelScanCountLabel(int curCount) 
+	{
+		String modelQty = "<html>"+"Total : " + curCount + "/" + String.valueOf(orderTotalCount)+" </br>";
+		for (Map.Entry<String, Integer> location : map.entrySet()) {
+			modelQty += location.getKey() +"(" + modelScanCurMap.get(location.getKey()) + "/"+location.getValue()+") </br>";
+		}
+		modelQty = modelQty + "</br></html>";
+		return modelQty;
+	}
 	private void printer(String saleOrder, String date, String billTo, String shipTo, String itemsInfo) {
 
 		String content = "Sales Order : " + saleOrder + "\n" + "TransactionDate : " + date + "\n" + "Bill To : "
