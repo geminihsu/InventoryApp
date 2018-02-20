@@ -233,7 +233,7 @@ public class ItemsPannel {
 					scanResultFrame.dispose();
 
 					if (type == MOVING) {
-						loadingframe = new LoadingFrameHelper();
+						loadingframe = new LoadingFrameHelper("Checking data...");
 						loading = loadingframe.loadingSample("Checking data...");
 
 						String[] itemList = items.split("\n");
@@ -478,8 +478,8 @@ public class ItemsPannel {
 					print.printItems(content);
 				}
 
-				loadingframe = new LoadingFrameHelper();
-				loading = loadingframe.loadingSample("Submit data...");
+				loadingframe = new LoadingFrameHelper("Add data...");
+				loading = loadingframe.loadingSample("Add data...");
 
 				exceuteCallback();
 				// displayLoadingBar();
@@ -589,7 +589,7 @@ public class ItemsPannel {
 
 		String zoneCode = LocationHelper.DisplayZoneCode(LocationHelper.MapZoneCode(location));
 		// Creating JLabel
-		JLabel modelLabel = new JLabel("<html>Do you want to assign all items :" + " <br/>" + "Model :" + model.Model
+		JLabel modelLabel = new JLabel("<html>Do you want to assign all items :" + " <br/>" + "Model :" + model.ModelNo
 				+ "(" + ((String) sortedList.get(0)).substring(0, 6) + ") <br/>" + "Total : " + sortedList.size()
 				+ " <br/>" + result + " <br/>" + "to location " + "[" + zoneCode + "][" + location + "] ?</html>");
 
@@ -639,8 +639,8 @@ public class ItemsPannel {
 					print.printItems(content);
 				}
 
-				loadingframe = new LoadingFrameHelper();
-				loading = loadingframe.loadingSample("Submit data...");
+				loadingframe = new LoadingFrameHelper("Add data...");
+				loading = loadingframe.loadingSample("Add data...");
 
 				exceuteCallback();
 				// displayLoadingBar();

@@ -30,17 +30,17 @@ public interface InventoryCallback {
 	Call<List<Itembean>> getItemsByLocation(@Path("location") Integer location);
 	
 	@GET("api/FGInventory/model/{modelNo}")
-	Call<List<Itembean>> getItemsByModelNo(@Path("modelNo") Integer modelNo);
+	Call<List<Itembean>> getItemsByModelNo(@Path("modelNo") String modelNo);
 	
 	@GET("api/FGInventory/model/{modelNo}/location/{location}")
-	Call<List<Itembean>> getItemsByModelNoAndLocation(@Path("modelNo") Integer modelNo,@Path("location") Integer location);
+	Call<List<Itembean>> getItemsByModelNoAndLocation(@Path("modelNo") String modelNo,@Path("location") Integer location);
 	
 	
 	@GET("api/FGInventory/model/{modelNo}/count/{count}")
-	Call<List<Itembean>> getItemsByModelNoAndCount(@Path("modelNo") Integer modelNo,@Path("count") Integer count);
+	Call<List<Itembean>> getItemsByModelNoAndCount(@Path("modelNo") String modelNo,@Path("count") Integer count);
 	
 	@GET("api/FGInventory/model/{modelNo}/date/{date}")
-	Call<List<Itembean>> getItemsByModelNoAndDate(@Path("modelNo") Integer modelNo,@Path("date") String date);
+	Call<List<Itembean>> getItemsByModelNoAndDate(@Path("modelNo") String modelNo,@Path("date") String date);
 	//Post one item
 	/*@POST("/api/FGInventory")
 	Call<Itembean> createItem(@Body Itembean itembean);*/

@@ -89,7 +89,7 @@ public class ModelZone2Report {
 
 	public ModelZone2Report(List<ModelZone2bean> data) {
 		resultModelItem = new ArrayList<String>();
-		loadingframe = new LoadingFrameHelper();
+		loadingframe = new LoadingFrameHelper("Loading Data from Server...");
 		loading = loadingframe.loadingSample("Loading Data from Server...");
 		intialCallback();
 		loadModelZone2Map();

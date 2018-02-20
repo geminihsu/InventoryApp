@@ -89,8 +89,10 @@ import spirit.fitness.scanner.restful.listener.HistoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.util.LoadingFrameHelper;
 import spirit.fitness.scanner.util.LocationHelper;
+import spirit.fitness.scanner.util.ModelNoUtil;
 import spirit.fitness.scanner.util.PrintTableUtil;
 import spirit.fitness.scanner.util.PrinterHelper;
+import spirit.fitness.scanner.util.WeightPlateUtil;
 import spirit.fitness.scanner.zonepannel.ZoneMenu;
 import spirit.fitness.scanner.model.CustOrderbean;
 import spirit.fitness.scanner.model.Historybean;
@@ -228,7 +230,11 @@ public class ShippingPicking {
 	private void queryByModelAndCount(String modelNo, int count) {
 
 		try {
-			fgRepositoryImplRetrofit.getItemsByModelAndCount(Integer.valueOf(modelNo),
+			
+			
+
+				
+			fgRepositoryImplRetrofit.getItemsByModelAndCount(modelNo,
 					count);
 
 			
@@ -389,8 +395,11 @@ public class ShippingPicking {
 				for (int j = 0; j < colsize; j++) {
 					orderModelItems[rowIndex][0] = loc.get(item.location);
 					orderModelItems[rowIndex][1] = item.modelID;
-					orderModelItems[rowIndex][2] = item.modelDes;
-
+					
+					if(!WeightPlateUtil.isModelParts(item.modelID))
+						orderModelItems[rowIndex][2] = item.modelDes;
+					else
+						orderModelItems[rowIndex][2] = item.modelDes + WeightPlateUtil.modelAppendWithPart(item.modelDes);
 					orderModelItems[rowIndex][3] = "  ["+LocationHelper.DisplayZoneCode(LocationHelper.MapZoneCode(item.location))+"] " +item.location;
 
 				}
@@ -422,9 +431,9 @@ public class ShippingPicking {
 			TableColumn quantity = packingTable.getColumnModel().getColumn(0);
 			quantity.setPreferredWidth(20);
 			TableColumn itemId = packingTable.getColumnModel().getColumn(1);
-			itemId.setPreferredWidth(50);
+			itemId.setPreferredWidth(40);
 			TableColumn modelTitle = packingTable.getColumnModel().getColumn(2);
-			modelTitle.setPreferredWidth(500);
+			modelTitle.setPreferredWidth(600);
 			TableColumn locationCol = packingTable.getColumnModel().getColumn(3);
 			locationCol.setPreferredWidth(100);
 			packingTable.setCellSelectionEnabled(false);
@@ -442,7 +451,7 @@ public class ShippingPicking {
 			if (tableSize > 400)
 				tableSize = 400;
 
-			scrollZonePane.setBounds(33, 20, 900, tableSize);
+			scrollZonePane.setBounds(33, 20, 990, tableSize);
 
 			scrollZonePane.setViewportView(packingTable);
 
@@ -601,14 +610,14 @@ public class ShippingPicking {
 						if (item.ItemID != null) {
 							if (map.containsKey(item.ItemID)) {
 
-								if (!item.ItemID.contains("PL") && item.ItemID.length() == 6) {
+								if (!item.ItemID.contains("PL") && item.ItemID.length() == 6 &&  !WeightPlateUtil.isWeightPlate(item.ItemID)) {
 									count += map.get(item.ItemID);
 									map.put(item.ItemID, count);
 									orderTotalCount += count;
 								}
 							} else {
 
-								if (!item.ItemID.contains("PL") && item.ItemID.length() == 6) {
+								if (!item.ItemID.contains("PL") && item.ItemID.length() == 6 &&  !WeightPlateUtil.isWeightPlate(item.ItemID)) {
 									orderTotalCount += count;
 									map.put(item.ItemID, count);
 									OrderModelmap.put(item.ItemID, item.description);
@@ -619,7 +628,7 @@ public class ShippingPicking {
 
 					if (!isOrderClosed) {
 						inventoryModelmap = new LinkedHashMap<String, List<Itembean>>();
-						loadingframe = new LoadingFrameHelper();
+						loadingframe = new LoadingFrameHelper("Loading data...");
 						loading = loadingframe.loadingSample("Loading data...");
 
 						EventQueue.invokeLater(new Runnable() {
@@ -628,7 +637,7 @@ public class ShippingPicking {
 									loading.setValue(50);
 									for (CustOrderbean _order : orders) {
 										if (_order.ItemID == null || _order.ItemID.indexOf("PL") != -1
-												|| _order.ItemID.length() != 6)
+												|| _order.ItemID.length() != 6 || WeightPlateUtil.isWeightPlate(_order.ItemID))
 											continue;
 										else
 											queryByModelAndCount(_order.ItemID, map.get(_order.ItemID));
@@ -713,7 +722,11 @@ public class ShippingPicking {
 					PickingItem pickItem = new PickingItem();
 					pickItem.quantity = 1;
 					pickItem.modelID = item.ModelNo;
-					pickItem.modelDes =OrderModelmap.get(pickItem.modelID);
+					
+					if(!WeightPlateUtil.isModelParts(item.ModelNo))
+						pickItem.modelDes =OrderModelmap.get(pickItem.modelID);
+					else
+						pickItem.modelDes =OrderModelmap.get(pickItem.modelID) + WeightPlateUtil.modelAppendWithPart(pickItem.modelID);
 					pickItem.location = item.Location;
 					pickingItems.add(pickItem);
 					System.out.println(location.getKey());

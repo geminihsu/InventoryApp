@@ -70,6 +70,7 @@ import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.util.LoadingFrameHelper;
 import spirit.fitness.scanner.util.PrintTableUtil;
 import spirit.fitness.scanner.util.PrinterHelper;
+import spirit.fitness.scanner.util.WeightPlateUtil;
 import spirit.fitness.scanner.model.CustOrderbean;
 import spirit.fitness.scanner.model.Historybean;
 import spirit.fitness.scanner.model.Itembean;
@@ -99,12 +100,12 @@ public class ShippingConfirm {
 
 	private String prevContent = "";
 
-	// Key:modelID, value:quality 
+	// Key:modelID, value:quality
 	private LinkedHashMap<String, Integer> map;
 
 	// Key:modelID, value:current scanner quality
 	private LinkedHashMap<String, Integer> modelScanCurMap;
-	
+
 	// Key:modelID, value:description
 	private TreeMap<String, String> OrderModelmap;
 
@@ -132,7 +133,7 @@ public class ShippingConfirm {
 	private List<String> resultModelItem = new ArrayList<String>();
 
 	public ShippingConfirm() {
-		loadingframe = new LoadingFrameHelper();
+		loadingframe = new LoadingFrameHelper("");
 		exceuteCallback();
 		orderInfo();
 	}
@@ -256,17 +257,17 @@ public class ShippingConfirm {
 
 	// Get items from History table
 	private List<Historybean> getShippgingItems(String salesOrder, boolean isDisplay) {
-		//List<Historybean> items = null;
+		// List<Historybean> items = null;
 		try {
 			items = historyRepositoryImplRetrofit.getItemsBySalesOrder(salesOrder);
 
 			if (isDisplay)
 				displayItemsfromHistory(items);
-			//else if (items.size() == 0)
-			//else
-			//	querySalesOrder(salesOrder);
-			//else
-			//	JOptionPane.showMessageDialog(null, "The sales order is closed !");
+			// else if (items.size() == 0)
+			// else
+			// querySalesOrder(salesOrder);
+			// else
+			// JOptionPane.showMessageDialog(null, "The sales order is closed !");
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -283,14 +284,12 @@ public class ShippingConfirm {
 
 			frame.dispose();
 			frame.setVisible(false);
-			
+
 			if (scanResultFrame != null) {
 				scanResultFrame.dispose();
 				scanResultFrame.setVisible(false);
 			}
 
-			
-			
 			JScrollPane JScrollPane = getShippgingItemsJScrollPane(items);
 
 			int tableSize = 50 * items.size() + 20;
@@ -307,7 +306,7 @@ public class ShippingConfirm {
 				loadingframe.setVisible(false);
 				loadingframe.dispose();
 			}
-			
+
 			orderFrame.invalidate();
 			orderFrame.validate();
 			orderFrame.repaint();
@@ -385,7 +384,7 @@ public class ShippingConfirm {
 	}
 
 	private void placeComponents(JPanel panel) {
-
+		loadingframe = new LoadingFrameHelper("Loading data...");
 		panel.setLayout(null);
 		Font font = new Font("Verdana", Font.BOLD, 18);
 		// Creating JLabel
@@ -414,12 +413,12 @@ public class ShippingConfirm {
 					EventQueue.invokeLater(new Runnable() {
 						public void run() {
 							try {
-								loadingframe = new LoadingFrameHelper();
-								loading = loadingframe.loadingSample("Loading data...");
 								
+								loading = loadingframe.loadingSample("Loading data...");
+
 								salesOrder = salesOrderNo.getText().toString().trim();
-								//querySalesOrder(salesOrder);
-								getShippgingItems(salesOrder,false);
+								// querySalesOrder(salesOrder);
+								getShippgingItems(salesOrder, false);
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -471,7 +470,7 @@ public class ShippingConfirm {
 		String shippToZip = salesOrderList.get(0).shipToZipCode;
 		String shippToVia = salesOrderList.get(0).shipVia;
 
-		//isOrderClosed = salesOrderList.get(0).closed;
+		// isOrderClosed = salesOrderList.get(0).closed;
 		orderDisplayPanel.setLayout(null);
 
 		Font font = new Font("Verdana", Font.BOLD, 18);
@@ -500,7 +499,12 @@ public class ShippingConfirm {
 				for (int j = 0; j < colsize; j++) {
 					orderModelItems[rowIndex][0] = location.getValue();
 					orderModelItems[rowIndex][1] = salesOrderList.get(rowIndex).ItemID;
-					orderModelItems[rowIndex][2] = salesOrderList.get(rowIndex).description;
+
+					if (!WeightPlateUtil.isModelParts(salesOrderList.get(rowIndex).ItemID))
+						orderModelItems[rowIndex][2] = salesOrderList.get(rowIndex).description;
+					else
+						orderModelItems[rowIndex][2] = salesOrderList.get(rowIndex).description
+								+ WeightPlateUtil.modelAppendWithPart(salesOrderList.get(rowIndex).ItemID);
 
 					OrderModelmap.put(salesOrderList.get(rowIndex).ItemID, salesOrderList.get(rowIndex).description);
 				}
@@ -534,9 +538,9 @@ public class ShippingConfirm {
 			TableColumn quantity = table.getColumnModel().getColumn(0);
 			quantity.setPreferredWidth(20);
 			TableColumn itemId = table.getColumnModel().getColumn(1);
-			itemId.setPreferredWidth(50);
+			itemId.setPreferredWidth(60);
 			TableColumn modelTitle = table.getColumnModel().getColumn(2);
-			modelTitle.setPreferredWidth(500);
+			modelTitle.setPreferredWidth(800);
 
 			table.setBackground(Constrant.TABLE_COLOR);
 			table.setRowHeight(40);
@@ -584,7 +588,7 @@ public class ShippingConfirm {
 
 			print.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					
+
 					String shipToAddress = billToTitle + "\n              " + shippToAdddress + "\n              "
 							+ shippToCity + "  " + shippToState + "\n              " + shippToZip + "    "
 							+ shippToCountry;
@@ -634,9 +638,9 @@ public class ShippingConfirm {
 				// display the items
 				orderDisplayPanel.add(print);
 
-				//List<Historybean> items = getShippgingItems(salesOrder, true);
+				// List<Historybean> items = getShippgingItems(salesOrder, true);
 				displayItemsfromHistory(items);
-				
+
 				for (Historybean h : items) {
 					historyItemsInfo += h.SN + "\n";
 				}
@@ -768,7 +772,7 @@ public class ShippingConfirm {
 
 		JLabel modelLabel = new JLabel("Pro # : " + pro);
 
-		modelLabel.setBounds(50, 40, 300, 25);
+		modelLabel.setBounds(50, 40, 800, 25);
 		modelLabel.setFont(font);
 		panel.add(modelLabel);
 
@@ -799,14 +803,15 @@ public class ShippingConfirm {
 			for (int j = 0; j < 3; j++) {
 				String modelNo = ((String) sortedList.get(i)).substring(0, 6);
 				rowData[i][0] = modelNo;
-				rowData[i][1] = Constrant.models.get(modelNo).Model;
+
+				rowData[i][1] = Constrant.models.get(modelNo).Desc;
 				rowData[i][2] = sortedList.get(i);
 			}
 		}
 
 		totalCount.setText("Quantity : " + sortedList.size());
 
-		Object columnNames[] = { "ItemID", "Model", "Serial Number" };
+		Object columnNames[] = { "ItemID", "Description", "Serial Number" };
 		final Class[] columnClass = new Class[] { String.class, String.class, String.class };
 
 		DefaultTableModel model = new DefaultTableModel(rowData, columnNames) {
@@ -829,13 +834,16 @@ public class ShippingConfirm {
 		table.setFont(font);
 		table.setRowHeight(40);
 
+		TableColumn quantity = table.getColumnModel().getColumn(0);
+		quantity.setPreferredWidth(20);
+		TableColumn itemId = table.getColumnModel().getColumn(1);
+		itemId.setPreferredWidth(200);
 		
 		int tableSize = 50 * rowData.length + 20;
 		if (tableSize > 450)
 			tableSize = 450;
 		scrollZonePane.setBounds(33, 100, 750, tableSize);
 		scrollZonePane.setViewportView(table);
-
 		panel.add(scrollZonePane);
 
 		// Creating Report button
@@ -845,12 +853,12 @@ public class ShippingConfirm {
 		report.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
-				if (loadingframe != null) { 
-					loading = loadingframe.loadingSample("Report data...");
+				if (loadingframe != null) {
+					loadingframe.updateTitle("Report Data...");
 					loading.setValue(80);
 					loadingframe.setVisible(true);
 				}
-				
+
 				isOrderClosed = true;
 				report.setEnabled(false);
 				scanItems = new ArrayList<Historybean>();
@@ -865,8 +873,7 @@ public class ShippingConfirm {
 				String shippToZip = salesOrderList.get(0).shipToZipCode;
 				String shippToVia = salesOrderList.get(0).shipVia;
 
-				String timeStamp = new SimpleDateFormat("yyyy-MM-dd")
-						.format(Calendar.getInstance().getTime());
+				String timeStamp = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 				for (String item : itemList) {
 					Historybean _item = new Historybean();
 
@@ -874,7 +881,7 @@ public class ShippingConfirm {
 					_item.date = timeStamp;
 					_item.location = "999";
 					_item.modelNo = item.substring(0, 6);
-				
+
 					_item.salesOrder = salesOrder;
 					_item.trackingNo = pro;
 					_item.billTo = billToTitle;
@@ -907,15 +914,13 @@ public class ShippingConfirm {
 					historyItemsInfo += h.SN + "\n";
 				}
 
-				
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
-						
+
 						// displayLoadingBar();
-						
-					
+
 						shippingItems(scanItems);
-						//getShippgingItems(salesOrder, false);
+						// getShippgingItems(salesOrder, false);
 						// updateSalesOrder();
 
 					}
@@ -1006,10 +1011,9 @@ public class ShippingConfirm {
 		}
 		// Creating JLabel
 		JLabel modelLabel = new JLabel("");
-          
-		
+
 		modelLabel.setText(setModelScanCountLabel(len));
-		
+
 		modelLabel.setBounds(50, 150, 200, 500);
 		modelLabel.setFont(font);
 		panel.add(modelLabel);
@@ -1034,11 +1038,21 @@ public class ShippingConfirm {
 				String[] item = inputSN.getText().toString().split("\n");
 
 				boolean lenError = false;
-				String model = item[item.length - 1].substring(0, 6);
-				int curModelCnt = modelScanCurMap.get(model);
-				if (!set.contains(item[item.length - 1]) && item[item.length - 1].length() == 16
-						&& set.size() <= orderTotalCount && map.containsKey(model) && curModelCnt < map.get(model)) {
+
+				String model = "";
+				int curModelCnt = 0;
+				if (item[item.length - 1].length() == 16) {
+					model = item[item.length - 1].substring(0, 6);
 					
+					if(modelScanCurMap.get(model) == null)
+						lenError = true;
+					else
+						curModelCnt = modelScanCurMap.get(model);
+				}
+
+				if (!set.contains(item[item.length - 1]) && item[item.length - 1].length() == 16
+						&& set.size() <= orderTotalCount && map.containsKey(model) && curModelCnt < map.get(model) && !lenError) {
+
 					modelScanCurMap.put(model, modelScanCurMap.get(model) + 1);
 					set.add(item[item.length - 1]);
 				} else {
@@ -1107,8 +1121,7 @@ public class ShippingConfirm {
 					if (result == JOptionPane.YES_OPTION) {
 						inputSN.setText("");
 						set.clear();
-						for (Map.Entry<String, Integer> location : modelScanCurMap.entrySet()) 
-						{
+						for (Map.Entry<String, Integer> location : modelScanCurMap.entrySet()) {
 							modelScanCurMap.put(location.getKey(), 0);
 						}
 						modelLabel.setText(setModelScanCountLabel(0));
@@ -1186,42 +1199,42 @@ public class ShippingConfirm {
 					frame.dispose();
 					frame.setVisible(false);
 
-					//if (isOrderClosed) {
-						pickingItems = new ArrayList<PickingItem>();
-						salesOrderList = new ArrayList<CustOrderbean>();
-						map = new LinkedHashMap<String, Integer>();
-						modelScanCurMap = new LinkedHashMap<String, Integer>();
-						OrderModelmap = new TreeMap<String, String>();
-						// salesOrderList = orders;
-						for (CustOrderbean item : orders) {
-							int count = Integer.valueOf(item.quantity);
-							// System.out.println("item.ItemID:" + item.ItemID);
+					// if (isOrderClosed) {
+					pickingItems = new ArrayList<PickingItem>();
+					salesOrderList = new ArrayList<CustOrderbean>();
+					map = new LinkedHashMap<String, Integer>();
+					modelScanCurMap = new LinkedHashMap<String, Integer>();
+					OrderModelmap = new TreeMap<String, String>();
+					// salesOrderList = orders;
+					for (CustOrderbean item : orders) {
+						int count = Integer.valueOf(item.quantity);
+						// System.out.println("item.ItemID:" + item.ItemID);
 
-							if (item.ItemID != null && !item.ItemID.contains("PL") && item.ItemID.length() == 6) {
-								salesOrderList.add(item);
-								if (map.containsKey(item.ItemID)) {
+						if (item.ItemID != null && !item.ItemID.contains("PL") && item.ItemID.length() == 6
+								&& !WeightPlateUtil.isWeightPlate(item.ItemID)) {
+							salesOrderList.add(item);
+							if (map.containsKey(item.ItemID)) {
 
-									count += map.get(item.ItemID);
-									map.put(item.ItemID, count);
-									orderTotalCount += count;
+								count += map.get(item.ItemID);
+								map.put(item.ItemID, count);
+								orderTotalCount += count;
 
-								} else {
+							} else {
 
-									orderTotalCount += count;
-									map.put(item.ItemID, count);
-									OrderModelmap.put(item.ItemID, item.description);
-									modelScanCurMap.put(item.ItemID, 0);
-								}
+								orderTotalCount += count;
+								map.put(item.ItemID, count);
+								OrderModelmap.put(item.ItemID, item.description);
+								modelScanCurMap.put(item.ItemID, 0);
 							}
 						}
-						
-						if (loadingframe != null) {
-							loadingframe.setVisible(false);
-							loadingframe.dispose();
-						}
-						
-						displayOrderInfo(null);
-						
+					}
+
+					if (loadingframe != null) {
+						loadingframe.setVisible(false);
+						loadingframe.dispose();
+					}
+
+					displayOrderInfo(null);
 
 				}
 			}
@@ -1242,13 +1255,12 @@ public class ShippingConfirm {
 
 			@Override
 			public void getHistoryItems(List<Historybean> _items) {
-				
-				if (!_items.isEmpty()) 
-				{
+
+				if (!_items.isEmpty()) {
 					JOptionPane.showMessageDialog(null, "Report data success.");
-					
-					//if(orderFrame != null)
-					//	orderFrame.setVisible(true);
+
+					// if(orderFrame != null)
+					// orderFrame.setVisible(true);
 					int rowIndex = 0;
 					for (Map.Entry<String, Integer> location : map.entrySet()) {
 						// orderItemsInfo += location.getValue() +" " +
@@ -1259,9 +1271,9 @@ public class ShippingConfirm {
 								+ salesOrderList.get(rowIndex).description + "\n" + scanItems.get(0).trackingNo + "\n");
 						rowIndex++;
 					}
-					
+
 					displayItemsfromHistory(scanItems);
-					
+
 				}
 			}
 
@@ -1270,10 +1282,10 @@ public class ShippingConfirm {
 				if (!_items.isEmpty()) {
 					isOrderClosed = true;
 					items = _items;
-				
-				}	//Check SaleOrder Info
-				
-				//if(!isOrderClosed)
+
+				} // Check SaleOrder Info
+
+				// if(!isOrderClosed)
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						try {
@@ -1283,8 +1295,7 @@ public class ShippingConfirm {
 						}
 					}
 				});
-				
-				
+
 			}
 
 		});
@@ -1294,7 +1305,7 @@ public class ShippingConfirm {
 	private boolean checkOrder(String content) {
 
 		String[] sn = content.toString().split("\n");
-		System.out.println("SN size :"+sn.length);
+		System.out.println("SN size :" + sn.length);
 		if (sn.length != orderTotalCount) {
 			JOptionPane.showMessageDialog(null, "Quantity Error! Please confirm the items quantiy.");
 			return false;
@@ -1319,17 +1330,16 @@ public class ShippingConfirm {
 		return true;
 	}
 
-	
-
-	private String setModelScanCountLabel(int curCount) 
-	{
-		String modelQty = "<html>"+"Total : " + curCount + "/" + String.valueOf(orderTotalCount)+" </br>";
+	private String setModelScanCountLabel(int curCount) {
+		String modelQty = "<html>" + "Total : " + curCount + "/" + String.valueOf(orderTotalCount) + " </br>";
 		for (Map.Entry<String, Integer> location : map.entrySet()) {
-			modelQty += location.getKey() +"(" + modelScanCurMap.get(location.getKey()) + "/"+location.getValue()+") </br>";
+			modelQty += location.getKey() + "(" + modelScanCurMap.get(location.getKey()) + "/" + location.getValue()
+					+ ") </br>";
 		}
 		modelQty = modelQty + "</br></html>";
 		return modelQty;
 	}
+
 	private void printer(String saleOrder, String date, String billTo, String shipTo, String itemsInfo) {
 
 		String content = "Sales Order : " + saleOrder + "\n" + "TransactionDate : " + date + "\n" + "Bill To : "

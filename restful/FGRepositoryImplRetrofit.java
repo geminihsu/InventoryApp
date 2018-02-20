@@ -112,7 +112,7 @@ public class FGRepositoryImplRetrofit {
 		return result;
 	}
 
-	public List<Itembean> getItemsByModel(Integer modelNo) throws Exception {
+	public List<Itembean> getItemsByModel(String modelNo) throws Exception {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
 				.addConverterFactory(GsonConverterFactory.create()).build();
 		InventoryCallback service = retrofit.create(InventoryCallback.class);
@@ -123,7 +123,7 @@ public class FGRepositoryImplRetrofit {
 		return result;
 	}
 	
-	public List<Itembean> getItemsByModelAndLocation(Integer modelNo,Integer location) throws Exception {
+	public List<Itembean> getItemsByModelAndLocation(String modelNo,Integer location) throws Exception {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
 				.addConverterFactory(GsonConverterFactory.create()).build();
 		InventoryCallback service = retrofit.create(InventoryCallback.class);
@@ -134,7 +134,7 @@ public class FGRepositoryImplRetrofit {
 		return result;
 	}
 	
-	public List<Itembean> getItemsByModelAndCount(Integer modelNo,Integer count) throws Exception {
+	public List<Itembean> getItemsByModelAndCount(String modelNo,Integer count) throws Exception {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
 				.addConverterFactory(GsonConverterFactory.create()).build();
 		InventoryCallback service = retrofit.create(InventoryCallback.class);
@@ -145,7 +145,7 @@ public class FGRepositoryImplRetrofit {
 		return result;
 	}
 	
-	public List<Itembean> getItemsByModelAndDate(Integer modelNo,String date) throws Exception {
+	public List<Itembean> getItemsByModelAndDate(String modelNo,String date) throws Exception {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
 				.addConverterFactory(GsonConverterFactory.create()).build();
 		InventoryCallback service = retrofit.create(InventoryCallback.class);

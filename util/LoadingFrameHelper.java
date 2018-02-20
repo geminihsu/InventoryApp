@@ -13,17 +13,25 @@ import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 
 public class LoadingFrameHelper extends JFrame{
+	private JProgressBar loading;
+	private Container content;
+	private Border border;
+	
+	public LoadingFrameHelper(String title) 
+	{
+		
+		 content = this.getContentPane();
+		 loading = new JProgressBar();
+	}
 	
 	public JProgressBar loadingSample(String title) 
 	{
-			this.setTitle("Loading");
+			this.setTitle(title);
 			this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 			this.setSize(200, 100);
-		    Container content = this.getContentPane();
-		    JProgressBar loading = new JProgressBar();
+			Border border = BorderFactory.createTitledBorder(title);
 		    loading.setValue(25);
 		    loading.setStringPainted(true);
-		    Border border = BorderFactory.createTitledBorder(title);
 		    loading.setBorder(border);
 		    content.add(loading, BorderLayout.NORTH);
 			this.setLocationRelativeTo(null);
@@ -36,5 +44,12 @@ public class LoadingFrameHelper extends JFrame{
 			});
 
 		    return loading;
+	}
+	
+	public void updateTitle(String title) {
+		this.setTitle(title);
+		Border border = BorderFactory.createTitledBorder(title);
+		loading.setBorder(border);
+		content.add(loading, BorderLayout.NORTH);
 	}
 }

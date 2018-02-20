@@ -239,7 +239,7 @@ public class QueryPannel implements ActionListener{
 					String modelNo = modelText.getText().toString().substring(0,6);
 					Modelbean model = Constrant.models.get(modelNo);
 					if (model != null)
-						ltotal.setText(model.Model);
+						ltotal.setText(model.Desc);
 					else
 						ltotal.setText("No model can be find.");
 				}
@@ -359,7 +359,7 @@ public class QueryPannel implements ActionListener{
 					modelNo = modelNo.substring(0, 6);
 				}
 				
-				fgRepository.getItemsByModelAndLocation(Integer.valueOf(modelNo),Integer.valueOf(Location));
+				fgRepository.getItemsByModelAndLocation(modelNo,Integer.valueOf(Location));
 
 			} catch (NumberFormatException e) {
 				// TODO Auto-generated catch block
@@ -389,7 +389,7 @@ public class QueryPannel implements ActionListener{
 			}
 
 			try {
-				fgRepository.getItemsByModel(Integer.valueOf(modelNo));
+				fgRepository.getItemsByModel(modelNo);
 
 			} catch (NumberFormatException e) {
 				// TODO Auto-generated catch block

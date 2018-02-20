@@ -44,7 +44,7 @@ public class ModelRepositoryImplRetrofit {
 	
 	
 	
-	public List<Modelbean> getItemsByModel(Integer modelNo) throws Exception {
+	public List<Modelbean> getItemsByModel(String modelNo) throws Exception {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl).addConverterFactory(GsonConverterFactory.create())
 				.build();
 		ModelCallback service = retrofit.create(ModelCallback.class);
@@ -68,7 +68,7 @@ public class ModelRepositoryImplRetrofit {
 		//Itembean fg = fgRepository.updateItem(item);
 		
 		//fgRepository.deleteItem(7);
-		System.out.println(fg.Model);
+		System.out.println(fg.ModelNo);
 		
 		
 		// bookRepository.deleteBook(book.getId());

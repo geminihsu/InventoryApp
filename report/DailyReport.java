@@ -88,7 +88,7 @@ public class DailyReport  {
 
 	public DailyReport(List<ModelDailyReportbean> data) {
 
-		loadingframe = new LoadingFrameHelper();
+		loadingframe = new LoadingFrameHelper("Loading Data from Server...");
 		loading = loadingframe.loadingSample("Loading Data from Server...");
 		intialCallback();
 		loadModelZone2Map();

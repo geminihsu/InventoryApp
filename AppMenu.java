@@ -84,7 +84,7 @@ public class AppMenu implements ActionListener {
 		//EmailHelper.sendMail();
 		//JOptionPane.showMessageDialog(null, "Model 15516 less than 50. Please move more item from Zone 1.");
 		exceuteCallback();
-		loadingframe =new LoadingFrameHelper();
+		loadingframe =new LoadingFrameHelper("Loading Data from Server...");
 		loading = loadingframe.loadingSample("Loading Data from Server...");
 		initialize();
 		//loadReport();
@@ -308,41 +308,7 @@ public class AppMenu implements ActionListener {
 
 	}
 	
-	// Loading Models data from Server
-	private void loadReport() {
 
-		// loading model and location information from Server
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-
-					fgModelZone2.getAllItems("2018-01-01");
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-
-	}
-	// Loading Models data from Server
-		private void loadModelZone2Map() {
-			
-			
-			// loading model and location information from Server
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					try {
-
-						fgModelZone2.getAllItems();
-
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
-			
-		}
 
 	// Loading Models data from Server
 	private void loadModel() {

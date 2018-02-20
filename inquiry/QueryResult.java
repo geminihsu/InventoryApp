@@ -3,6 +3,7 @@ package spirit.fitness.scanner.inquiry;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -20,9 +21,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -37,7 +40,9 @@ import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 
 import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
@@ -55,7 +60,6 @@ public class QueryResult {
 	public final static int QUERY_LOCATION = 1;
 	public final static int QUERY_MODEL_LOCATION = 2;
 
-	
 	public static boolean isQueryRepeat = false;
 
 	/* --------- Query by model -------- */
@@ -77,7 +81,7 @@ public class QueryResult {
 	private FGRepositoryImplRetrofit fgInventory;
 	private int queryType;
 
-	private JTable zone1Table,zone2Table,zone3Table,zone4Table;
+	private JTable zone1Table, zone2Table, zone3Table, zone4Table, locationTable;
 
 	public void setContent(int type, List<Itembean> _items) {
 		JFrame.setDefaultLookAndFeelDecorated(false);
@@ -91,7 +95,7 @@ public class QueryResult {
 
 	private void setContentLayOut(List<Itembean> _items) {
 		String modelNo = _items.get(0).ModelNo;
-		String title = Constrant.models.get(modelNo).Model;
+		String title = Constrant.models.get(modelNo).Desc;
 
 		resultFrame = new JFrame("");
 		// Setting the width and height of frame
@@ -127,11 +131,11 @@ public class QueryResult {
 
 	private void setContentQueryLayOut(List<Itembean> _items) {
 		String modelNo = _items.get(0).ModelNo;
-		String title = Constrant.models.get(modelNo).Model;
+		String title = Constrant.models.get(modelNo).Desc;
 
 		colFrame = new JFrame("");
 		// Setting the width and height of frame
-		colFrame.setSize(780, 600);
+		colFrame.setSize(780, 700);
 		colFrame.setLocationRelativeTo(null);
 		colFrame.setUndecorated(true);
 		colFrame.setResizable(false);
@@ -246,10 +250,11 @@ public class QueryResult {
 			public boolean isCellEditable(int row, int column) {
 				if (!isQueryRepeat) {
 					zone1Table.clearSelection();
+					zone1Table.getSelectionModel().clearSelection();
 					isQueryRepeat = true;
 					Object location = zone1Data[row][0];
 					queryType = QUERY_LOCATION;
-					queryLocation(String.valueOf(location));
+					queryLocation(String.valueOf(location).substring(37, 40));
 				}
 				return false;
 			}
@@ -266,10 +271,11 @@ public class QueryResult {
 			public boolean isCellEditable(int row, int column) {
 				if (!isQueryRepeat) {
 					zone2Table.clearSelection();
+					zone2Table.getSelectionModel().clearSelection();
 					isQueryRepeat = true;
 					Object location = zone2Data[row][0];
 					queryType = QUERY_LOCATION;
-					queryLocation(String.valueOf(location));
+					queryLocation(String.valueOf(location).substring(37, 40));
 				}
 				return false;
 			}
@@ -286,10 +292,11 @@ public class QueryResult {
 			public boolean isCellEditable(int row, int column) {
 				if (!isQueryRepeat) {
 					zone3Table.clearSelection();
+					zone3Table.getSelectionModel().clearSelection();
 					isQueryRepeat = true;
 					Object location = zone3Data[row][0];
 					queryType = QUERY_LOCATION;
-					queryLocation(String.valueOf(location));
+					queryLocation(String.valueOf(location).substring(37, 40));
 				}
 				return false;
 			}
@@ -305,10 +312,11 @@ public class QueryResult {
 			public boolean isCellEditable(int row, int column) {
 				if (!isQueryRepeat) {
 					zone4Table.clearSelection();
+					zone4Table.getSelectionModel().clearSelection();
 					isQueryRepeat = true;
 					Object location = zone4Data[row][0];
 					queryType = QUERY_LOCATION;
-					queryLocation(String.valueOf(location));
+					queryLocation(String.valueOf(location).substring(37, 40));
 				}
 				return false;
 			}
@@ -320,19 +328,31 @@ public class QueryResult {
 		};
 
 		if (zone1Data != null) {
+
 			zone1.setText("Zone 1 : " + zoneCount.get(1));
 			scrollZone1Pane.setBounds(33, 250, 700, 50 * zone1Data.length + 20);
 			scrollZone1Pane.setBackground(Constrant.BACKGROUN_COLOR);
 
 			zone1Table = new JTable(model1);
-			//zone1Table.setCellSelectionEnabled(false);
-			//zone1Table.setColumnSelectionAllowed(false);
-	
+			// zone1Table.setCellSelectionEnabled(false);
+			// zone1Table.setColumnSelectionAllowed(false);
+
 			zone1Table.getTableHeader().setBackground(Constrant.TABLE_COLOR);
 			zone1Table.getTableHeader().setFont(font);
 			zone1Table.setBackground(Constrant.TABLE_COLOR);
 			zone1Table.setRowHeight(40);
 			zone1Table.setFont(font);
+
+			zone1Table.setDefaultRenderer(Double.class, new DefaultTableCellRenderer() {
+				@Override
+				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+						boolean hasFocus, int row, int column) {
+					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+					c.setForeground(((Double) value) > 0 ? Color.BLUE : Color.RED);
+					return c;
+				}
+			});
+
 			scrollZone1Pane.setViewportView(zone1Table);
 		} else {
 			scrollZone1Pane.setVisible(false);
@@ -345,10 +365,9 @@ public class QueryResult {
 			scrollZone2Pane.setBackground(Constrant.TABLE_COLOR);
 
 			zone2Table = new JTable(model2);
-			//zone2Table.setCellSelectionEnabled(false);
-			//zone2Table.setColumnSelectionAllowed(false);
-			
-			
+			// zone2Table.setCellSelectionEnabled(false);
+			// zone2Table.setColumnSelectionAllowed(false);
+
 			zone2Table.getTableHeader().setBackground(Constrant.TABLE_COLOR);
 			zone2Table.getTableHeader().setFont(font);
 			zone2Table.setBackground(Constrant.TABLE_COLOR);
@@ -425,9 +444,8 @@ public class QueryResult {
 					resultFrame.dispose();
 					resultFrame.setVisible(false);
 				}
-				
-				if(colFrame != null) 
-				{
+
+				if (colFrame != null) {
 					colFrame.dispose();
 					colFrame.setVisible(false);
 				}
@@ -440,7 +458,7 @@ public class QueryResult {
 		prev.setBounds(33, 630, 100, 50);
 		exit.setBounds(150, 630, 100, 50);
 		panel.add(prev);
-	    panel.add(exit);
+		panel.add(exit);
 
 	}
 
@@ -477,11 +495,11 @@ public class QueryResult {
 			for (Itembean item : _items) {
 
 				String key = String.valueOf(item.ModelNo);
-				if (key.equals("131100") || key.equals("160053") ||key.equals("155012") || key.equals("155112") ||  key.equals("168812") || key.equals("160086")
-						|| key.equals("611541") || key.equals("900571")
+				if (key.equals("131100") || key.equals("160053") || key.equals("155012") || key.equals("155112")
+						|| key.equals("168812") || key.equals("160086") || key.equals("611541") || key.equals("900571")
 						|| key.equals("951113") || key.equals(""))
 					continue;
-				
+
 				if (map.containsKey(item.ModelNo)) {
 					List<Itembean> items = map.get(item.ModelNo);
 					items.add(item);
@@ -499,11 +517,18 @@ public class QueryResult {
 			for (Map.Entry<String, List<Itembean>> location : map.entrySet()) {
 				for (int j = 0; j < 2; j++) {
 
-					System.out.println(location.getKey());
-					rowData[rowIndex][0] = Constrant.models.get(location.getKey()).Model;
+					String modelTitle = Constrant.models.get(location.getKey()).Desc;
+
+					if (!isQueryRepeat)
+						rowData[rowIndex][0] = "<html>" + "<span style=\"color: blue;\"> <u>"
+								+ Constrant.models.get(location.getKey()).Desc + "</u></span> " + "</html>";
+					else
+						rowData[rowIndex][0] = Constrant.models.get(location.getKey()).Desc;
+
 					rowData[rowIndex][1] = location.getValue().size();
 
-					modelMapingNumber.put(Constrant.models.get(location.getKey()).Model, location.getKey());
+					modelMapingNumber.put(Constrant.models.get(location.getKey()).Desc, location.getKey());
+
 				}
 				totalCount += location.getValue().size();
 				rowIndex++;
@@ -521,7 +546,12 @@ public class QueryResult {
 					if (!isQueryRepeat) {
 						isQueryRepeat = true;
 						queryType = QUERY_MODEL;
-						Object model = modelMapingNumber.get(rowData[row][0]);
+						locationTable.clearSelection();
+						locationTable.getSelectionModel().clearSelection();
+
+						String modelDes = String.valueOf(rowData[row][0]).substring(37,
+								String.valueOf(rowData[row][0]).length() - 19);
+						Object model = modelMapingNumber.get(modelDes);
 						queryModel(String.valueOf(model));
 					}
 					return false;
@@ -533,13 +563,13 @@ public class QueryResult {
 				}
 			};
 
-			JTable table = new JTable(model);
-			table.getTableHeader().setBackground(Constrant.TABLE_COLOR);
-			table.getTableHeader().setFont(font);
+			locationTable = new JTable(model);
+			locationTable.getTableHeader().setBackground(Constrant.TABLE_COLOR);
+			locationTable.getTableHeader().setFont(font);
 
-			table.setBackground(Constrant.TABLE_COLOR);
-			table.setRowHeight(40);
-			table.setFont(font);
+			locationTable.setBackground(Constrant.TABLE_COLOR);
+			locationTable.setRowHeight(40);
+			locationTable.setFont(font);
 
 			int heigh = 0;
 
@@ -548,7 +578,7 @@ public class QueryResult {
 			else
 				heigh = 50 * rowData.length + 20;
 			scrollZonePane.setBounds(33, 91, 700, heigh);
-			scrollZonePane.setViewportView(table);
+			scrollZonePane.setViewportView(locationTable);
 
 			panel.add(scrollZonePane);
 
@@ -582,9 +612,8 @@ public class QueryResult {
 					resultFrame.dispose();
 					resultFrame.setVisible(false);
 				}
-				
-				if(colFrame != null) 
-				{
+
+				if (colFrame != null) {
 					colFrame.dispose();
 					colFrame.setVisible(false);
 				}
@@ -598,7 +627,7 @@ public class QueryResult {
 		prev.setBounds(33, 520, 100, 50);
 		exit.setBounds(150, 520, 100, 50);
 		panel.add(prev);
-	    panel.add(exit);
+		panel.add(exit);
 
 	}
 
@@ -611,7 +640,7 @@ public class QueryResult {
 		map = new LinkedHashMap<String, List<Itembean>>();
 
 		for (Itembean item : _items) {
-					
+
 			if (map.containsKey(item.Location)) {
 				List<Itembean> items = map.get(item.Location);
 				items.add(item);
@@ -654,10 +683,14 @@ public class QueryResult {
 		int rowIndex = 0;
 
 		for (Map.Entry<String, List<Itembean>> location : zoneData.entrySet()) {
-			
+
 			for (int j = 0; j < 2; j++) {
+				if (!isQueryRepeat)
+					rowData[rowIndex][0] = "<html>" + "<span style=\"color: blue;\"> <u>" + location.getKey()
+							+ "</u></span> " + "</html>";
+				else
+					rowData[rowIndex][0] = location.getKey();
 				
-				rowData[rowIndex][0] = location.getKey();
 				rowData[rowIndex][1] = location.getValue().size();
 
 			}
@@ -691,7 +724,7 @@ public class QueryResult {
 			@Override
 			public void checkInventoryItems(List<Itembean> items) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 
@@ -716,7 +749,7 @@ public class QueryResult {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					fgInventory.getItemsByModel(Integer.valueOf(modelNo));
+					fgInventory.getItemsByModel(modelNo);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -724,5 +757,18 @@ public class QueryResult {
 		});
 
 	}
+
+	/*
+	 * public class MyTableCellEditor extends AbstractCellEditor implements
+	 * TableCellEditor { JComponent component = new JTextField(); public Component
+	 * getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
+	 * int rowIndex, int vColIndex) {
+	 * ((JTextField)component).setText((String)value);
+	 * ((JTextField)component).setFont(new java.awt.Font("Arial Unicode MS", 0,
+	 * 12)); return component; }
+	 * 
+	 * @Override public Object getCellEditorValue() { // TODO Auto-generated method
+	 * stub return null; } }
+	 */
 
 }
