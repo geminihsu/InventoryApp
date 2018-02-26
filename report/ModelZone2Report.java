@@ -73,6 +73,9 @@ import spirit.fitness.scanner.model.Reportbean;
 
 public class ModelZone2Report {
 
+	private static ModelZone2Report modelZone2Report = null;
+	
+	
 	public final static int REPORT = 0;
 	public final static int MIN_QUANTITY = 1;
 
@@ -82,11 +85,22 @@ public class ModelZone2Report {
 	private LoadingFrameHelper loadingframe;
 	private JProgressBar loading;
 
-	private JButton btnDone, refreshDone;
+	private JButton btnDone;
 	
-
 	private ModelZoneMapRepositoryImplRetrofit fgModelZone2;
 
+	public static ModelZone2Report getInstance(List<ModelZone2bean> data) {
+		if (modelZone2Report == null) {
+			modelZone2Report = new ModelZone2Report(data);
+		}
+		return modelZone2Report;
+	}
+
+	public static boolean isExit() 
+	 {
+		 return modelZone2Report != null;
+	 }
+	
 	public ModelZone2Report(List<ModelZone2bean> data) {
 		resultModelItem = new ArrayList<String>();
 		loadingframe = new LoadingFrameHelper("Loading Data from Server...");
@@ -250,6 +264,8 @@ public class ModelZone2Report {
 
 		exitDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				modelZone2Report = null;
+				
 				frame.dispose();
 				frame.setVisible(false);
 			}
@@ -304,7 +320,7 @@ public class ModelZone2Report {
 			public void run() {
 				try {
 
-					fgModelZone2.getAllItems();
+					fgModelZone2.getAllItemsQty();
 
 				} catch (Exception e) {
 					e.printStackTrace();

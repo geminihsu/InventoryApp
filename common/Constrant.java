@@ -16,8 +16,9 @@ public class Constrant {
 	public static HashMap<String,Modelbean> models;
 	public static HashMap<String,Locationbean> locations;
 	public static List<Reportbean> reports;
-	public static List<ModelDailyReportbean> dailyReport;
+	public static HashMap<String,ModelDailyReportbean> dailyReport;
 	public static List<ModelZone2bean> modelZone2List;
+	public static HashMap<String,ModelZone2bean> modelZone2;
 
 	
 	//Zone mapping Table key : zone number, value : location number

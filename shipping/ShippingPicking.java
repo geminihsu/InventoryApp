@@ -98,12 +98,16 @@ import spirit.fitness.scanner.model.CustOrderbean;
 import spirit.fitness.scanner.model.Historybean;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Locationbean;
+import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.PickingItem;
 import spirit.fitness.scanner.model.Shippingbean;
 import spirit.fitness.scanner.receving.ItemsPannel;
+import spirit.fitness.scanner.report.ModelZone2Report;
 
 public class ShippingPicking {
 
+	private static ShippingPicking shippingPicking = null;
+	
 	private static final String TEXT_SUBMIT = "text-submit";
 	private static final String INSERT_BREAK = "insert-break";
 	public JFrame frame;
@@ -158,7 +162,17 @@ public class ShippingPicking {
 		orderInfo();
 	}
 
+	public static ShippingPicking getInstance() {
+		if (shippingPicking == null) {
+			shippingPicking = new ShippingPicking();
+		}
+		return shippingPicking;
+	}
 	
+	public static boolean isExit() 
+	 {
+		 return shippingPicking != null;
+	 }
 	
 	private void displayPickingOrderInfo(List<Itembean> items) {
 
@@ -343,6 +357,8 @@ public class ShippingPicking {
 		exitButton.setBounds(230, 250, 320, 50);
 		exitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				shippingPicking = null;
+				
 				frame.dispose();
 				frame.setVisible(false);
 			}
@@ -491,6 +507,8 @@ public class ShippingPicking {
 
 			exit.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					
+					shippingPicking = null;
 					if (scanResultFrame != null) {
 						scanResultFrame.dispose();
 						scanResultFrame.setVisible(false);

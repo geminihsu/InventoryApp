@@ -64,36 +64,43 @@ import spirit.fitness.scanner.restful.listener.ReportCallBackFunction;
 import spirit.fitness.scanner.shipping.ShippingConfirm;
 import spirit.fitness.scanner.shipping.ShippingPicking;
 import spirit.fitness.scanner.util.EmailHelper;
+import spirit.fitness.scanner.util.InstanceUtil;
 import spirit.fitness.scanner.util.LoadingFrameHelper;
 
 public class AppMenu implements ActionListener {
-
-
-	private JButton btnRecving, btnMoving, btnInQuiry, btnShipping, btnReport, btnModelQuantity,btnPickingList,btnReplenishment,btnConfiguration;
-	private JFrame frame;
+	private static AppMenu instance = null;
 	
+	private JButton btnRecving, btnMoving, btnInQuiry, btnShipping, btnReport, btnModelQuantity, btnPickingList,
+			btnReplenishment, btnConfiguration;
+	private JFrame frame;
+
 	private JProgressBar loading;
 	private LoadingFrameHelper loadingframe;
-	
+
 	private ModelZoneMapRepositoryImplRetrofit fgModelZone2;
 	private ModelRepositoryImplRetrofit fgModels;
 	private LocationRepositoryImplRetrofit localModels;
 
-
 	public AppMenu() {
-		//EmailHelper.sendMail();
-		//JOptionPane.showMessageDialog(null, "Model 15516 less than 50. Please move more item from Zone 1.");
+		// EmailHelper.sendMail();
+		// JOptionPane.showMessageDialog(null, "Model 15516 less than 50. Please move
+		// more item from Zone 1.");
 		exceuteCallback();
-		loadingframe =new LoadingFrameHelper("Loading Data from Server...");
+		loadingframe = new LoadingFrameHelper("Loading Data from Server...");
 		loading = loadingframe.loadingSample("Loading Data from Server...");
 		initialize();
-		//loadReport();
-		//loadModelZone2Map();
+		// loadReport();
+		loadModelMapZone2();
 		loadModel();
 		loadLocatin();
 	}
 	
-	
+	 public static AppMenu getInstance(){
+	        if(instance == null){
+	            instance = new AppMenu();
+	        }
+	        return instance;
+	    }
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -115,7 +122,6 @@ public class AppMenu implements ActionListener {
 	 */
 	private void initialize() {
 
-		
 		frame = new JFrame("FG Inventory App");
 		frame.setSize(1200, 600);
 		frame.setLocationRelativeTo(null);
@@ -134,17 +140,17 @@ public class AppMenu implements ActionListener {
 		btnReport.setFont(font);
 		btnShipping = new JButton("Shipping");
 		btnShipping.setFont(font);
-		//btnModelQuantity = new JButton("Model Quantity");
-		//btnModelQuantity.setFont(font);
+		// btnModelQuantity = new JButton("Model Quantity");
+		// btnModelQuantity.setFont(font);
 		btnPickingList = new JButton("Picking");
 		btnPickingList.setFont(font);
-		
-		btnReplenishment= new JButton("Replenishment");
+
+		btnReplenishment = new JButton("Replenishment");
 		btnReplenishment.setFont(font);
-		btnConfiguration= new JButton("Configuration");
+		btnConfiguration = new JButton("Configuration");
 		btnConfiguration.setFont(font);
-		//btnModelQuantity = new JButton("Model Quantity");
-		//btnModelQuantity.setFont(font);
+		// btnModelQuantity = new JButton("Model Quantity");
+		// btnModelQuantity.setFont(font);
 		// btnRecving.setBounds(20,20,100,40);
 		// btnMoving.setBounds(150,20,100,40);
 		// btnInQuiry.setBounds(280,20,100,40);
@@ -156,7 +162,7 @@ public class AppMenu implements ActionListener {
 		btnMoving.addActionListener(this);
 		btnShipping.addActionListener(this);
 		btnInQuiry.addActionListener(this);
-		//btnModelQuantity.addActionListener(this);
+		// btnModelQuantity.addActionListener(this);
 		btnReport.addActionListener(this);
 		btnPickingList.addActionListener(this);
 		btnReplenishment.addActionListener(this);
@@ -168,9 +174,8 @@ public class AppMenu implements ActionListener {
 		cp.add(btnShipping);
 		cp.add(btnReport);
 		cp.add(btnReplenishment);
-	    cp.add(btnConfiguration);
+		cp.add(btnConfiguration);
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		
 
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -187,46 +192,51 @@ public class AppMenu implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String btn = "";
-		if (e.getSource() == btnRecving) {
-			// btnRecving.setEnabled(false);
-			ItemsPannel window = new ItemsPannel(ItemsPannel.RECEVING);
-			// window.frame.setVisible(true);
-		} else if (e.getSource() == btnMoving) {
-			ItemsPannel window = new ItemsPannel(ItemsPannel.MOVING);
-			window.frame.setVisible(true);
-		} else if (e.getSource() == btnInQuiry) {
-			QueryPannel window = new QueryPannel();
-			window.frame.setVisible(true);
 
-		} else if (e.getSource() == btnShipping) {
-			ShippingConfirm window = new ShippingConfirm();
-			window.frame.setVisible(true);
+		if (!InstanceUtil.isExits()) {
+			if (e.getSource() == btnRecving) {
+				// btnRecving.setEnabled(false);
+				ItemsPannel.getInstance("",ItemsPannel.RECEVING);
+				// window.frame.setVisible(true);
+			} else if (e.getSource() == btnMoving) {
+				// ItemsPannel window = new ItemsPannel(ItemsPannel.MOVING);
+				// window.frame.setVisible(true);
+				ItemsPannel.getInstance("",ItemsPannel.MOVING);
+			} else if (e.getSource() == btnInQuiry) {
+				// QueryPannel window = new QueryPannel();
+				// window.frame.setVisible(true);
+				QueryPannel.getInstance();
+			} else if (e.getSource() == btnShipping) {
+				// ShippingConfirm window = new ShippingConfirm();
+				// window.frame.setVisible(true);
 
-		}else if (e.getSource() == btnReport) {
-			
-			//JOptionPane.showMessageDialog(null, "Model 15516 less than 50. Please move more item from Zone 1.");
+				ShippingConfirm.getInstance();
+			} else if (e.getSource() == btnReport) {
 
-			DailyReport window = new DailyReport(Constrant.dailyReport);
-			window.frame.setVisible(true);
- 
-		}else if (e.getSource() == btnPickingList) {
-			
-			ShippingPicking window = new ShippingPicking();
-			window.frame.setVisible(true);
-			
-		}else if (e.getSource() == btnReplenishment) {
-			
-			ModelZone2Report window = new ModelZone2Report(Constrant.modelZone2List);
-			//window.frame.setVisible(true);
+				// JOptionPane.showMessageDialog(null, "Model 15516 less than 50. Please move
+				// more item from Zone 1.");
+
+				// DailyReport window = new DailyReport(Constrant.dailyReport);
+				// window.frame.setVisible(true);
+				DailyReport.getInstance(Constrant.dailyReport);
+
+			} else if (e.getSource() == btnPickingList) {
+
+				// ShippingPicking window = new ShippingPicking();
+				// window.frame.setVisible(true);
+				ShippingPicking.getInstance();
+			} else if (e.getSource() == btnReplenishment) {
+
+				ModelZone2Report.getInstance(Constrant.modelZone2List);
+				// window.frame.setVisible(true);
+			}
+
 		}
-		
-
 
 	}
 
 	private void exceuteCallback() {
 
-		
 		fgModelZone2 = new ModelZoneMapRepositoryImplRetrofit();
 		fgModelZone2.setinventoryServiceCallBackFunction(new ModelZone2CallBackFunction() {
 
@@ -240,17 +250,27 @@ public class AppMenu implements ActionListener {
 
 			@Override
 			public void getReportItems(List<ModelZone2bean> items) {
-				Constrant.modelZone2List = items;
+				// Constrant.modelZone2List = items;
+
+				HashMap<String, ModelZone2bean> map = new HashMap<>();
+				for (ModelZone2bean i : items) {
+					map.put(i.Model, i);
+				}
+
+				Constrant.modelZone2 = map;
 				loading.setValue(60);
-				
+
 			}
 
 			@Override
 			public void getModelDailyReportItems(List<ModelDailyReportbean> items) {
-				
-				Constrant.dailyReport = items;
-			}
 
+				HashMap<String, ModelDailyReportbean> map = new HashMap<>();
+				for (ModelDailyReportbean i : items) {
+					map.put(i.ModelNo, i);
+				}
+				Constrant.dailyReport = map;
+			}
 
 		});
 
@@ -275,7 +295,7 @@ public class AppMenu implements ActionListener {
 
 				Constrant.models = map;
 				loading.setValue(60);
-				
+
 			}
 
 		});
@@ -307,8 +327,6 @@ public class AppMenu implements ActionListener {
 		});
 
 	}
-	
-
 
 	// Loading Models data from Server
 	private void loadModel() {
@@ -318,6 +336,23 @@ public class AppMenu implements ActionListener {
 				try {
 
 					fgModels.getAllItems();
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+	}
+
+	// Loading Models data from Server
+	private void loadModelMapZone2() {
+		// loading model and location information from Server
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+
+					fgModelZone2.getAllItems();
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -342,9 +377,6 @@ public class AppMenu implements ActionListener {
 			}
 		});
 		try {
-			
-
-			
 
 		} catch (NumberFormatException x) {
 			// TODO Auto-generated catch block
@@ -354,7 +386,5 @@ public class AppMenu implements ActionListener {
 			x.printStackTrace();
 		}
 	}
-	
-	
 
 }

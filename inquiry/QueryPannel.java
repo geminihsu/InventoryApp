@@ -41,8 +41,10 @@ import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Locationbean;
+import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Modelbean;
 import spirit.fitness.scanner.receving.ItemsPannel;
+import spirit.fitness.scanner.report.ModelZone2Report;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.zonepannel.ReturnLocation;
@@ -52,6 +54,9 @@ import spirit.fitness.scanner.zonepannel.ZoneMenu;
 import spirit.fitness.scanner.zonepannel.ReturnLocation.ZoneCodeReturnCallBackFunction;
 
 public class QueryPannel implements ActionListener{
+	
+	private static QueryPannel queryPannel = null;
+	
 	public final static int INQUIRY = 3;
 	public JFrame frame;
 	private JTextField locationText;
@@ -59,11 +64,30 @@ public class QueryPannel implements ActionListener{
 	private Zone1Location zone1Location;
 	private Zone2Location zone2Location;
 	private ZoneMenu showRoom;
+	//private ZoneMenu window;
 	
 	private int queryType;
 	
 	private FGRepositoryImplRetrofit fgRepository;
 
+	
+	public static QueryPannel getInstance() {
+		if (queryPannel == null) {
+			queryPannel = new QueryPannel();
+		}
+		return queryPannel;
+	}
+	
+	public static boolean isExit() 
+	 {
+		 return queryPannel != null;
+	 }
+	
+	public static void destory() 
+	{
+		queryPannel = null;
+	}
+	
 	public QueryPannel() {
 		QueryResult.isQueryRepeat = false;
 		initialZoneCodeCallback();
@@ -279,8 +303,9 @@ public class QueryPannel implements ActionListener{
 
 		MapButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ZoneMenu window = new ZoneMenu(null, INQUIRY);
-				window.frame.setVisible(true);
+				//window = new ZoneMenu(null, INQUIRY);
+				//window.frame.setVisible(true);
+				ZoneMenu.getInstance(null, INQUIRY);
 			}
 		});
 		panel.add(MapButton);
@@ -336,7 +361,11 @@ public class QueryPannel implements ActionListener{
 		exitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				clearZoneCodeCallback();
-
+				//if(window != null && window.frame != null)
+				//	window.frame.setVisible(false);
+				ZoneMenu.destory();
+				
+				queryPannel = null;
 				frame.dispose();
 				frame.setVisible(false);
 			}

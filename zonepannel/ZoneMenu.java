@@ -31,7 +31,7 @@ public class ZoneMenu implements ActionListener {
 	/**
 	 * Create the application.
 	 */
-
+	private static ZoneMenu instance = null;
 	private JButton btnZone1, btnZone2, btnReturn, btnDisplayRoom, btnScrapped, btnRework, btnQC;
 	public JFrame frame;
 	private String items;
@@ -42,13 +42,25 @@ public class ZoneMenu implements ActionListener {
 		assignType = type;
 
 		if (assignType != -1)
-			initialize();
+			initialize(content);
 	}
-
+	
+	 public static ZoneMenu getInstance(String content, int type){
+	        if(instance == null){
+	            instance = new ZoneMenu(content,type);
+	        }
+	        return instance;
+	    }
+	 
+	 public static void destory() 
+	 {
+		 instance = null;
+	 }
+	 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize(String content) {
 
 		// JFrame.setDefaultLookAndFeelDecorated(false);
 		// JDialog.setDefaultLookAndFeelDecorated(false);
@@ -129,16 +141,18 @@ public class ZoneMenu implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				frame.dispose();
 				frame.setVisible(false);
-
+				instance = null;
 				if(assignType == ItemsPannel.RECEVING) 
 				{
-					ItemsPannel window = new ItemsPannel(ItemsPannel.RECEVING);
-					window.frame.setVisible(true);
+					//ItemsPannel window = new ItemsPannel(ItemsPannel.RECEVING);
+					//window.frame.setVisible(true);
+					ItemsPannel.getInstance(content,ItemsPannel.RECEVING);
 					
 				}else if(assignType == ItemsPannel.MOVING) 
 				{
-					ItemsPannel window = new ItemsPannel(ItemsPannel.MOVING);
-					window.frame.setVisible(true);
+					//ItemsPannel window = new ItemsPannel(ItemsPannel.MOVING);
+					//window.frame.setVisible(true);
+					ItemsPannel.getInstance(content,ItemsPannel.MOVING);
 				}else if(assignType == QueryPannel.INQUIRY) 
 				{
 					//QueryPannel window = new QueryPannel();
@@ -152,6 +166,8 @@ public class ZoneMenu implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				instance = null;
+				ItemsPannel.destory();
 				frame.dispose();
 				frame.setVisible(false);
 			}
@@ -195,6 +211,7 @@ public class ZoneMenu implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String btn = "";
 		if (e.getSource() == btnZone1) {
+			instance = null;
 			this.frame.setVisible(false);
 			this.frame.dispose();
 
@@ -202,7 +219,7 @@ public class ZoneMenu implements ActionListener {
 			window.frame.setVisible(true);
 
 		} else if (e.getSource() == btnZone2) {
-
+			instance = null;
 			this.frame.setVisible(false);
 			this.frame.dispose();
 
@@ -210,6 +227,8 @@ public class ZoneMenu implements ActionListener {
 			window.frame.setVisible(true);
 
 		} else if (e.getSource() == btnReturn) {
+			
+			instance = null;
 			this.frame.setVisible(false);
 			this.frame.dispose();
 
@@ -217,6 +236,7 @@ public class ZoneMenu implements ActionListener {
 			window.frame.setVisible(true);
 
 		} else if (e.getSource() == btnDisplayRoom) {
+			instance = null;
 			if (showRoomCodeCallBackFunction != null) {
 				this.frame.setVisible(false);
 				this.frame.dispose();
@@ -225,11 +245,13 @@ public class ZoneMenu implements ActionListener {
 				this.frame.setVisible(false);
 				this.frame.dispose();
 
-				ItemsPannel window = new ItemsPannel(items, "888", assignType);
-				window.dialogFrame.setVisible(true);
+				//ItemsPannel window = new ItemsPannel(items, "888", assignType);
+				//window.dialogFrame.setVisible(true);
+				ItemsPannel.getInstance(items, "888", assignType);
 			}
 
 		}else if (e.getSource() == btnRework) {
+			instance = null;
 			if (reworkCodeCallBackFunction != null) {
 				this.frame.setVisible(false);
 				this.frame.dispose();
@@ -238,11 +260,13 @@ public class ZoneMenu implements ActionListener {
 				this.frame.setVisible(false);
 				this.frame.dispose();
 
-				ItemsPannel window = new ItemsPannel(items, "555", assignType);
-				window.dialogFrame.setVisible(true);
+				//ItemsPannel window = new ItemsPannel(items, "555", assignType);
+				//window.dialogFrame.setVisible(true);
+				ItemsPannel.getInstance(items, "555", assignType);
 			}
 
 		}else if (e.getSource() == btnQC) {
+			instance = null;
 			if (qcCodeCallBackFunction != null) {
 				this.frame.setVisible(false);
 				this.frame.dispose();
@@ -251,11 +275,13 @@ public class ZoneMenu implements ActionListener {
 				this.frame.setVisible(false);
 				this.frame.dispose();
 
-				ItemsPannel window = new ItemsPannel(items, "666", assignType);
-				window.dialogFrame.setVisible(true);
+				//ItemsPannel window = new ItemsPannel(items, "666", assignType);
+				//window.dialogFrame.setVisible(true);
+				ItemsPannel.getInstance(items, "666", assignType);
 			}
 
 		}else if (e.getSource() == btnScrapped) {
+			instance = null;
 			if (scrappedCodeCallbackFunction != null) {
 				this.frame.setVisible(false);
 				this.frame.dispose();
@@ -264,8 +290,9 @@ public class ZoneMenu implements ActionListener {
 				this.frame.setVisible(false);
 				this.frame.dispose();
 
-				ItemsPannel window = new ItemsPannel(items, "777", assignType);
-				window.dialogFrame.setVisible(true);
+				//ItemsPannel window = new ItemsPannel(items, "777", assignType);
+				//window.dialogFrame.setVisible(true);
+				ItemsPannel.getInstance(items, "777", assignType);
 			}
 
 		}

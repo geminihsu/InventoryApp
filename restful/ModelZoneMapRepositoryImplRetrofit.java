@@ -40,6 +40,19 @@ public class ModelZoneMapRepositoryImplRetrofit {
 				.build();
 		ModelZoneMapCallback service = retrofit.create(ModelZoneMapCallback.class);
 		
+		Response<List<ModelZone2bean>> request = service.getAllModelMapZone2().execute();
+		int code = request.code();
+		List<ModelZone2bean> result = retriveCode(code,request);
+		
+		return result;
+	}
+
+	
+	public List<ModelZone2bean> getAllItemsQty() throws Exception {
+		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl).addConverterFactory(GsonConverterFactory.create())
+				.build();
+		ModelZoneMapCallback service = retrofit.create(ModelZoneMapCallback.class);
+		
 		Response<List<ModelZone2bean>> request = service.getAllModelQtyReport().execute();
 		int code = request.code();
 		List<ModelZone2bean> result = retriveCode(code,request);

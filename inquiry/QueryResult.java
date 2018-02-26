@@ -439,7 +439,8 @@ public class QueryResult {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				if (!isQueryRepeat)
+					QueryPannel.destory();
 				if (!isQueryRepeat && resultFrame != null) {
 					resultFrame.dispose();
 					resultFrame.setVisible(false);
@@ -608,6 +609,9 @@ public class QueryResult {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
+				if (!isQueryRepeat)
+					QueryPannel.destory();
+
 				if (!isQueryRepeat && resultFrame != null) {
 					resultFrame.dispose();
 					resultFrame.setVisible(false);
@@ -690,7 +694,7 @@ public class QueryResult {
 							+ "</u></span> " + "</html>";
 				else
 					rowData[rowIndex][0] = location.getKey();
-				
+
 				rowData[rowIndex][1] = location.getValue().size();
 
 			}

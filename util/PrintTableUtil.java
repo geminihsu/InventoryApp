@@ -15,6 +15,7 @@ public class PrintTableUtil {
         Board board = new Board(100);
         Table table = new Table(board, 75, headersList, rowsList);
         table.setGridMode(Table.GRID_COLUMN);
+ 
         //setting width and data-align of columns
         List<Integer> colWidthsList = Arrays.asList(14, 14, 50, 14);
         List<Integer> colAlignList = Arrays.asList(Block.DATA_CENTER, Block.DATA_CENTER, Block.DATA_CENTER, Block.DATA_CENTER);
@@ -35,7 +36,7 @@ public class PrintTableUtil {
         Table table = new Table(board, 75, headersList, rowsList);
         table.setGridMode(Table.GRID_COLUMN);
         //setting width and data-align of columns
-        List<Integer> colWidthsList = Arrays.asList(8, 20, 8, 12,10);
+        List<Integer> colWidthsList = Arrays.asList(8, 30, 8, 12,10);
         List<Integer> colAlignList = Arrays.asList(Block.DATA_CENTER, Block.DATA_CENTER, Block.DATA_CENTER, Block.DATA_CENTER, Block.DATA_CENTER);
         table.setColWidthsList(colWidthsList);
         table.setColAlignsList(colAlignList);

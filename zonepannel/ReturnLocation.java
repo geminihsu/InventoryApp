@@ -95,8 +95,9 @@ public class ReturnLocation implements ActionListener {
 				frame.dispose();
 				frame.setVisible(false);
 				
-				ZoneMenu window = new ZoneMenu(items, assignType);
-				window.frame.setVisible(true);
+				//ZoneMenu window = new ZoneMenu(items, assignType);
+				//window.frame.setVisible(true);
+				ZoneMenu.getInstance(items, assignType);
 			}
 		});
 		
@@ -104,6 +105,7 @@ public class ReturnLocation implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				ItemsPannel.destory();
 				frame.dispose();
 				frame.setVisible(false);
 			}
@@ -152,23 +154,26 @@ public class ReturnLocation implements ActionListener {
 			if (zoneCodeReturnCallBackFunction != null) {
 				zoneCodeReturnCallBackFunction.getZoneCode(btnReturn1.getText().toString());
 			} else {
-				ItemsPannel window = new ItemsPannel(items, btnReturn1.getText().toString(), assignType);
-				window.frame.setVisible(true);
+				//ItemsPannel window = new ItemsPannel(items, btnReturn1.getText().toString(), assignType);
+				//window.frame.setVisible(true);
+				ItemsPannel.getInstance(items, btnReturn1.getText().toString(), assignType);
 			}
 		} else if (e.getSource() == btnReturn2) {
 			if (zoneCodeReturnCallBackFunction != null) {
 				zoneCodeReturnCallBackFunction.getZoneCode(btnReturn2.getText().toString());
 			} else {
-				ItemsPannel window = new ItemsPannel(items, btnReturn2.getText().toString(), assignType);
-				window.frame.setVisible(true);
+				//ItemsPannel window = new ItemsPannel(items, btnReturn2.getText().toString(), assignType);
+				//window.frame.setVisible(true);
+				ItemsPannel.getInstance(items, btnReturn2.getText().toString(), assignType);
 			}
 
 		} else if (e.getSource() == btnReturn3) {
 			if (zoneCodeReturnCallBackFunction != null) {
 				zoneCodeReturnCallBackFunction.getZoneCode(btnReturn3.getText().toString());
 			} else {
-				ItemsPannel window = new ItemsPannel(items, btnReturn3.getText().toString(), assignType);
-				window.frame.setVisible(true);
+				//ItemsPannel window = new ItemsPannel(items, btnReturn3.getText().toString(), assignType);
+				//window.frame.setVisible(true);
+				ItemsPannel.getInstance(items, btnReturn3.getText().toString(), assignType);
 			}
 		}
 

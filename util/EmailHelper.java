@@ -3,6 +3,8 @@ package spirit.fitness.scanner.util;
 
 
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Properties;
 
 import javax.mail.*;
@@ -15,11 +17,11 @@ import java.util.Properties;
 
 public class EmailHelper {
 
-	public static void sendMail() 
+	public static void sendMail(String items) 
 	{
 
-		 final String username = "geminih@spiritfitness.com";
-         final String password = "$pirit3Ma1l";
+	   final String username = "geminih@spiritfitness.com";
+       final String password = "$pirit3Ma1l";
 
        Properties props = new Properties();
        props.put("mail.smtp.auth", "true");
@@ -36,12 +38,14 @@ public class EmailHelper {
 
        try {
 
+    	   String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+			
            Message message = new MimeMessage(session);
            message.setFrom(new InternetAddress("geminih@spiritfitness.com"));
            message.setRecipients(Message.RecipientType.TO,
                    InternetAddress.parse("gemini612gemini@gmail.com"));
-           message.setSubject("Zone 2 Quantity Alert");
-           message.setText("Zone 2 model 155516 less than the 50.");
+           message.setSubject(timeStamp +" Receiving Container");
+           message.setText(items);
 
            Transport.send(message);
 

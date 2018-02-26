@@ -26,6 +26,10 @@ import spirit.fitness.scanner.model.Reportbean;
 public interface ModelZoneMapCallback {
     
 	@Headers("Content-Type: application/json")
+
+	@GET("api/ModelZoneMaps")
+	Call<List<ModelZone2bean>> getAllModelMapZone2();
+	
 	@GET("api/ModelZoneMaps/Qty")
 	Call<List<ModelZone2bean>> getAllModelQtyReport();
 	

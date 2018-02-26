@@ -98,8 +98,9 @@ public class Zone1Location implements ActionListener {
 						frame.dispose();
 						frame.setVisible(false);
 
-                        ItemsPannel window = new ItemsPannel(items, content, assignType);
-						window.dialogFrame.setVisible(true);
+                        //ItemsPannel window = new ItemsPannel(items, content, assignType);
+						//window.dialogFrame.setVisible(true);
+						ItemsPannel.getInstance(items, content, assignType);
 					}
 
 				}
@@ -118,8 +119,9 @@ public class Zone1Location implements ActionListener {
 				frame.dispose();
 				frame.setVisible(false);
 				
-				ZoneMenu window = new ZoneMenu(items, assignType);
-				window.frame.setVisible(true);
+				//ZoneMenu window = new ZoneMenu(items, assignType);
+				//window.frame.setVisible(true);
+				ZoneMenu.getInstance(items, assignType);
 			}
 		});
 		
@@ -129,6 +131,7 @@ public class Zone1Location implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				ItemsPannel.destory();
 				frame.dispose();
 				frame.setVisible(false);
 			}
@@ -169,19 +172,22 @@ public class Zone1Location implements ActionListener {
 
 		if (e.getSource() == btnZoneCode) {
 
-			ItemsPannel window = new ItemsPannel(items, "Return(" + btnZoneCode[0].getText().toString() + ")",
-					assignType);
-			window.frame.setVisible(true);
+			//ItemsPannel window = new ItemsPannel(items, "Return(" + btnZoneCode[0].getText().toString() + ")",
+			//		assignType);
+			//window.frame.setVisible(true);
+			ItemsPannel.getInstance(items, "Return(" + btnZoneCode[0].getText().toString() + ")",assignType);
 		} else if (e.getSource() == btnZoneCode[1]) {
-			ItemsPannel window = new ItemsPannel(items, "Return(" + btnZoneCode[1].getText().toString() + ")",
-					assignType);
-			window.frame.setVisible(true);
-
+			//ItemsPannel window = new ItemsPannel(items, "Return(" + btnZoneCode[1].getText().toString() + ")",
+			//		assignType);
+			//window.frame.setVisible(true);
+			ItemsPannel.getInstance(items, "Return(" + btnZoneCode[1].getText().toString() + ")",
+							assignType);
 		} else if (e.getSource() == btnZoneCode[2]) {
-			ItemsPannel window = new ItemsPannel(items, "Return(" + btnZoneCode[2].getText().toString() + ")",
-					assignType);
-			window.frame.setVisible(true);
-
+			//ItemsPannel window = new ItemsPannel(items, "Return(" + btnZoneCode[2].getText().toString() + ")",
+			//		assignType);
+			//window.frame.setVisible(true);
+			ItemsPannel.getInstance(items,"Return(" + btnZoneCode[2].getText().toString() + ")",
+							assignType);
 		}
 
 		/*

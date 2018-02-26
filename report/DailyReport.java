@@ -18,8 +18,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.swing.BorderFactory;
@@ -70,8 +73,11 @@ import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.ModelDailyReportbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Reportbean;
+import spirit.fitness.scanner.receving.ItemsPannel;
 
-public class DailyReport  {
+public class DailyReport {
+
+	private static DailyReport dailyReport = null;
 
 	public final static int REPORT = 0;
 	public final static int MIN_QUANTITY = 1;
@@ -82,17 +88,28 @@ public class DailyReport  {
 	private ProgressMonitor progressMonitor;
 	private JButton btnDone;
 	private ModelZoneMapRepositoryImplRetrofit fgModelZone2;
-	
+
 	private LoadingFrameHelper loadingframe;
 	private JProgressBar loading;
 
-	public DailyReport(List<ModelDailyReportbean> data) {
+	public static DailyReport getInstance(HashMap<String,ModelDailyReportbean> data) {
+		if (dailyReport == null) {
+			dailyReport = new DailyReport(data);
+		}
+		return dailyReport;
+	}
+	
+	public static boolean isExit() 
+	 {
+		 return dailyReport != null;
+	 }
+
+	public DailyReport(HashMap<String,ModelDailyReportbean> data) {
 
 		loadingframe = new LoadingFrameHelper("Loading Data from Server...");
 		loading = loadingframe.loadingSample("Loading Data from Server...");
 		intialCallback();
 		loadModelZone2Map();
-		
 
 	}
 
@@ -160,65 +177,56 @@ public class DailyReport  {
 		int reworkTotal = 0;
 		int qcTotal = 0;
 		int Total = 0;
-		
+
 		for (int i = 0; i < data.size(); i++) {
 
-			/*if (i == 10) {
-				for (int j = 0; j < 12; j++) {
-					rowDataReport[i][0] = " TOTAL";
-					rowDataReport[i][1] = "";
-					rowDataReport[i][2] = prevTotal;
-					rowDataReport[i][3] = shippedTotal;
-					rowDataReport[i][4] = receivedTotal;
-					rowDataReport[i][5] = scrappedTotal;
-					rowDataReport[i][6] = shippableOnHandTotal;
-					rowDataReport[i][7] = returnUnshippableTotal;
-					;
-					rowDataReport[i][8] = showroom;
-					rowDataReport[i][9] = reworkTotal;
-					rowDataReport[i][10] = qcTotal;
-					rowDataReport[i][11] = Total;
-				}
-			} else {*/
-				for (int j = 0; j < 12; j++) {
-					rowDataReport[i][0] = " " + data.get(i).ModelNo;
-					rowDataReport[i][1] = data.get(i).ModelFG;
-					rowDataReport[i][2] = data.get(i).Previous;
-					rowDataReport[i][3] = data.get(i).Shipped;
-					rowDataReport[i][4] = data.get(i).Received;
-					rowDataReport[i][5] = data.get(i).Scrapped;
-					rowDataReport[i][6] = data.get(i).OnHand;
-					rowDataReport[i][7] = data.get(i).ReturnItem;
+			/*
+			 * if (i == 10) { for (int j = 0; j < 12; j++) { rowDataReport[i][0] = " TOTAL";
+			 * rowDataReport[i][1] = ""; rowDataReport[i][2] = prevTotal;
+			 * rowDataReport[i][3] = shippedTotal; rowDataReport[i][4] = receivedTotal;
+			 * rowDataReport[i][5] = scrappedTotal; rowDataReport[i][6] =
+			 * shippableOnHandTotal; rowDataReport[i][7] = returnUnshippableTotal; ;
+			 * rowDataReport[i][8] = showroom; rowDataReport[i][9] = reworkTotal;
+			 * rowDataReport[i][10] = qcTotal; rowDataReport[i][11] = Total; } } else {
+			 */
+			for (int j = 0; j < 12; j++) {
+				rowDataReport[i][0] = " " + data.get(i).ModelNo;
+				rowDataReport[i][1] = data.get(i).ModelFG;
+				rowDataReport[i][2] = data.get(i).Previous;
+				rowDataReport[i][3] = data.get(i).Shipped;
+				rowDataReport[i][4] = data.get(i).Received;
+				rowDataReport[i][5] = data.get(i).Scrapped;
+				rowDataReport[i][6] = data.get(i).OnHand;
+				rowDataReport[i][7] = data.get(i).ReturnItem;
 
-					rowDataReport[i][8] = data.get(i).ShowRoom;
-					rowDataReport[i][9] = data.get(i).Rework;
-					rowDataReport[i][10] = data.get(i).QC;
-					rowDataReport[i][11] = data.get(i).Total;
-					
-					
-					
-				//}
+				rowDataReport[i][8] = data.get(i).ShowRoom;
+				rowDataReport[i][9] = data.get(i).Rework;
+				rowDataReport[i][10] = data.get(i).QC;
+				rowDataReport[i][11] = data.get(i).Total;
+
+				// }
 			}
-				
-				prevTotal += data.get(i).Previous;
-				shippedTotal += data.get(i).Shipped;
-				receivedTotal += data.get(i).Received;
-				scrappedTotal += data.get(i).Scrapped;
-				shippableOnHandTotal += data.get(i).OnHand;
-				returnUnshippableTotal += data.get(i).ReturnItem;
-				showroom += data.get(i).ShowRoom;
-				reworkTotal += data.get(i).Rework;
-				qcTotal += data.get(i).QC;
-				Total += data.get(i).Total;
+
+			prevTotal += data.get(i).Previous;
+			shippedTotal += data.get(i).Shipped;
+			receivedTotal += data.get(i).Received;
+			scrappedTotal += data.get(i).Scrapped;
+			shippableOnHandTotal += data.get(i).OnHand;
+			returnUnshippableTotal += data.get(i).ReturnItem;
+			showroom += data.get(i).ShowRoom;
+			reworkTotal += data.get(i).Rework;
+			qcTotal += data.get(i).QC;
+			Total += data.get(i).Total;
 		}
 
 		String zone = "";
 
-		Object columnNames[] = { "Model#", "FG", "Previous", "Shipped", "Received", "Scrapped", "Shippable/On Hand", "Return/Unshippable",
-				"ShowRoom", "Rework","QC","Total" };
+		Object columnNames[] = { "Model#", "FG", "Previous", "Shipped", "Received", "Scrapped", "Shippable/On Hand",
+				"Return/Unshippable", "ShowRoom", "Rework", "QC", "Total" };
 		Font font = new Font("Verdana", Font.BOLD, 15);
 		final Class[] columnClass = new Class[] { String.class, String.class, Integer.class, Integer.class,
-				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class };
+				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,
+				Integer.class };
 
 		DefaultTableModel model = new DefaultTableModel(rowDataReport, columnNames) {
 			@Override
@@ -232,10 +240,6 @@ public class DailyReport  {
 				return columnClass[columnIndex];
 			}
 		};
-
-	
-
-		
 
 		JTable table = new JTable(model);
 		table.getTableHeader().setFont(font);
@@ -261,14 +265,13 @@ public class DailyReport  {
 		returnQty.setPreferredWidth(200);
 		TableColumn column = table.getColumnModel().getColumn(8);
 		column.setPreferredWidth(120);
-		
+
 		TableColumn qCcolumn = table.getColumnModel().getColumn(10);
 		qCcolumn.setPreferredWidth(50);
 		table.setCellSelectionEnabled(false);
 		table.setColumnSelectionAllowed(false);
 		table.setEnabled(false);
 
-	
 		int heigh = 0;
 
 		if (50 * rowDataReport.length + 20 > 630)
@@ -276,28 +279,33 @@ public class DailyReport  {
 		else
 			heigh = 430;
 		scrollZonePane.setBounds(5, 5, 1190, heigh);
-		
+
 		scrollZonePane.setViewportView(table);
 
 		panel.add(scrollZonePane);
-		
-		//Border border = LineBorder.createBlackLineBorder();
-		
-		/*JLabel modelLabel = new JLabel(" Total                                                  "+prevTotal+"            "+shippedTotal+"        "+receivedTotal+"                 "+scrappedTotal+"                       "+shippableOnHandTotal+"                                "+returnUnshippableTotal+"                   "+showroom + "           "+reworkTotal+"        "+qcTotal+ "   "+Total);
-		
-		modelLabel.setBounds(5, 418, 1190, 50);
-		modelLabel.setOpaque(true);
-		modelLabel.setBackground(Constrant.DISPALY_ITEMS_TABLE_COLOR);
-		modelLabel.setFont(font);
-		modelLabel.setBorder(border);
-		panel.add(modelLabel);*/
-		
+
+		// Border border = LineBorder.createBlackLineBorder();
+
+		/*
+		 * JLabel modelLabel = new
+		 * JLabel(" Total                                                  "
+		 * +prevTotal+"            "+shippedTotal+"        "
+		 * +receivedTotal+"                 "+scrappedTotal+"                       "
+		 * +shippableOnHandTotal+"                                "
+		 * +returnUnshippableTotal+"                   "+showroom +
+		 * "           "+reworkTotal+"        "+qcTotal+ "   "+Total);
+		 * 
+		 * modelLabel.setBounds(5, 418, 1190, 50); modelLabel.setOpaque(true);
+		 * modelLabel.setBackground(Constrant.DISPALY_ITEMS_TABLE_COLOR);
+		 * modelLabel.setFont(font); modelLabel.setBorder(border);
+		 * panel.add(modelLabel);
+		 */
+
 		Font btnFont = new Font("Verdana", Font.BOLD, 18);
 		btnDone = new JButton("Export To Excel");
 		btnDone.setFont(btnFont);
 		btnDone.setBounds(5, 640, 200, 50);
 
-	
 		btnDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -306,13 +314,12 @@ public class DailyReport  {
 						try {
 							ExcelHelper exp = new ExcelHelper();
 
-							
-								exp.fillData(table,
-										new File("C:\\Users\\geminih\\Downloads\\" + timeStamp + "_report.xls"));
+							exp.fillData(table,
+									new File("C:\\Users\\geminih\\Downloads\\" + timeStamp + "_report.xls"));
 
-								JOptionPane.showMessageDialog(null, "Export " + timeStamp + ".xls' successfully",
-										"Message", JOptionPane.INFORMATION_MESSAGE);
-							
+							JOptionPane.showMessageDialog(null, "Export " + timeStamp + ".xls' successfully", "Message",
+									JOptionPane.INFORMATION_MESSAGE);
+
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -329,6 +336,7 @@ public class DailyReport  {
 
 		exitDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				dailyReport = null;
 				frame.dispose();
 				frame.setVisible(false);
 			}
@@ -351,9 +359,9 @@ public class DailyReport  {
 			@Override
 			public void getReportItems(List<ModelZone2bean> items) {
 
-				//if (refreshDone != null)
-				//	refreshDone.setEnabled(true);
-			
+				// if (refreshDone != null)
+				// refreshDone.setEnabled(true);
+
 			}
 
 			@Override
@@ -361,8 +369,17 @@ public class DailyReport  {
 				loading.setValue(100);
 				loadingframe.setVisible(false);
 				loadingframe.dispose();
-				Constrant.dailyReport = items;
-				displayTable(items);
+				LinkedHashMap<String, ModelDailyReportbean> map = new LinkedHashMap<>();
+				for (ModelDailyReportbean i : items) {
+					map.put(i.ModelNo, i);
+				}
+				Constrant.dailyReport = map;
+				List<ModelDailyReportbean> list = new ArrayList<ModelDailyReportbean>();
+				for (Map.Entry<String, ModelDailyReportbean> location : map.entrySet()) 
+				{
+					list.add(location.getValue());
+				}
+				displayTable(list);
 				java.awt.EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -370,29 +387,29 @@ public class DailyReport  {
 						frame.repaint();
 					}
 				});
-				
+
 			}
 
 		});
 	}
-	
+
 	// Loading Models data from Server
-		private void loadModelZone2Map() {
+	private void loadModelZone2Map() {
 
-			// loading model and location information from Server
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					try {
-						String timeStamp = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
-						//fgModelZone2.getAllItems("2018-02-12");
-						fgModelZone2.getAllItems(timeStamp);
+		// loading model and location information from Server
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					String timeStamp = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+				    //fgModelZone2.getAllItems("2018-02-23");
+					fgModelZone2.getAllItems(timeStamp);
 
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			});
+			}
+		});
 
-		}
+	}
 
 }

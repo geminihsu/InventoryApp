@@ -70,6 +70,7 @@ import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.util.LoadingFrameHelper;
 import spirit.fitness.scanner.util.PrintTableUtil;
 import spirit.fitness.scanner.util.PrinterHelper;
+import spirit.fitness.scanner.util.PrinterHelper.PrintTable;
 import spirit.fitness.scanner.util.WeightPlateUtil;
 import spirit.fitness.scanner.model.CustOrderbean;
 import spirit.fitness.scanner.model.Historybean;
@@ -78,7 +79,9 @@ import spirit.fitness.scanner.model.Locationbean;
 import spirit.fitness.scanner.model.PickingItem;
 
 public class ShippingConfirm {
-
+	
+	private static ShippingConfirm shippingConfirm = null;
+	
 	private static final String TEXT_SUBMIT = "text-submit";
 	private static final String INSERT_BREAK = "insert-break";
 	public JFrame frame;
@@ -132,6 +135,19 @@ public class ShippingConfirm {
 
 	private List<String> resultModelItem = new ArrayList<String>();
 
+	public static boolean isExit() 
+	 {
+		 return shippingConfirm != null;
+	 }
+	
+	
+	public static ShippingConfirm getInstance() {
+		if (shippingConfirm == null) {
+			shippingConfirm = new ShippingConfirm();
+		}
+		return shippingConfirm;
+	}
+	
 	public ShippingConfirm() {
 		loadingframe = new LoadingFrameHelper("");
 		exceuteCallback();
@@ -142,7 +158,6 @@ public class ShippingConfirm {
 	 * Initialize the contents of the frame.
 	 */
 	public void scanInfo(String salesOrder) {
-
 		scanResultFrame = new JFrame("");
 		// Setting the width and height of frame
 		// scanResultFrame.setSize(600, 800);
@@ -449,6 +464,7 @@ public class ShippingConfirm {
 		exitButton.setBounds(230, 250, 320, 50);
 		exitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				shippingConfirm = null;
 				frame.dispose();
 				frame.setVisible(false);
 			}
@@ -619,6 +635,9 @@ public class ShippingConfirm {
 
 			exit.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					
+					shippingConfirm =  null;
+					
 					if (scanResultFrame != null) {
 						scanResultFrame.dispose();
 						scanResultFrame.setVisible(false);
@@ -650,8 +669,13 @@ public class ShippingConfirm {
 					// salesOrderList.get(rowIndex).ItemID +" "+
 					// salesOrderList.get(rowIndex).description + " "+ items.get(0).trackingNo
 					// +"\n";
+					
+					
+					String trackingNo = items.get(0).trackingNo;
+					if(trackingNo.equals(""))
+						trackingNo += " ";
 					resultModelItem.add(location.getValue() + "\n" + salesOrderList.get(rowIndex).ItemID + "\n"
-							+ salesOrderList.get(rowIndex).description + "\n" + items.get(0).trackingNo + "\n");
+							+ salesOrderList.get(rowIndex).description + "\n" + trackingNo + "\n");
 					rowIndex++;
 				}
 
@@ -833,6 +857,7 @@ public class ShippingConfirm {
 		table.setBackground(Constrant.TABLE_COLOR);
 		table.setFont(font);
 		table.setRowHeight(40);
+		
 
 		TableColumn quantity = table.getColumnModel().getColumn(0);
 		quantity.setPreferredWidth(20);
@@ -1139,6 +1164,7 @@ public class ShippingConfirm {
 		exitButton.setBounds(50, 670, 180, 50);
 		exitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
 				scanner.setEnabled(true);
 				scanResultFrame.dispose();
 				scanResultFrame.setVisible(false);
@@ -1267,8 +1293,11 @@ public class ShippingConfirm {
 						// salesOrderList.get(rowIndex).ItemID +" "+
 						// salesOrderList.get(rowIndex).description + " "+ items.get(0).trackingNo
 						// +"\n";
+						
+						String modelDes = salesOrderList.get(rowIndex).description;
+						
 						resultModelItem.add(location.getValue() + "\n" + salesOrderList.get(rowIndex).ItemID + "\n"
-								+ salesOrderList.get(rowIndex).description + "\n" + scanItems.get(0).trackingNo + "\n");
+								+ modelDes + "\n" + scanItems.get(0).trackingNo + "\n");
 						rowIndex++;
 					}
 
@@ -1344,7 +1373,7 @@ public class ShippingConfirm {
 
 		String content = "Sales Order : " + saleOrder + "\n" + "TransactionDate : " + date + "\n" + "Bill To : "
 				+ billTo + "\n" + "Ship To : " + shipTo + "\n";
-		List<String> headersList = Arrays.asList("Total", "Item", "Model", "PRO#");
+		List<String> headersList = Arrays.asList("Qty", "Item", "Model", "PRO#");
 
 		List<List<String>> rowsList = new ArrayList<List<String>>();
 		for (String s : resultModelItem) {
@@ -1355,11 +1384,14 @@ public class ShippingConfirm {
 		// String result = PrintTableUtil.printReport(headersList, rowsList);
 		String result = PrintTableUtil.printReport(headersList, rowsList);
 		content += result + itemsInfo;
-		// System.out.println(content);
+		System.out.println(content);
 
-		PrinterHelper print = new PrinterHelper();
-		print.printItems(content);
+		
+		//PrinterHelper print = new PrinterHelper();
+		//print.printTable(content);
+		
 
 	}
+	
 
 }

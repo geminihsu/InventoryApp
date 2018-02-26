@@ -95,8 +95,9 @@ public class Zone2Location implements ActionListener {
 						frame.dispose();
 						frame.setVisible(false);
 
-						ItemsPannel window = new ItemsPannel(items, content, assignType);
-						window.frame.setVisible(true);
+						//ItemsPannel window = new ItemsPannel(items, content, assignType);
+						//window.frame.setVisible(true);
+						ItemsPannel.getInstance(items, content, assignType);
 					}
 				}
 			});
@@ -124,11 +125,13 @@ public class Zone2Location implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				ItemsPannel.destory();
 				frame.dispose();
 				frame.setVisible(false);
 				
-				ZoneMenu window = new ZoneMenu(items, assignType);
-				window.frame.setVisible(true);
+				//ZoneMenu window = new ZoneMenu(items, assignType);
+				//window.frame.setVisible(true);
+				ZoneMenu.getInstance(items, assignType);
 			}
 		});
 		
