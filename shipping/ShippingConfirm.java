@@ -1387,8 +1387,8 @@ public class ShippingConfirm {
 		System.out.println(content);
 
 		
-		//PrinterHelper print = new PrinterHelper();
-		//print.printTable(content);
+		PrinterHelper print = new PrinterHelper();
+		print.printTable(content);
 		
 
 	}

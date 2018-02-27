@@ -75,6 +75,7 @@ public class ItemsPannel {
 	public JFrame scanResultFrame;
 	public JFrame dialogFrame;
 	private JTextArea inputSN;
+	private JLabel ltotal;
 	private String items;
 	private String result;
 	private String scanContent;
@@ -162,7 +163,7 @@ public class ItemsPannel {
 		panel.setLayout(null);
 		Font font = new Font("Verdana", Font.BOLD, 18);
 
-		JLabel ltotal = new JLabel("Total: 0");
+		ltotal = new JLabel("Total: 0");
 		ltotal.setFont(font);
 		ltotal.setBounds(35, 550, 200, 50);
 		panel.add(ltotal);
@@ -237,7 +238,9 @@ public class ItemsPannel {
 				if (inputSN.getText().isEmpty())
 					JOptionPane.showMessageDialog(null, "Please scan serial number.");
 				else {
-
+					scanResultFrame.setVisible(false);
+					scanResultFrame.dispose();
+					instance = null;
 					displayScanResultFrame(inputSN.getText().toString(), "000", type);
 				}
 			}
@@ -412,6 +415,7 @@ public class ItemsPannel {
 							{
 								updateTxt += i.SN +"\n";
 							}
+							ltotal.setText("Total : "+ items.size());
 							inputSN.setText(updateTxt);
 							scanResultFrame.setVisible(true);
 						}
@@ -592,7 +596,15 @@ public class ItemsPannel {
 		if (LocationHelper.MapZoneCode(location) == 2) {
 			String model = itemList[0].substring(0, 6);
 			modelMapZone2 = Constrant.modelZone2.get(model);
-			if (modelMapZone2.Zone2Code.equals(location))
+			
+			if(modelMapZone2 == null) 
+			{
+				isMoveZone2 = true;
+			}
+			else if (modelMapZone2.Zone2Code == null)
+				isMoveZone2 = true;
+			
+			else if (modelMapZone2.Zone2Code.equals(location))
 				isMoveZone2 = true;
 			else {
 				JOptionPane.showMessageDialog(null,
@@ -762,6 +774,7 @@ public class ItemsPannel {
 
 			cancel.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					instance = null;
 					dialogFrame.dispose();
 					dialogFrame.setVisible(false);
 				}
@@ -857,7 +870,8 @@ public class ItemsPannel {
 							updateTxt += s + "\n";
 						}
 					}
-
+					String[] item = updateTxt.split("\n");
+					ltotal.setText("Total : "+ item.length);
 					inputSN.setText(updateTxt);
 					scanResultFrame.setVisible(true);
 				}
