@@ -61,6 +61,9 @@ public interface InventoryCallback {
 	@PUT("api/FGInventory/SN/NotExist")
 	Call<List<Itembean>> getItemsLocationBySNExits(@Body List<Itembean> itembean);
 
+	@PUT("api/FGInventory/SN/Zone2/{salesOrder}")
+	Call<List<Itembean>> getItemsZone2BySNExits(@Path("salesOrder") String salesOrder,@Body List<Itembean> itembean);
+
 	
 	//Delete no work
 	@DELETE("/api/FGInventory")

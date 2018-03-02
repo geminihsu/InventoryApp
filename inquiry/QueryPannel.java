@@ -133,6 +133,12 @@ public class QueryPannel implements ActionListener{
 				// TODO Auto-generated method stub
 				
 			}
+
+			@Override
+			public void checkInventoryZone2Items(int result,List<Itembean> items) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
 		zoneCodeReturn = new ReturnLocation(null,-1);
 		zoneCodeReturn.setZoneCodeReturnCallBackFunction(new ReturnLocation.ZoneCodeReturnCallBackFunction() {

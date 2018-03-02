@@ -18,15 +18,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -50,13 +53,16 @@ import javax.swing.table.DefaultTableModel;
 import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
+import spirit.fitness.scanner.restful.ModelZoneMapRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
+import spirit.fitness.scanner.restful.listener.ModelZone2CallBackFunction;
 import spirit.fitness.scanner.util.EmailHelper;
 import spirit.fitness.scanner.util.LoadingFrameHelper;
 import spirit.fitness.scanner.util.LocationHelper;
 import spirit.fitness.scanner.util.PrinterHelper;
 import spirit.fitness.scanner.zonepannel.ZoneMenu;
 import spirit.fitness.scanner.model.Itembean;
+import spirit.fitness.scanner.model.ModelDailyReportbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Modelbean;
 import spirit.fitness.string.tableview.*;
@@ -76,29 +82,39 @@ public class ItemsPannel {
 	public JFrame dialogFrame;
 	private JTextArea inputSN;
 	private JLabel ltotal;
+	private JLabel destination;
 	private String items;
 	private String result;
 	private String scanContent;
 	private int assignType;
+	private boolean repMove = false;
+	private HashSet<String> set;
 
 	private JButton btnDone;
 
 	private JProgressBar loading;
 	private LoadingFrameHelper loadingframe;
+	
 
 	private FGRepositoryImplRetrofit fgRepository;
+	private ModelZoneMapRepositoryImplRetrofit fgModelZone2;
+	
+	private ModelZone2bean modelzone2;
 
 	private ItemsPannel(String prevText, int type) {
 		assignType = type;
 		// initialize(type);
 		scanInfo(prevText, type);
-
+		exceuteCallback();
+		loadModelMapZone2();
 	}
 
 	public ItemsPannel(String content, String location, int type) {
 		assignType = type;
 		// displayTable(content, location, type);
 		displayScanResultFrame(content, location, type);
+		exceuteCallback();
+		loadModelMapZone2();
 	}
 
 	public static ItemsPannel getInstance(String preText, int type) {
@@ -168,6 +184,59 @@ public class ItemsPannel {
 		ltotal.setBounds(35, 550, 200, 50);
 		panel.add(ltotal);
 
+		
+		destination = new JLabel("");
+		destination.setFont(font);
+		destination.setBounds(35, 5, 300, 50);
+		panel.add(destination);
+
+		if (assignType == MOVING) {
+
+			
+			JCheckBox repButton = new JCheckBox("Rep.");
+			repButton.setFont(font);
+			repButton.setBackground(Constrant.BACKGROUN_COLOR);
+			repButton.setBounds(230, 550, 80, 50);
+			panel.add(repButton);
+
+			ActionListener actionListener = new ActionListener() {
+				public void actionPerformed(ActionEvent actionEvent) {
+					AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+					boolean selected = abstractButton.getModel().isSelected();
+					repMove = selected;
+
+					String[] item = inputSN.getText().toString().split("\n");
+
+					if (item.length > 0 && !item[0].equals("")) {
+						if (!selected) {
+							destination.setText("");
+							ltotal.setText("Total : " + item.length);
+						} else {
+							String model = item[0].substring(0, 6);
+							modelzone2 = Constrant.modelZone2.get(model);
+							destination.setText("Des. : " + modelzone2.Zone2Code /*+(" (Zone 2)")*/);
+							ltotal.setText("Total: " + item.length + "/" + modelzone2.Z2CurtQty);
+
+						}
+					}
+				}
+			};
+
+			repButton.addActionListener(actionListener);
+		}
+
+		if (!prevTxt.equals("")) {
+			String[] prev = prevTxt.split("\n");
+			
+			if(set == null)
+				set = new HashSet<String>();
+			for(String s : prev) 
+			{
+				set.add(s);
+			}
+			ltotal.setText("Total : " + prev.length);
+		}
+
 		inputSN = new JTextArea(20, 15);
 		String content = "";
 
@@ -190,7 +259,8 @@ public class ItemsPannel {
 		input.put(shiftEnter, INSERT_BREAK); // input.get(enter)) = "insert-break"
 		input.put(enter, TEXT_SUBMIT);
 
-		HashSet<String> set = new HashSet<String>();
+		if(set == null)
+			set = new HashSet<String>();
 		ActionMap actions = inputSN.getActionMap();
 		actions.put(TEXT_SUBMIT, new AbstractAction() {
 			@Override
@@ -201,7 +271,10 @@ public class ItemsPannel {
 				String prev = inputSN.getText().toString();
 				String[] item = inputSN.getText().toString().split("\n");
 
+				
 				boolean lenError = false;
+				
+				
 				if (!set.contains(item[item.length - 1]) && item[item.length - 1].length() == 16) {
 
 					set.add(item[item.length - 1]);
@@ -217,8 +290,16 @@ public class ItemsPannel {
 					// ltotal.setForeground(Color.RED);
 					// ltotal.setText("<html>"+item[item.length-1] +"</br> size Error.</html>");
 				} else {
-					ltotal.setForeground(Color.BLACK);
-					ltotal.setText("Total: " + set.size());
+
+					if (!repMove) {
+						ltotal.setForeground(Color.BLACK);
+						ltotal.setText("Total: " + set.size());
+					} else {
+						modelzone2 = Constrant.modelZone2.get(item[0].substring(0, 6));
+						destination.setText("Des. : " + modelzone2.Zone2Code /*+(" (Zone 2)")*/);
+						ltotal.setText("Total: " + set.size() + "/" + modelzone2.Z2CurtQty);
+
+					}
 				}
 			}
 		});
@@ -228,7 +309,7 @@ public class ItemsPannel {
 		inputSN.setFont(font);
 		panel.add(scrollPanel1);
 
-		// Creating Reset button
+		// Creating 000 button
 		JButton defaultButton = new JButton("000");
 		defaultButton.setFont(font);
 		defaultButton.setBounds(35, 600, 125, 50);
@@ -285,13 +366,8 @@ public class ItemsPannel {
 						items.add(_item);
 
 					}
-					exceuteCallback();
+				
 					checkItemExits(items);
-					// } else {
-					// ZoneMenu window = new ZoneMenu(items, type);
-					// window.frame.setVisible(true);
-					// ZoneMenu.getInstance(items, type);
-					// }
 
 				}
 			}
@@ -299,7 +375,7 @@ public class ItemsPannel {
 
 		panel.add(locateButton);
 
-		// Creating Reset button
+		// Creating Clear button
 		JButton clearButton = new JButton("Clear");
 		clearButton.setFont(font);
 		clearButton.setBounds(35, 665, 125, 50);
@@ -322,7 +398,7 @@ public class ItemsPannel {
 
 		panel.add(clearButton);
 
-		// Creating Query button
+		// Creating Exit button
 		JButton exitButton = new JButton("Exit");
 		exitButton.setFont(font);
 		exitButton.setBounds(175, 665, 125, 50);
@@ -340,6 +416,65 @@ public class ItemsPannel {
 
 	private void exceuteCallback() {
 
+		fgModelZone2 = new ModelZoneMapRepositoryImplRetrofit();
+		fgModelZone2.setinventoryServiceCallBackFunction(new ModelZone2CallBackFunction() {
+
+			@Override
+			public void resultCode(int code) {
+				// TODO Auto-generated method stub
+				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
+
+				}
+			}
+
+			@Override
+			public void getReportItems(List<ModelZone2bean> items) {
+				// Constrant.modelZone2List = items;
+
+				HashMap<String, ModelZone2bean> map = new HashMap<>();
+				
+				int cnt = 0;
+				for (ModelZone2bean i : items) {
+
+					if (map.containsKey(i.Model)) {
+						ModelZone2bean m = map.get(i.Model);
+						m.Zone2Code = m.Zone2Code + "," + i.Zone2Code;
+
+						if (cnt == 0) {
+							cnt += m.Z2MaxQty - m.Z2CurtQty;
+							m.Z2CurtQty = m.Z2MaxQty - cnt;
+						}
+						if (i.Z2MaxQty - i.Z2CurtQty != 0) {
+							cnt += i.Z2MaxQty - i.Z2CurtQty;
+							m.Z2CurtQty = m.Z2MaxQty - cnt;
+						}
+						// if(m.Z2CurtQty > i.Z2CurtQty)
+						// m.Z2CurtQty = i.Z2CurtQty;
+
+						map.put(i.Model, m);
+					} else
+						map.put(i.Model, i);
+				}
+
+				Constrant.modelZone2 = map;
+				
+				if(loading != null)
+					loading.setValue(60);
+
+			}
+
+			@Override
+			public void getModelDailyReportItems(List<ModelDailyReportbean> items) {
+
+				HashMap<String, ModelDailyReportbean> map = new HashMap<>();
+				for (ModelDailyReportbean i : items) {
+					map.put(i.ModelNo, i);
+				}
+				Constrant.dailyReport = map;
+			}
+
+		});
+		
 		fgRepository = new FGRepositoryImplRetrofit();
 		fgRepository.setinventoryServiceCallBackFunction(new InventoryCallBackFunction() {
 
@@ -382,7 +517,7 @@ public class ItemsPannel {
 
 					if (assignType == MOVING) {
 						JOptionPane.showMessageDialog(null, "Update Data Success!");
-
+						loadModelMapZone2();
 					}
 
 					if (scanResultFrame != null) {
@@ -408,14 +543,13 @@ public class ItemsPannel {
 
 					if (items.size() != scanItem.length) {
 						JOptionPane.showMessageDialog(null, "Items already exit.");
-						
+
 						if (scanResultFrame != null) {
 							String updateTxt = "";
-							for(Itembean i: items) 
-							{
-								updateTxt += i.SN +"\n";
+							for (Itembean i : items) {
+								updateTxt += i.SN + "\n";
 							}
-							ltotal.setText("Total : "+ items.size());
+							ltotal.setText("Total : " + items.size());
 							inputSN.setText(updateTxt);
 							scanResultFrame.setVisible(true);
 						}
@@ -427,7 +561,7 @@ public class ItemsPannel {
 						ZoneMenu.getInstance(inputSN.getText().toString(), assignType);
 
 				} else if (assignType == MOVING) {
-					
+
 					// JOptionPane.showMessageDialog(null, "Update Data Success!");
 					if (items.size() == 0) {
 
@@ -440,6 +574,12 @@ public class ItemsPannel {
 					}
 				}
 
+			}
+
+			@Override
+			public void checkInventoryZone2Items(int result,List<Itembean> items) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 
@@ -547,7 +687,7 @@ public class ItemsPannel {
 				loadingframe = new LoadingFrameHelper("Add data...");
 				loading = loadingframe.loadingSample("Add data...");
 
-				exceuteCallback();
+				
 				// displayLoadingBar();
 
 				EventQueue.invokeLater(new Runnable() {
@@ -597,14 +737,25 @@ public class ItemsPannel {
 			String model = itemList[0].substring(0, 6);
 			modelMapZone2 = Constrant.modelZone2.get(model);
 			
-			if(modelMapZone2 == null) 
-			{
-				isMoveZone2 = true;
-			}
-			else if (modelMapZone2.Zone2Code == null)
-				isMoveZone2 = true;
+			String[] loc = modelMapZone2.Zone2Code.split(",");
 			
+			HashMap<String,String> mapZone2Code = new HashMap<String,String>();
+			
+			for(String s : loc) 
+			{
+				mapZone2Code.put(s, modelMapZone2.Model);
+			}
+
+			if (modelMapZone2 == null) {
+				isMoveZone2 = true;
+			} else if (modelMapZone2.Zone2Code == null)
+				isMoveZone2 = true;
+
+			else if (mapZone2Code.containsKey(location))
+				isMoveZone2 = true;
 			else if (modelMapZone2.Zone2Code.equals(location))
+				isMoveZone2 = true;
+			else if (modelMapZone2.Zone2Code.equals("111"))
 				isMoveZone2 = true;
 			else {
 				JOptionPane.showMessageDialog(null,
@@ -731,7 +882,7 @@ public class ItemsPannel {
 					loadingframe = new LoadingFrameHelper("Add data...");
 					loading = loadingframe.loadingSample("Add data...");
 
-					exceuteCallback();
+					
 					// displayLoadingBar();
 
 					EventQueue.invokeLater(new Runnable() {
@@ -858,7 +1009,7 @@ public class ItemsPannel {
 
 				dialogFrame.setVisible(false);
 				dialogFrame.dispose();
-
+				set.clear();
 				if (scanResultFrame != null) {
 					String[] checkItem = items.split("\n");
 
@@ -868,11 +1019,21 @@ public class ItemsPannel {
 							if (s.equals(p))
 								continue;
 							updateTxt += s + "\n";
+							set.add(s);
 						}
 					}
 					String[] item = updateTxt.split("\n");
-					ltotal.setText("Total : "+ item.length);
+					
 					inputSN.setText(updateTxt);
+					if(!repMove)
+						ltotal.setText("Total : " + item.length);
+					else 
+					{
+						modelzone2 = Constrant.modelZone2.get(item[0].substring(0, 6));
+						destination.setText("Destination : " + modelzone2.Zone2Code +(" (Zone 2)"));
+						ltotal.setText("Total: " + item.length + "/" + modelzone2.Z2CurtQty);
+					}
+					
 					scanResultFrame.setVisible(true);
 				}
 
@@ -926,5 +1087,22 @@ public class ItemsPannel {
 			e.printStackTrace();
 		}
 	}
+	
+	// Loading Models data from Server
+		private void loadModelMapZone2() {
+			// loading model and location information from Server
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					try {
+
+						fgModelZone2.getAllItems();
+
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+
+		}
 
 }

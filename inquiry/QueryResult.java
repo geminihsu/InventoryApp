@@ -330,7 +330,12 @@ public class QueryResult {
 		if (zone1Data != null) {
 
 			zone1.setText("Zone 1 : " + zoneCount.get(1));
-			scrollZone1Pane.setBounds(33, 250, 700, 50 * zone1Data.length + 20);
+			
+			int height = 50 * zone1Data.length + 20;
+			
+			if( 50 * zone1Data.length + 20 > 100)
+				height = 100;
+			scrollZone1Pane.setBounds(33, 250, 700, height);
 			scrollZone1Pane.setBackground(Constrant.BACKGROUN_COLOR);
 
 			zone1Table = new JTable(model1);
@@ -361,7 +366,12 @@ public class QueryResult {
 
 		if (zone2Data != null) {
 			zone2.setText("Zone 2 : " + zoneCount.get(2));
-			scrollZone2Pane.setBounds(33, 91, 700, 50 * zone2Data.length + 20);
+			
+			int height = 50 * zone2Data.length + 20;
+			
+			if( 50 * zone2Data.length + 20 > 100)
+				height = 100;
+			scrollZone2Pane.setBounds(33, 91, 700, height);
 			scrollZone2Pane.setBackground(Constrant.TABLE_COLOR);
 
 			zone2Table = new JTable(model2);
@@ -381,7 +391,12 @@ public class QueryResult {
 
 		if (zone3Data != null) {
 			zone3.setText("Return : " + zoneCount.get(3));
-			scrollZone3Pane.setBounds(33, 420, 700, 50 * zone3Data.length + 20);
+			
+			int height =50 *  zone3Data.length + 20;
+			
+			if( 50 * zone3Data.length + 20 > 100)
+				height = 100;
+			scrollZone3Pane.setBounds(33, 420, 700, height);
 			scrollZone3Pane.setBackground(Constrant.TABLE_COLOR);
 
 			zone3Table = new JTable(model3);
@@ -662,6 +677,7 @@ public class QueryResult {
 			String key = String.valueOf(bean.ZoneCode);
 			if (key.trim().equals(""))
 				continue;
+			
 
 			if (zoneMap.containsKey(bean.ZoneCode)) {
 				LinkedHashMap<String, List<Itembean>> items = zoneMap.get(bean.ZoneCode);
@@ -729,6 +745,12 @@ public class QueryResult {
 			public void checkInventoryItems(List<Itembean> items) {
 				// TODO Auto-generated method stub
 
+			}
+
+			@Override
+			public void checkInventoryZone2Items(int result,List<Itembean> items) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 

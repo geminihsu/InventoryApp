@@ -101,6 +101,26 @@ public class FGRepositoryImplRetrofit {
 		return result;
 	}
 	
+	public List<Itembean> getItemsZone2BySNList(String salesOrder,List<Itembean> items) throws Exception {
+		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
+				.addConverterFactory(GsonConverterFactory.create()).build();
+		InventoryCallback service = retrofit.create(InventoryCallback.class);
+		
+		Response<List<Itembean>> request = service.getItemsZone2BySNExits(salesOrder,items).execute();
+		int code = request.code();
+		
+		List<Itembean> result = null;
+		if (code == HttpRequestCode.HTTP_REQUEST_OK) 
+		      result = request.body();
+		else if(code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) 
+			System.out.println("The item does not exists on peach tree.");
+		
+		if (inventoryServiceCallBackFunction != null)
+			inventoryServiceCallBackFunction.checkInventoryZone2Items(code,result);
+		
+		return result;
+	}
+	
 	public List<Itembean> getItemsByLocation(Integer location) throws Exception {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
 				.addConverterFactory(GsonConverterFactory.create()).build();

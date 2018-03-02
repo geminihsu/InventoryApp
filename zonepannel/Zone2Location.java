@@ -67,7 +67,7 @@ public class Zone2Location implements ActionListener {
 		Container cp = frame.getContentPane();
 		cp.setLayout(new GridLayout(0, 2));
 
-		btnZoneCode = new JButton[38];
+		btnZoneCode = new JButton[39];
 		Font font = new Font("Verdana", Font.BOLD, 18);
 
 		int index = 701;
@@ -102,18 +102,14 @@ public class Zone2Location implements ActionListener {
 				}
 			});
 
-			if (index == 722 || index == 772) {
-				btn.setText("");
-				btn.setEnabled(false);
-			}
-
+			
 			index++;
 			if (index % 10 > 2) {
 				index = index + 10;
 				index = index / 10;
 				index = index * 10 + 1;
 
-				if (index == 881)
+				if (index == 881 || index == 901)
 					index++;
 			}
 

@@ -69,7 +69,7 @@ import spirit.fitness.scanner.util.LoadingFrameHelper;
 
 public class AppMenu implements ActionListener {
 	private static AppMenu instance = null;
-	
+
 	private JButton btnRecving, btnMoving, btnInQuiry, btnShipping, btnReport, btnModelQuantity, btnPickingList,
 			btnReplenishment, btnConfiguration;
 	private JFrame frame;
@@ -94,13 +94,13 @@ public class AppMenu implements ActionListener {
 		loadModel();
 		loadLocatin();
 	}
-	
-	 public static AppMenu getInstance(){
-	        if(instance == null){
-	            instance = new AppMenu();
-	        }
-	        return instance;
-	    }
+
+	public static AppMenu getInstance() {
+		if (instance == null) {
+			instance = new AppMenu();
+		}
+		return instance;
+	}
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -196,12 +196,12 @@ public class AppMenu implements ActionListener {
 		if (!InstanceUtil.isExits()) {
 			if (e.getSource() == btnRecving) {
 				// btnRecving.setEnabled(false);
-				ItemsPannel.getInstance("",ItemsPannel.RECEVING);
+				ItemsPannel.getInstance("", ItemsPannel.RECEVING);
 				// window.frame.setVisible(true);
 			} else if (e.getSource() == btnMoving) {
 				// ItemsPannel window = new ItemsPannel(ItemsPannel.MOVING);
 				// window.frame.setVisible(true);
-				ItemsPannel.getInstance("",ItemsPannel.MOVING);
+				ItemsPannel.getInstance("", ItemsPannel.MOVING);
 			} else if (e.getSource() == btnInQuiry) {
 				// QueryPannel window = new QueryPannel();
 				// window.frame.setVisible(true);
@@ -253,8 +253,28 @@ public class AppMenu implements ActionListener {
 				// Constrant.modelZone2List = items;
 
 				HashMap<String, ModelZone2bean> map = new HashMap<>();
+
+				int cnt = 0;
 				for (ModelZone2bean i : items) {
-					map.put(i.Model, i);
+
+					if (map.containsKey(i.Model)) {
+						ModelZone2bean m = map.get(i.Model);
+						m.Zone2Code = m.Zone2Code + "," + i.Zone2Code;
+
+						if (cnt == 0) {
+							cnt += m.Z2MaxQty - m.Z2CurtQty;
+							m.Z2CurtQty = m.Z2MaxQty - cnt;
+						}
+						if (i.Z2MaxQty - i.Z2CurtQty != 0) {
+							cnt += i.Z2MaxQty - i.Z2CurtQty;
+							m.Z2CurtQty = m.Z2MaxQty - cnt;
+						}
+						// if(m.Z2CurtQty > i.Z2CurtQty)
+						// m.Z2CurtQty = i.Z2CurtQty;
+
+						map.put(i.Model, m);
+					} else
+						map.put(i.Model, i);
 				}
 
 				Constrant.modelZone2 = map;

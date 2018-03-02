@@ -73,6 +73,7 @@ public class ModelZoneMapRepositoryImplRetrofit {
 		return result;
 	}
 	
+	
 	public List<ModelZone2bean> getItemsByModel(Integer modelNo) throws Exception {
 		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl).addConverterFactory(GsonConverterFactory.create())
 				.build();

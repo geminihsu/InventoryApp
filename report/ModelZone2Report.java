@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -291,6 +292,12 @@ public class ModelZone2Report {
 
 				//if (refreshDone != null)
 				//	refreshDone.setEnabled(true);
+				HashMap<String, ModelZone2bean> map = new HashMap<>();
+				for (ModelZone2bean i : items) {
+					map.put(i.Model, i);
+				}
+
+				Constrant.modelZone2 = map;
 				loading.setValue(100);
 				Constrant.modelZone2List = items;
 				displayTable(items);

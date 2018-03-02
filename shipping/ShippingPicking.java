@@ -592,6 +592,12 @@ public class ShippingPicking {
 				
 			}
 
+			@Override
+			public void checkInventoryZone2Items(int result,List<Itembean> items) {
+				// TODO Auto-generated method stub
+				
+			}
+
 		});
 
 		ordersRepositoryImplRetrofit = new OrdersRepositoryImplRetrofit();
