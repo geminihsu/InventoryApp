@@ -974,23 +974,7 @@ public class ShippingConfirm {
 				frame.dispose();
 				frame.setVisible(false);
 				// scanInfo(salesOrder);
-				scanResultFrame.setVisible(true);
-				if (!prevContent.equals("")) {
-
-					String[] datas = prevContent.split("\n");
-					modelScanCurMap.clear();
-					for (String s : datas) {
-						set.add(s);
-
-						String modelNo = s.substring(0, 6);
-						if (!modelScanCurMap.containsKey(modelNo))
-							modelScanCurMap.put(modelNo, 1);
-						else
-							modelScanCurMap.put(modelNo, modelScanCurMap.get(modelNo) + 1);
-
-					}
-
-				}
+				restoreScanPannel(null);
 			}
 		});
 
@@ -1232,7 +1216,7 @@ public class ShippingConfirm {
 			@Override
 			public void resultCode(int code) {
 				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
-					JOptionPane.showMessageDialog(null, "Items already exit.");
+					JOptionPane.showMessageDialog(null, "Items already exist.");
 
 				}
 
@@ -1252,34 +1236,20 @@ public class ShippingConfirm {
 			@Override
 			public void checkInventoryZone2Items(int result, List<Itembean> items) {
 
+				prevContent = inputSN.getText().toString();
 				if (result == HttpRequestCode.HTTP_REQUEST_OK) {
 					String[] scanItems = inputSN.getText().toString().split("\n");
-					if (items.size() == scanItems.length)
+					if (items.size() == 0)
 						displayShippingResult(salesOrder, shipDate, trackingNo, inputSN.getText().toString());
 					else {
-						JOptionPane.showMessageDialog(null, "Some of scan items doesn't exits on Zone 2.");
-
-						if (scanResultFrame != null)
-							scanResultFrame.setVisible(true);
-						// scan items not exits on Zone2
-						String updateTxt = "";
-						//modelScanCurMap.clear();
-						for (Itembean i : items) {
-							updateTxt += i.SN + "\n";
-
-							String modelNo = i.SN.substring(0, 6);
-							if (!modelScanCurMap.containsKey(modelNo))
-								modelScanCurMap.put(modelNo, 1);
-							else
-								modelScanCurMap.put(modelNo, modelScanCurMap.get(modelNo) + 1);
-						}
-
-						lCount.setText(setModelScanCountLabel(items.size()));
-						inputSN.setText(updateTxt);
+						JOptionPane.showMessageDialog(null, "Some of items doesn't exist on Zone 2.");
+						restoreScanPannel(items);
 					}
 
-				}else if(result == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR)
-					JOptionPane.showMessageDialog(null, "Some of scan items doesn't exits on PeachTree.");
+				} else if (result == HttpRequestCode.HTTP_REQUEST_ACCEPTED) {
+					JOptionPane.showMessageDialog(null, "Some of items doesn't exist on PeachTree.");
+					restoreScanPannel(items);
+				}
 
 			}
 		});
@@ -1291,7 +1261,7 @@ public class ShippingConfirm {
 			public void resultCode(int code) {
 				// TODO Auto-generated method stub
 				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
-					JOptionPane.showMessageDialog(null, "Items already exit.");
+					JOptionPane.showMessageDialog(null, "Items already exist.");
 
 				}
 
@@ -1301,7 +1271,7 @@ public class ShippingConfirm {
 			public void updateSalesOrder(List<CustOrderbean> orders) {
 
 				if (orders.isEmpty())
-					JOptionPane.showMessageDialog(null, "The sales order doesn't exit !");
+					JOptionPane.showMessageDialog(null, "The sales order doesn't exist !");
 				else {
 					frame.dispose();
 					frame.setVisible(false);
@@ -1354,7 +1324,7 @@ public class ShippingConfirm {
 			@Override
 			public void resultCode(int code) {
 				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
-					JOptionPane.showMessageDialog(null, "Items already exit.");
+					JOptionPane.showMessageDialog(null, "Items already exist.");
 
 				}
 
@@ -1443,8 +1413,9 @@ public class ShippingConfirm {
 	private String setModelScanCountLabel(int curCount) {
 		String modelQty = "<html>" + "Total : " + curCount + "/" + String.valueOf(orderTotalCount) + " </br>";
 		for (Map.Entry<String, Integer> location : map.entrySet()) {
-			modelQty += location.getKey() + "(" + modelScanCurMap.get(location.getKey()) + "/" + location.getValue()
-					+ ") </br>";
+			int cnt = modelScanCurMap.get(location.getKey());
+
+			modelQty += location.getKey() + "(" + cnt + "/" + location.getValue() + ") </br>";
 		}
 		modelQty = modelQty + "</br></html>";
 		return modelQty;
@@ -1470,6 +1441,58 @@ public class ShippingConfirm {
 		PrinterHelper print = new PrinterHelper();
 		print.printTable(content);
 
+	}
+
+	private void restoreScanPannel(List<Itembean> items) {
+		if (scanResultFrame != null)
+			scanResultFrame.setVisible(true);
+		// scan items not exits on Zone2
+		String updateTxt = "";
+		// modelScanCurMap.clear();
+
+		if (items == null) {
+			String[] item = prevContent.split("\n");
+			modelScanCurMap.clear();
+			for (String s : item) {
+				updateTxt += s + "\n";
+
+				String modelNo = s.substring(0, 6);
+				if (!modelScanCurMap.containsKey(modelNo))
+					modelScanCurMap.put(modelNo, 1);
+				else
+					modelScanCurMap.put(modelNo, modelScanCurMap.get(modelNo) + 1);
+
+			}
+			lCount.setText(setModelScanCountLabel(item.length));
+		} else {
+			modelScanCurMap.clear();
+
+			String[] prevText = prevContent.split("\n");
+			for (String s : prevText) {
+				for (Itembean i : items) {
+					if (s.equals(i.SN))
+						continue;
+					updateTxt += s + "\n";
+				}
+			}
+			String[] itemSize = updateTxt.split("\n");
+
+			if (itemSize.length > 1) {
+				for (String s : itemSize) {
+					String modelNo = s.substring(0, 6);
+					if (!modelScanCurMap.containsKey(modelNo))
+						modelScanCurMap.put(modelNo, 1);
+					else
+						modelScanCurMap.put(modelNo, modelScanCurMap.get(modelNo) + 1);
+
+				}
+
+			}else
+				inputSN.setText(updateTxt);
+			lCount.setText(setModelScanCountLabel(itemSize.length));
+		}
+
+		inputSN.setText(updateTxt);
 	}
 
 }

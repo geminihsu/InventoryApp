@@ -539,7 +539,7 @@ public class ShippingPicking {
 			@Override
 			public void resultCode(int code) {
 				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
-					JOptionPane.showMessageDialog(null, "Items already exit.");
+					JOptionPane.showMessageDialog(null, "Items already exist.");
 
 				}
 
@@ -607,7 +607,7 @@ public class ShippingPicking {
 			public void resultCode(int code) {
 				// TODO Auto-generated method stub
 				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
-					JOptionPane.showMessageDialog(null, "Items already exit.");
+					JOptionPane.showMessageDialog(null, "Items already exist.");
 
 				}
 
@@ -617,7 +617,7 @@ public class ShippingPicking {
 			public void updateSalesOrder(List<CustOrderbean> orders) {
 
 				if (orders.isEmpty())
-					JOptionPane.showMessageDialog(null, "The sales order doesn't exit !");
+					JOptionPane.showMessageDialog(null, "The sales order doesn't exist !");
 				else {
 					frame.dispose();
 					frame.setVisible(false);
@@ -690,7 +690,7 @@ public class ShippingPicking {
 			@Override
 			public void resultCode(int code) {
 				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
-					JOptionPane.showMessageDialog(null, "Items already exit.");
+					JOptionPane.showMessageDialog(null, "Items already exist.");
 
 				}
 

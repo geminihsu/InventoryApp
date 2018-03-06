@@ -432,28 +432,34 @@ public class ItemsPannel {
 				// Constrant.modelZone2List = items;
 
 				HashMap<String, ModelZone2bean> map = new HashMap<>();
-				
-				int cnt = 0;
+			
+				HashMap<String, Integer> cntMap = new HashMap<>();
+
+				//int cnt = 0;
 				for (ModelZone2bean i : items) {
 
 					if (map.containsKey(i.Model)) {
 						ModelZone2bean m = map.get(i.Model);
 						m.Zone2Code = m.Zone2Code + "," + i.Zone2Code;
 
-						if (cnt == 0) {
-							cnt += m.Z2MaxQty - m.Z2CurtQty;
-							m.Z2CurtQty = m.Z2MaxQty - cnt;
-						}
+						//if (cnt == 0) {
+							int cnt = cntMap.get(m.Model);
+							//m.Z2CurtQty = m.Z2MaxQty - cnt;
+						//}
 						if (i.Z2MaxQty - i.Z2CurtQty != 0) {
 							cnt += i.Z2MaxQty - i.Z2CurtQty;
 							m.Z2CurtQty = m.Z2MaxQty - cnt;
 						}
+						
+						cntMap.put(i.Model,cnt);
 						// if(m.Z2CurtQty > i.Z2CurtQty)
 						// m.Z2CurtQty = i.Z2CurtQty;
 
 						map.put(i.Model, m);
-					} else
+					} else {
+						cntMap.put(i.Model, i.Z2MaxQty - i.Z2CurtQty);
 						map.put(i.Model, i);
+					}
 				}
 
 				Constrant.modelZone2 = map;
@@ -483,7 +489,7 @@ public class ItemsPannel {
 				// TODO Auto-generated method stub
 				if (code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) {
 					instance = null;
-					JOptionPane.showMessageDialog(null, "Items already exit.");
+					JOptionPane.showMessageDialog(null, "Items already exist.");
 
 					loadingframe.setVisible(false);
 					loadingframe.dispose();
@@ -517,7 +523,7 @@ public class ItemsPannel {
 
 					if (assignType == MOVING) {
 						JOptionPane.showMessageDialog(null, "Update Data Success!");
-						loadModelMapZone2();
+						
 					}
 
 					if (scanResultFrame != null) {
@@ -542,7 +548,7 @@ public class ItemsPannel {
 					String[] scanItem = inputSN.getText().toString().split("\n");
 
 					if (items.size() != scanItem.length) {
-						JOptionPane.showMessageDialog(null, "Items already exit.");
+						JOptionPane.showMessageDialog(null, "Items already exist.");
 
 						if (scanResultFrame != null) {
 							String updateTxt = "";
@@ -974,7 +980,7 @@ public class ItemsPannel {
 		}
 
 		// Creating JLabel
-		JLabel Info = new JLabel("<html>The all serial number do not exits :" + " <br/>");
+		JLabel Info = new JLabel("<html>The all serial number do not exist :" + " <br/>");
 		Info.setBounds(40, 0, 500, 50);
 		Info.setFont(font);
 		panel.add(Info);

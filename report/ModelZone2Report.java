@@ -64,6 +64,7 @@ import spirit.fitness.scanner.restful.listener.ModelZone2CallBackFunction;
 import spirit.fitness.scanner.util.ExcelHelper;
 import spirit.fitness.scanner.util.LoadingFrameHelper;
 import spirit.fitness.scanner.util.LocationHelper;
+import spirit.fitness.scanner.util.PrintJtableUtil;
 import spirit.fitness.scanner.util.PrintTableUtil;
 import spirit.fitness.scanner.util.PrinterHelper;
 import spirit.fitness.scanner.zonepannel.ZoneMenu;
@@ -235,8 +236,8 @@ public class ModelZone2Report {
 		btnDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				printer();
-				// HttpRestApi.postData(result);
+				//printer();
+				printer(table,frame);
 			}
 		});
 		panel.add(btnDone);
@@ -292,13 +293,53 @@ public class ModelZone2Report {
 
 				//if (refreshDone != null)
 				//	refreshDone.setEnabled(true);
+				HashMap<String, Integer> mapModelCount = new HashMap<>();
 				HashMap<String, ModelZone2bean> map = new HashMap<>();
 				for (ModelZone2bean i : items) {
-					map.put(i.Model, i);
+					
+					if(!map.containsKey(i.Model)) {
+						map.put(i.Model, i);
+						mapModelCount.put(i.Model, 1);
+					}
+					else
+					{
+						mapModelCount.put(i.Model, mapModelCount.get(i.Model) + 1);
+						
+						ModelZone2bean m = map.get(i.Model);
+						if(i.Z2CurtQty < m.Z2CurtQty)
+							map.put(i.Model, i);
+					}
 				}
 
 				Constrant.modelZone2 = map;
+				Constrant.modelMapZone2Count = mapModelCount;
 				loading.setValue(100);
+				
+				
+
+				/*for(int i = 0; i < items.size();) 
+				{
+					ModelZone2bean m = items.get(i);
+					if(map.containsKey(m.Model)) {
+						m.Z2CurtQty = map.get(m.Model).Z2CurtQty;
+						if(mapModelCount.containsKey(m.Model)) {
+							m.Z2CurtQty = m.Z2CurtQty / mapModelCount.get(m.Model);
+							
+							int cnt = mapModelCount.get(m.Model);
+							while(cnt > 0) 
+							{
+								items.set(i, m);
+								i++;
+								cnt--;
+							}
+							
+							continue;
+						}
+					}
+					
+					i++;
+				}*/
+				
 				Constrant.modelZone2List = items;
 				displayTable(items);
 				java.awt.EventQueue.invokeLater(new Runnable() {
@@ -354,8 +395,14 @@ public class ModelZone2Report {
 	    System.out.println(result);
 
 		PrinterHelper print = new PrinterHelper();
-		print.printItems(result);
+		print.printTable(result);
 
+	}
+	
+	private void printer(JTable table, JFrame frame) 
+	{
+		String timeStamp = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+		PrintJtableUtil.printTableResult("Replenishment Report - " + timeStamp, "", true, true, true, table, frame);
 	}
 
 }

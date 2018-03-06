@@ -110,10 +110,12 @@ public class FGRepositoryImplRetrofit {
 		int code = request.code();
 		
 		List<Itembean> result = null;
-		if (code == HttpRequestCode.HTTP_REQUEST_OK) 
+		if (code == HttpRequestCode.HTTP_REQUEST_OK || code == HttpRequestCode.HTTP_REQUEST_ACCEPTED) 
 		      result = request.body();
-		else if(code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) 
+		else if(code == HttpRequestCode.HTTP_REQUEST_INSERT_DATABASE_ERROR) { 
+			result = request.body();
 			System.out.println("The item does not exists on peach tree.");
+		}
 		
 		if (inventoryServiceCallBackFunction != null)
 			inventoryServiceCallBackFunction.checkInventoryZone2Items(code,result);
