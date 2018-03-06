@@ -312,33 +312,11 @@ public class ModelZone2Report {
 				}
 
 				Constrant.modelZone2 = map;
-				Constrant.modelMapZone2Count = mapModelCount;
+			
 				loading.setValue(100);
 				
 				
 
-				/*for(int i = 0; i < items.size();) 
-				{
-					ModelZone2bean m = items.get(i);
-					if(map.containsKey(m.Model)) {
-						m.Z2CurtQty = map.get(m.Model).Z2CurtQty;
-						if(mapModelCount.containsKey(m.Model)) {
-							m.Z2CurtQty = m.Z2CurtQty / mapModelCount.get(m.Model);
-							
-							int cnt = mapModelCount.get(m.Model);
-							while(cnt > 0) 
-							{
-								items.set(i, m);
-								i++;
-								cnt--;
-							}
-							
-							continue;
-						}
-					}
-					
-					i++;
-				}*/
 				
 				Constrant.modelZone2List = items;
 				displayTable(items);

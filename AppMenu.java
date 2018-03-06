@@ -254,6 +254,8 @@ public class AppMenu implements ActionListener {
 
 				HashMap<String, ModelZone2bean> map = new HashMap<>();
 				HashMap<String, Integer> cntMap = new HashMap<>();
+				
+				
 
 				//int cnt = 0;
 				for (ModelZone2bean i : items) {

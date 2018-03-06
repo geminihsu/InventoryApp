@@ -94,11 +94,10 @@ public class ItemsPannel {
 
 	private JProgressBar loading;
 	private LoadingFrameHelper loadingframe;
-	
 
 	private FGRepositoryImplRetrofit fgRepository;
 	private ModelZoneMapRepositoryImplRetrofit fgModelZone2;
-	
+
 	private ModelZone2bean modelzone2;
 
 	private ItemsPannel(String prevText, int type) {
@@ -184,7 +183,6 @@ public class ItemsPannel {
 		ltotal.setBounds(35, 550, 200, 50);
 		panel.add(ltotal);
 
-		
 		destination = new JLabel("");
 		destination.setFont(font);
 		destination.setBounds(35, 5, 300, 50);
@@ -192,7 +190,6 @@ public class ItemsPannel {
 
 		if (assignType == MOVING) {
 
-			
 			JCheckBox repButton = new JCheckBox("Rep.");
 			repButton.setFont(font);
 			repButton.setBackground(Constrant.BACKGROUN_COLOR);
@@ -214,7 +211,7 @@ public class ItemsPannel {
 						} else {
 							String model = item[0].substring(0, 6);
 							modelzone2 = Constrant.modelZone2.get(model);
-							destination.setText("Des. : " + modelzone2.Zone2Code /*+(" (Zone 2)")*/);
+							destination.setText("Des. : " + modelzone2.Zone2Code /* +(" (Zone 2)") */);
 							ltotal.setText("Total: " + item.length + "/" + modelzone2.Z2CurtQty);
 
 						}
@@ -227,11 +224,10 @@ public class ItemsPannel {
 
 		if (!prevTxt.equals("")) {
 			String[] prev = prevTxt.split("\n");
-			
-			if(set == null)
+
+			if (set == null)
 				set = new HashSet<String>();
-			for(String s : prev) 
-			{
+			for (String s : prev) {
 				set.add(s);
 			}
 			ltotal.setText("Total : " + prev.length);
@@ -259,7 +255,7 @@ public class ItemsPannel {
 		input.put(shiftEnter, INSERT_BREAK); // input.get(enter)) = "insert-break"
 		input.put(enter, TEXT_SUBMIT);
 
-		if(set == null)
+		if (set == null)
 			set = new HashSet<String>();
 		ActionMap actions = inputSN.getActionMap();
 		actions.put(TEXT_SUBMIT, new AbstractAction() {
@@ -271,10 +267,8 @@ public class ItemsPannel {
 				String prev = inputSN.getText().toString();
 				String[] item = inputSN.getText().toString().split("\n");
 
-				
 				boolean lenError = false;
-				
-				
+
 				if (!set.contains(item[item.length - 1]) && item[item.length - 1].length() == 16) {
 
 					set.add(item[item.length - 1]);
@@ -296,7 +290,7 @@ public class ItemsPannel {
 						ltotal.setText("Total: " + set.size());
 					} else {
 						modelzone2 = Constrant.modelZone2.get(item[0].substring(0, 6));
-						destination.setText("Des. : " + modelzone2.Zone2Code /*+(" (Zone 2)")*/);
+						destination.setText("Des. : " + modelzone2.Zone2Code /* +(" (Zone 2)") */);
 						ltotal.setText("Total: " + set.size() + "/" + modelzone2.Z2CurtQty);
 
 					}
@@ -366,7 +360,7 @@ public class ItemsPannel {
 						items.add(_item);
 
 					}
-				
+
 					checkItemExits(items);
 
 				}
@@ -432,39 +426,35 @@ public class ItemsPannel {
 				// Constrant.modelZone2List = items;
 
 				HashMap<String, ModelZone2bean> map = new HashMap<>();
-			
-				HashMap<String, Integer> cntMap = new HashMap<>();
+				HashMap<String, Integer> curMap = new HashMap<>();
+				HashMap<String, Integer> totalMap = new HashMap<>();
 
-				//int cnt = 0;
+				// int cnt = 0;
 				for (ModelZone2bean i : items) {
 
 					if (map.containsKey(i.Model)) {
 						ModelZone2bean m = map.get(i.Model);
-						m.Zone2Code = m.Zone2Code + "," + i.Zone2Code;
+						i.Zone2Code = m.Zone2Code + "," + i.Zone2Code;
 
-						//if (cnt == 0) {
-							int cnt = cntMap.get(m.Model);
-							//m.Z2CurtQty = m.Z2MaxQty - cnt;
-						//}
-						if (i.Z2MaxQty - i.Z2CurtQty != 0) {
-							cnt += i.Z2MaxQty - i.Z2CurtQty;
-							m.Z2CurtQty = m.Z2MaxQty - cnt;
-						}
-						
-						cntMap.put(i.Model,cnt);
-						// if(m.Z2CurtQty > i.Z2CurtQty)
-						// m.Z2CurtQty = i.Z2CurtQty;
+						int curCnt = curMap.get(m.Model);
+						totalMap.put(m.Model, totalMap.get(m.Model) + i.Z2MaxQty);
 
-						map.put(i.Model, m);
+						curCnt += i.Z2MaxQty - i.Z2CurtQty;
+						i.Z2CurtQty = totalMap.get(m.Model) - curCnt;
+
+						curMap.put(i.Model, curCnt);
+
+						map.put(i.Model, i);
 					} else {
-						cntMap.put(i.Model, i.Z2MaxQty - i.Z2CurtQty);
+						curMap.put(i.Model, i.Z2MaxQty - i.Z2CurtQty);
+						totalMap.put(i.Model, i.Z2MaxQty);
 						map.put(i.Model, i);
 					}
 				}
 
 				Constrant.modelZone2 = map;
-				
-				if(loading != null)
+
+				if (loading != null)
 					loading.setValue(60);
 
 			}
@@ -480,7 +470,7 @@ public class ItemsPannel {
 			}
 
 		});
-		
+
 		fgRepository = new FGRepositoryImplRetrofit();
 		fgRepository.setinventoryServiceCallBackFunction(new InventoryCallBackFunction() {
 
@@ -523,7 +513,7 @@ public class ItemsPannel {
 
 					if (assignType == MOVING) {
 						JOptionPane.showMessageDialog(null, "Update Data Success!");
-						
+
 					}
 
 					if (scanResultFrame != null) {
@@ -583,9 +573,9 @@ public class ItemsPannel {
 			}
 
 			@Override
-			public void checkInventoryZone2Items(int result,List<Itembean> items) {
+			public void checkInventoryZone2Items(int result, List<Itembean> items) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 
@@ -693,7 +683,6 @@ public class ItemsPannel {
 				loadingframe = new LoadingFrameHelper("Add data...");
 				loading = loadingframe.loadingSample("Add data...");
 
-				
 				// displayLoadingBar();
 
 				EventQueue.invokeLater(new Runnable() {
@@ -742,13 +731,12 @@ public class ItemsPannel {
 		if (LocationHelper.MapZoneCode(location) == 2) {
 			String model = itemList[0].substring(0, 6);
 			modelMapZone2 = Constrant.modelZone2.get(model);
-			
+
 			String[] loc = modelMapZone2.Zone2Code.split(",");
-			
-			HashMap<String,String> mapZone2Code = new HashMap<String,String>();
-			
-			for(String s : loc) 
-			{
+
+			HashMap<String, String> mapZone2Code = new HashMap<String, String>();
+
+			for (String s : loc) {
 				mapZone2Code.put(s, modelMapZone2.Model);
 			}
 
@@ -888,7 +876,6 @@ public class ItemsPannel {
 					loadingframe = new LoadingFrameHelper("Add data...");
 					loading = loadingframe.loadingSample("Add data...");
 
-					
 					// displayLoadingBar();
 
 					EventQueue.invokeLater(new Runnable() {
@@ -1029,17 +1016,16 @@ public class ItemsPannel {
 						}
 					}
 					String[] item = updateTxt.split("\n");
-					
+
 					inputSN.setText(updateTxt);
-					if(!repMove)
+					if (!repMove)
 						ltotal.setText("Total : " + item.length);
-					else 
-					{
+					else {
 						modelzone2 = Constrant.modelZone2.get(item[0].substring(0, 6));
-						destination.setText("Destination : " + modelzone2.Zone2Code +(" (Zone 2)"));
+						destination.setText("Destination : " + modelzone2.Zone2Code + (" (Zone 2)"));
 						ltotal.setText("Total: " + item.length + "/" + modelzone2.Z2CurtQty);
 					}
-					
+
 					scanResultFrame.setVisible(true);
 				}
 
@@ -1093,22 +1079,22 @@ public class ItemsPannel {
 			e.printStackTrace();
 		}
 	}
-	
+
 	// Loading Models data from Server
-		private void loadModelMapZone2() {
-			// loading model and location information from Server
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					try {
+	private void loadModelMapZone2() {
+		// loading model and location information from Server
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
 
-						fgModelZone2.getAllItems();
+					fgModelZone2.getAllItems();
 
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			});
+			}
+		});
 
-		}
+	}
 
 }
