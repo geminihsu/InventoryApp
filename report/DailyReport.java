@@ -61,7 +61,6 @@ import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HttpRestApi;
 import spirit.fitness.scanner.restful.ModelZoneMapRepositoryImplRetrofit;
-import spirit.fitness.scanner.restful.ShippingRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.ModelZone2CallBackFunction;
 import spirit.fitness.scanner.util.ExcelHelper;
@@ -72,7 +71,6 @@ import spirit.fitness.scanner.zonepannel.ZoneMenu;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.ModelDailyReportbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
-import spirit.fitness.scanner.model.Reportbean;
 import spirit.fitness.scanner.receving.ItemsPannel;
 
 public class DailyReport {

@@ -44,6 +44,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -58,7 +59,6 @@ import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HttpRestApi;
 import spirit.fitness.scanner.restful.ModelZoneMapRepositoryImplRetrofit;
-import spirit.fitness.scanner.restful.ShippingRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.ModelZone2CallBackFunction;
 import spirit.fitness.scanner.util.ExcelHelper;
@@ -71,24 +71,23 @@ import spirit.fitness.scanner.zonepannel.ZoneMenu;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.ModelDailyReportbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
-import spirit.fitness.scanner.model.Reportbean;
+
 
 public class ModelZone2Report {
 
 	private static ModelZone2Report modelZone2Report = null;
-	
-	
+
 	public final static int REPORT = 0;
 	public final static int MIN_QUANTITY = 1;
 
 	private List<String> resultModelItem;
-	
+
 	public JFrame frame;
 	private LoadingFrameHelper loadingframe;
 	private JProgressBar loading;
 
 	private JButton btnDone;
-	
+
 	private ModelZoneMapRepositoryImplRetrofit fgModelZone2;
 
 	public static ModelZone2Report getInstance(List<ModelZone2bean> data) {
@@ -98,11 +97,10 @@ public class ModelZone2Report {
 		return modelZone2Report;
 	}
 
-	public static boolean isExit() 
-	 {
-		 return modelZone2Report != null;
-	 }
-	
+	public static boolean isExit() {
+		return modelZone2Report != null;
+	}
+
 	public ModelZone2Report(List<ModelZone2bean> data) {
 		resultModelItem = new ArrayList<String>();
 		loadingframe = new LoadingFrameHelper("Loading Data from Server...");
@@ -171,12 +169,13 @@ public class ModelZone2Report {
 		for (int i = 0; i < data.size(); i++) {
 			String printItem = "";
 			for (int j = 0; j < 5; j++) {
-				rowDataReport[i][0] = " "+data.get(i).Model;
-				rowDataReport[i][1] = " "+data.get(i).FG;
+				rowDataReport[i][0] = " " + data.get(i).Model;
+				rowDataReport[i][1] = " " + data.get(i).FG;
 				rowDataReport[i][2] = data.get(i).Z2CurtQty;
 				rowDataReport[i][3] = data.get(i).Zone1Code;
 				rowDataReport[i][4] = data.get(i).Zone2Code;
-				printItem = data.get(i).Model +"\n" +data.get(i).FG +"\n" +data.get(i).Z2CurtQty+"\n" +data.get(i).Zone1Code+"\n" + data.get(i).Zone2Code;  
+				printItem = data.get(i).Model + "\n" + data.get(i).FG + "\n" + data.get(i).Z2CurtQty + "\n"
+						+ data.get(i).Zone1Code + "\n" + data.get(i).Zone2Code;
 			}
 			resultModelItem.add(printItem);
 		}
@@ -207,18 +206,31 @@ public class ModelZone2Report {
 		table.setBackground(Constrant.DISPALY_ITEMS_TABLE_COLOR);
 		table.setFont(font);
 		table.setRowHeight(40);
+		DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+		leftRenderer.setHorizontalAlignment(JLabel.CENTER);
+		
 		TableColumn modelNo = table.getColumnModel().getColumn(0);
 		modelNo.setPreferredWidth(20);
+		modelNo.setCellRenderer(leftRenderer);
 		TableColumn modelTitle = table.getColumnModel().getColumn(1);
 		modelTitle.setPreferredWidth(200);
+		modelTitle.setCellRenderer(leftRenderer);
 		TableColumn qtycolumn = table.getColumnModel().getColumn(2);
 		qtycolumn.setPreferredWidth(10);
+		qtycolumn.setCellRenderer(leftRenderer);
+		
+		TableColumn zone1 = table.getColumnModel().getColumn(3);
+		zone1.setCellRenderer(leftRenderer);
+		
+		TableColumn zone2 = table.getColumnModel().getColumn(4);
+		zone2.setCellRenderer(leftRenderer);
+		
 		table.setCellSelectionEnabled(false);
 		table.setColumnSelectionAllowed(false);
 		table.setEnabled(false);
 
 		int heigh = 0;
-		System.out.println(""+50 * rowDataReport.length + 20);
+		System.out.println("" + 50 * rowDataReport.length + 20);
 		if (50 * rowDataReport.length + 20 > 500)
 			heigh = 500;
 		else
@@ -236,29 +248,23 @@ public class ModelZone2Report {
 		btnDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				//printer();
-				printer(table,frame);
+				// printer();
+				printer(table, frame);
 			}
 		});
 		panel.add(btnDone);
 
-		/*refreshDone = new JButton("Refresh");
-		refreshDone.setFont(font);
-		refreshDone.setBounds(220, 540, 200, 50);
-
-		refreshDone.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				refreshDone.setEnabled(false);
-				loadingframe = new LoadingFrameHelper();
-				loading = loadingframe.loadingSample("Loading Data from Server...");
-				loading.setValue(50);
-				frame.dispose();
-				frame.setVisible(false);
-				frame = null;
-				loadModelZone2Map();
-			}
-		});
-		panel.add(refreshDone);*/
+		/*
+		 * refreshDone = new JButton("Refresh"); refreshDone.setFont(font);
+		 * refreshDone.setBounds(220, 540, 200, 50);
+		 * 
+		 * refreshDone.addActionListener(new ActionListener() { public void
+		 * actionPerformed(ActionEvent e) { refreshDone.setEnabled(false); loadingframe
+		 * = new LoadingFrameHelper(); loading =
+		 * loadingframe.loadingSample("Loading Data from Server...");
+		 * loading.setValue(50); frame.dispose(); frame.setVisible(false); frame = null;
+		 * loadModelZone2Map(); } }); panel.add(refreshDone);
+		 */
 
 		JButton exitDone = new JButton("Exit");
 		exitDone.setFont(font);
@@ -267,7 +273,7 @@ public class ModelZone2Report {
 		exitDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				modelZone2Report = null;
-				
+
 				frame.dispose();
 				frame.setVisible(false);
 			}
@@ -291,33 +297,28 @@ public class ModelZone2Report {
 			@Override
 			public void getReportItems(List<ModelZone2bean> items) {
 
-				//if (refreshDone != null)
-				//	refreshDone.setEnabled(true);
+				// if (refreshDone != null)
+				// refreshDone.setEnabled(true);
 				HashMap<String, Integer> mapModelCount = new HashMap<>();
 				HashMap<String, ModelZone2bean> map = new HashMap<>();
 				for (ModelZone2bean i : items) {
-					
-					if(!map.containsKey(i.Model)) {
+
+					if (!map.containsKey(i.Model)) {
 						map.put(i.Model, i);
 						mapModelCount.put(i.Model, 1);
-					}
-					else
-					{
+					} else {
 						mapModelCount.put(i.Model, mapModelCount.get(i.Model) + 1);
-						
+
 						ModelZone2bean m = map.get(i.Model);
-						if(i.Z2CurtQty < m.Z2CurtQty)
+						if (i.Z2CurtQty < m.Z2CurtQty)
 							map.put(i.Model, i);
 					}
 				}
 
 				Constrant.modelZone2 = map;
-			
-				loading.setValue(100);
-				
-				
 
-				
+				loading.setValue(100);
+
 				Constrant.modelZone2List = items;
 				displayTable(items);
 				java.awt.EventQueue.invokeLater(new Runnable() {
@@ -332,7 +333,7 @@ public class ModelZone2Report {
 			@Override
 			public void getModelDailyReportItems(List<ModelDailyReportbean> items) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 		});
@@ -355,10 +356,9 @@ public class ModelZone2Report {
 		});
 
 	}
-	
+
 	private void printer() {
 
-		
 		List<String> headersList = Arrays.asList("Model#", "FG", "Quantity", "From(Zone 1)", "To(Zone 2)");
 
 		List<List<String>> rowsList = new ArrayList<List<String>>();
@@ -369,16 +369,15 @@ public class ModelZone2Report {
 
 		// String result = PrintTableUtil.printReport(headersList, rowsList);
 		String result = PrintTableUtil.printModelQuantityReport(headersList, rowsList);
-		//content += result + itemsInfo;
-	    System.out.println(result);
+		// content += result + itemsInfo;
+		System.out.println(result);
 
 		PrinterHelper print = new PrinterHelper();
 		print.printTable(result);
 
 	}
-	
-	private void printer(JTable table, JFrame frame) 
-	{
+
+	private void printer(JTable table, JFrame frame) {
 		String timeStamp = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 		PrintJtableUtil.printTableResult("Replenishment Report - " + timeStamp, "", true, true, true, table, frame);
 	}

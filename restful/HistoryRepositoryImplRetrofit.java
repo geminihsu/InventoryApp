@@ -12,10 +12,8 @@ import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.model.Historybean;
 import spirit.fitness.scanner.model.Itembean;
-import spirit.fitness.scanner.model.Shippingbean;
 import spirit.fitness.scanner.restful.callback.HistoryCallback;
 import spirit.fitness.scanner.restful.callback.InventoryCallback;
-import spirit.fitness.scanner.restful.callback.ShippingCallback;
 import spirit.fitness.scanner.restful.listener.HistoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 
@@ -159,9 +157,7 @@ public class HistoryRepositoryImplRetrofit {
 		service.deleteItem(seq);
 	}
 
-	public Shippingbean findItemBySeq(Integer seq) {
-		return null;
-	}
+	
 
 	private List<Historybean> retriveCode(int code, Response<List<Historybean>> request) {
 		List<Historybean> resultData = null;

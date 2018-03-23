@@ -12,11 +12,10 @@ import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Modelbean;
-import spirit.fitness.scanner.model.Reportbean;
 import spirit.fitness.scanner.restful.callback.InventoryCallback;
 import spirit.fitness.scanner.restful.callback.ModelCallback;
 import spirit.fitness.scanner.restful.listener.ModelsCallBackFunction;
-import spirit.fitness.scanner.restful.listener.ReportCallBackFunction;
+
 
 
 

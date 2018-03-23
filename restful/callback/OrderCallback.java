@@ -34,7 +34,7 @@ public interface OrderCallback {
 	Call<Itembean> createItem(@Body Itembean itembean);*/
 	
 	//PUT more than one item
-	@PUT("/api/CustOrders")
+	@PUT("api/CustOrders")
 	Call<List<CustOrderbean>> updateItem(@Body List<CustOrderbean> itembean);
 
 }

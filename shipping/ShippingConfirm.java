@@ -63,7 +63,6 @@ import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HistoryRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HttpRestApi;
 import spirit.fitness.scanner.restful.OrdersRepositoryImplRetrofit;
-import spirit.fitness.scanner.restful.ShippingRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.CustOrderCallBackFunction;
 import spirit.fitness.scanner.restful.listener.HistoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
@@ -104,6 +103,7 @@ public class ShippingConfirm {
 	private String shipDate = "";
 	private String trackingNo = "";
 	private boolean isOrderClosed;
+	private HashSet<String> snRepeatSet;
 
 	// Key:modelID, value:quality
 	private LinkedHashMap<String, Integer> map;
@@ -880,7 +880,7 @@ public class ShippingConfirm {
 		panel.add(scrollZonePane);
 
 		// Creating Report button
-		report = new JButton("Report");
+		report = new JButton("Submit");
 		report.setFont(font);
 		report.setBounds(600, 570, 180, 50);
 		report.addActionListener(new ActionListener() {
@@ -1022,6 +1022,11 @@ public class ShippingConfirm {
 
 		JTextField proNumber = new JTextField(20);
 
+		scanResultFrame.addWindowListener(new WindowAdapter() {
+			public void windowOpened(WindowEvent e) {
+				proNumber.requestFocus();
+			}
+		});
 		proNumber.setText(prevTrackingNo);
 		proNumber.setFont(font);
 		proNumber.setBounds(250, 70, 250, 50);
@@ -1031,14 +1036,14 @@ public class ShippingConfirm {
 		String content = "";
 		inputSN.setText(prevContent);
 		String[] item = prevContent.split("\n");
-		HashSet<String> set = new HashSet<String>();
+		snRepeatSet = new HashSet<String>();
 		int len = 0;
 		if (!prevContent.equals("")) {
 
 			len = item.length;
 			// modelScanCurMap.clear();
 			for (String s : item) {
-				set.add(s);
+				snRepeatSet.add(s);
 
 				/*
 				 * String modelNo = s.substring(0,6); if(!modelScanCurMap.containsKey(modelNo))
@@ -1090,12 +1095,12 @@ public class ShippingConfirm {
 						curModelCnt = modelScanCurMap.get(model);
 				}
 
-				if (!set.contains(item[item.length - 1]) && item[item.length - 1].length() == 16
-						&& set.size() <= orderTotalCount && map.containsKey(model) && curModelCnt < map.get(model)
+				if (!snRepeatSet.contains(item[item.length - 1]) && item[item.length - 1].length() == 16
+						&& snRepeatSet.size() <= orderTotalCount && map.containsKey(model) && curModelCnt < map.get(model)
 						&& !lenError) {
 
 					modelScanCurMap.put(model, modelScanCurMap.get(model) + 1);
-					set.add(item[item.length - 1]);
+					snRepeatSet.add(item[item.length - 1]);
 				} else {
 					lenError = true;
 					prev = prev.substring(0, prev.length() - (item[item.length - 1].length()) - 1);
@@ -1108,7 +1113,7 @@ public class ShippingConfirm {
 				} else {
 
 					lCount.setForeground(Color.BLACK);
-					lCount.setText(setModelScanCountLabel(set.size()));
+					lCount.setText(setModelScanCountLabel(snRepeatSet.size()));
 
 				}
 			}
@@ -1177,7 +1182,7 @@ public class ShippingConfirm {
 							JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 					if (result == JOptionPane.YES_OPTION) {
 						inputSN.setText("");
-						set.clear();
+						snRepeatSet.clear();
 						for (Map.Entry<String, Integer> location : modelScanCurMap.entrySet()) {
 							modelScanCurMap.put(location.getKey(), 0);
 						}
@@ -1242,12 +1247,12 @@ public class ShippingConfirm {
 					if (items.size() == 0)
 						displayShippingResult(salesOrder, shipDate, trackingNo, inputSN.getText().toString());
 					else {
-						JOptionPane.showMessageDialog(null, "Some of items doesn't exist on Zone 2.");
+						JOptionPane.showMessageDialog(null, "Some items don't exist on Zone 2.");
 						restoreScanPannel(items);
 					}
 
 				} else if (result == HttpRequestCode.HTTP_REQUEST_ACCEPTED) {
-					JOptionPane.showMessageDialog(null, "Some of items doesn't exist on PeachTree.");
+					JOptionPane.showMessageDialog(null, "Some items don't exist on PeachTree.");
 					restoreScanPannel(items);
 				}
 
@@ -1270,9 +1275,18 @@ public class ShippingConfirm {
 			@Override
 			public void updateSalesOrder(List<CustOrderbean> orders) {
 
-				if (orders.isEmpty())
+				if (orders.isEmpty()) {
 					JOptionPane.showMessageDialog(null, "The sales order doesn't exist !");
-				else {
+
+					if (loadingframe != null) {
+						loadingframe.setVisible(false);
+						loadingframe.dispose();
+					}
+
+					frame.dispose();
+					frame.setVisible(false);
+
+				} else {
 					frame.dispose();
 					frame.setVisible(false);
 
@@ -1413,8 +1427,10 @@ public class ShippingConfirm {
 	private String setModelScanCountLabel(int curCount) {
 		String modelQty = "<html>" + "Total : " + curCount + "/" + String.valueOf(orderTotalCount) + " </br>";
 		for (Map.Entry<String, Integer> location : map.entrySet()) {
-			int cnt = modelScanCurMap.get(location.getKey());
+			int cnt = 0;
 
+			if (modelScanCurMap.get(location.getKey()) != null)
+				cnt = modelScanCurMap.get(location.getKey());
 			modelQty += location.getKey() + "(" + cnt + "/" + location.getValue() + ") </br>";
 		}
 		modelQty = modelQty + "</br></html>";
@@ -1444,15 +1460,27 @@ public class ShippingConfirm {
 	}
 
 	private void restoreScanPannel(List<Itembean> items) {
+
 		if (scanResultFrame != null)
 			scanResultFrame.setVisible(true);
+		
+		EventQueue.invokeLater(new Runnable() {
+
+			   @Override
+			     public void run() {
+				   inputSN.grabFocus();
+				   inputSN.requestFocus();//or inWindow
+			     }
+			});
 		// scan items not exits on Zone2
 		String updateTxt = "";
 		// modelScanCurMap.clear();
 
 		if (items == null) {
 			String[] item = prevContent.split("\n");
-			modelScanCurMap.clear();
+			//modelScanCurMap.clear();
+			
+			
 			for (String s : item) {
 				updateTxt += s + "\n";
 
@@ -1465,19 +1493,37 @@ public class ShippingConfirm {
 			}
 			lCount.setText(setModelScanCountLabel(item.length));
 		} else {
-			modelScanCurMap.clear();
-
-			String[] prevText = prevContent.split("\n");
-			for (String s : prevText) {
-				for (Itembean i : items) {
-					if (s.equals(i.SN))
-						continue;
-					updateTxt += s + "\n";
-				}
+			//modelScanCurMap.clear();
+			
+			//initial modelScanCurMap model current count to 0
+			for (Map.Entry<String, Integer> location : modelScanCurMap.entrySet()) 
+			{
+				modelScanCurMap.put(location.getKey(), 0);
 			}
-			String[] itemSize = updateTxt.split("\n");
+			snRepeatSet.clear();
+			String[] prevText = prevContent.split("\n");
+			// updateTxt = prevText[0] + "\n";
 
-			if (itemSize.length > 1) {
+			HashSet<String> itemError = new HashSet<String>();
+
+			for (Itembean i : items) {
+				itemError.add(i.SN);
+			}
+			for (String s : prevText) {
+				if (itemError.contains(s))
+					continue;
+				else {
+					updateTxt += s + "\n";
+					snRepeatSet.add(s);
+				}
+
+			}
+			
+			
+			String[] itemSize = updateTxt.split("\n");
+			prevContent = updateTxt;
+			
+			if (!updateTxt.equals("")) {
 				for (String s : itemSize) {
 					String modelNo = s.substring(0, 6);
 					if (!modelScanCurMap.containsKey(modelNo))
@@ -1486,13 +1532,16 @@ public class ShippingConfirm {
 						modelScanCurMap.put(modelNo, modelScanCurMap.get(modelNo) + 1);
 
 				}
-
-			}else
+				lCount.setText(setModelScanCountLabel(itemSize.length));
+			} else {
 				inputSN.setText(updateTxt);
-			lCount.setText(setModelScanCountLabel(itemSize.length));
+				lCount.setText(setModelScanCountLabel(0));
+			}
+
 		}
 
 		inputSN.setText(updateTxt);
+
 	}
 
 }

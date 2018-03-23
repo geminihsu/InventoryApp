@@ -15,8 +15,6 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 import spirit.fitness.scanner.model.Historybean;
 import spirit.fitness.scanner.model.Itembean;
-import spirit.fitness.scanner.model.Shippingbean;
-
 /**
  * Created by User on 5/1/2017.
  */
@@ -48,11 +46,11 @@ public interface HistoryCallback {
 
 	
 	//PUT more than one item
-	@PUT("/api/Histories")
+	@PUT("api/Histories")
 	Call<List<Historybean>> updateItem(@Body List<Historybean> itembean);
 
 	//Delete no work
-	@DELETE("/api/Histories/{seq}")
+	@DELETE("api/Histories/{seq}")
 	Call<Historybean> deleteItem(@Path("seq") Integer seq);
 
 }

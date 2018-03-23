@@ -83,7 +83,6 @@ import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HistoryRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HttpRestApi;
 import spirit.fitness.scanner.restful.OrdersRepositoryImplRetrofit;
-import spirit.fitness.scanner.restful.ShippingRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.CustOrderCallBackFunction;
 import spirit.fitness.scanner.restful.listener.HistoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
@@ -100,7 +99,6 @@ import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Locationbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.PickingItem;
-import spirit.fitness.scanner.model.Shippingbean;
 import spirit.fitness.scanner.receving.ItemsPannel;
 import spirit.fitness.scanner.report.ModelZone2Report;
 

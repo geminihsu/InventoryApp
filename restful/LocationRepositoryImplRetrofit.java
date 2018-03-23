@@ -13,7 +13,6 @@ import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Locationbean;
 import spirit.fitness.scanner.model.Modelbean;
-import spirit.fitness.scanner.model.Reportbean;
 import spirit.fitness.scanner.restful.callback.InventoryCallback;
 import spirit.fitness.scanner.restful.callback.LocationCallback;
 import spirit.fitness.scanner.restful.callback.ModelCallback;

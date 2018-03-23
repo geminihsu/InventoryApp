@@ -7,7 +7,6 @@ import spirit.fitness.scanner.model.Historybean;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.ModelDailyReportbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
-import spirit.fitness.scanner.model.Reportbean;
 
 
 public interface ModelZone2CallBackFunction {

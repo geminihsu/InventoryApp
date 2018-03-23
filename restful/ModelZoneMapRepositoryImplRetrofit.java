@@ -14,14 +14,12 @@ import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.ModelDailyReportbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Modelbean;
-import spirit.fitness.scanner.model.Reportbean;
 import spirit.fitness.scanner.restful.callback.InventoryCallback;
 import spirit.fitness.scanner.restful.callback.ModelCallback;
 import spirit.fitness.scanner.restful.callback.ModelZoneMapCallback;
-import spirit.fitness.scanner.restful.callback.ReportCallback;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.ModelZone2CallBackFunction;
-import spirit.fitness.scanner.restful.listener.ReportCallBackFunction;
+
 
 
 

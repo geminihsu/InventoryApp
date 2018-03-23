@@ -55,7 +55,7 @@ public interface InventoryCallback {
 
 	
 	//PUT more than one item
-	@PUT("/api/FGInventory")
+	@PUT("api/FGInventory")
 	Call<List<Itembean>> updateItem(@Body List<Itembean> itembean);
 
 	@PUT("api/FGInventory/SN/NotExist")
@@ -66,7 +66,7 @@ public interface InventoryCallback {
 
 	
 	//Delete no work
-	@DELETE("/api/FGInventory")
+	@DELETE("api/FGInventory")
 	Call<List<Itembean>> deleteItem(@Body List<Itembean> itembean);
 
 }

@@ -827,7 +827,7 @@ public class ItemsPannel {
 			String zoneCode = LocationHelper.DisplayZoneCode(LocationHelper.MapZoneCode(location));
 			// Creating JLabel
 			JLabel modelLabel = new JLabel("<html>Do you want to assign all items :" + " <br/>" + "Model :"
-					+ model.ModelNo + "(" + ((String) sortedList.get(0)).substring(0, 6) + ") <br/>" + "Total : "
+					+ model.ModelNo + "(" + Constrant.models.get(((String) sortedList.get(0)).substring(0, 6)).Desc + ") <br/>" + "Total : "
 					+ sortedList.size() + " <br/>" + result + " <br/>" + "to location " + "[" + zoneCode + "]["
 					+ location + "] ?</html>");
 

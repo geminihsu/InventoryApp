@@ -6,7 +6,7 @@ import spirit.fitness.scanner.model.CustOrderbean;
 import spirit.fitness.scanner.model.Historybean;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Locationbean;
-import spirit.fitness.scanner.model.Reportbean;
+
 
 
 public interface LocationCallBackFunction {

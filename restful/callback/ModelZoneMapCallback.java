@@ -17,7 +17,6 @@ import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.ModelDailyReportbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Modelbean;
-import spirit.fitness.scanner.model.Reportbean;
 
 /**
  * Created by User on 5/1/2017.
