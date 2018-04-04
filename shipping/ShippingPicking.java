@@ -78,7 +78,6 @@ import okhttp3.internal.http1.Http1Codec;
 import spirit.fitness.scanner.AppMenu;
 import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
-import spirit.fitness.scanner.inquiry.QueryResult;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HistoryRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HttpRestApi;
@@ -86,6 +85,7 @@ import spirit.fitness.scanner.restful.OrdersRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.CustOrderCallBackFunction;
 import spirit.fitness.scanner.restful.listener.HistoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
+import spirit.fitness.scanner.search.QueryResult;
 import spirit.fitness.scanner.util.LoadingFrameHelper;
 import spirit.fitness.scanner.util.LocationHelper;
 import spirit.fitness.scanner.util.ModelNoUtil;
@@ -481,7 +481,7 @@ public class ShippingPicking {
 
 			total.setText("Total : " + String.valueOf(orderTotalCount));
 
-			prev = new JButton("Prev");
+			prev = new JButton("Back");
 			prev.setFont(font);
 			prev.setBounds(820, 700, 90, 50);
 

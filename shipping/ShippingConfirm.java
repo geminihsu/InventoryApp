@@ -58,7 +58,6 @@ import javax.swing.table.TableColumn;
 
 import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
-import spirit.fitness.scanner.inquiry.QueryResult;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HistoryRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.HttpRestApi;
@@ -66,6 +65,7 @@ import spirit.fitness.scanner.restful.OrdersRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.listener.CustOrderCallBackFunction;
 import spirit.fitness.scanner.restful.listener.HistoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
+import spirit.fitness.scanner.search.QueryResult;
 import spirit.fitness.scanner.util.LoadingFrameHelper;
 import spirit.fitness.scanner.util.PrintTableUtil;
 import spirit.fitness.scanner.util.PrinterHelper;
@@ -603,7 +603,7 @@ public class ShippingConfirm {
 			print.setFont(font);
 			print.setBounds(820, buttonHeight, 190, 50);
 
-			prev = new JButton("Prev");
+			prev = new JButton("Back");
 			prev.setFont(font);
 			prev.setBounds(820, 700, 90, 50);
 
@@ -965,7 +965,7 @@ public class ShippingConfirm {
 		panel.add(report);
 
 		// Creating Report button
-		JButton prev = new JButton("Prev");
+		JButton prev = new JButton("Back");
 		prev.setFont(font);
 		prev.setBounds(600, 630, 80, 50);
 		prev.addActionListener(new ActionListener() {
@@ -1136,7 +1136,7 @@ public class ShippingConfirm {
 		});
 
 		// Creating Query button
-		JButton queryButton = new JButton("Add");
+		JButton queryButton = new JButton("Save");
 		queryButton.setFont(font);
 		queryButton.setBounds(250, 670, 110, 50);
 		queryButton.addActionListener(new ActionListener() {

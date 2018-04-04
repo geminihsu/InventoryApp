@@ -88,7 +88,7 @@ public class ReturnLocation implements ActionListener {
 
 		JPanel exitControl = new JPanel();
 		exitControl.setLayout(new GridLayout(0, 5));
-		JButton exit = new JButton(new AbstractAction("Prev"){
+		JButton exit = new JButton(new AbstractAction("Back"){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {

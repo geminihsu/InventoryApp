@@ -40,14 +40,13 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
-import spirit.fitness.scanner.inquiry.QueryPannel;
-import spirit.fitness.scanner.inquiry.QueryResult;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.Locationbean;
 import spirit.fitness.scanner.model.ModelDailyReportbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
 import spirit.fitness.scanner.model.Modelbean;
 import spirit.fitness.scanner.receving.ItemsPannel;
+import spirit.fitness.scanner.receving.ContainerPannel;
 import spirit.fitness.scanner.report.DailyReport;
 import spirit.fitness.scanner.report.ModelZone2Report;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
@@ -58,6 +57,8 @@ import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.LocationCallBackFunction;
 import spirit.fitness.scanner.restful.listener.ModelZone2CallBackFunction;
 import spirit.fitness.scanner.restful.listener.ModelsCallBackFunction;
+import spirit.fitness.scanner.search.QueryPannel;
+import spirit.fitness.scanner.search.QueryResult;
 import spirit.fitness.scanner.shipping.ShippingConfirm;
 import spirit.fitness.scanner.shipping.ShippingPicking;
 import spirit.fitness.scanner.util.EmailHelper;
@@ -192,9 +193,8 @@ public class AppMenu implements ActionListener {
 
 		if (!InstanceUtil.isExits()) {
 			if (e.getSource() == btnRecving) {
-				// btnRecving.setEnabled(false);
-				ItemsPannel.getInstance("", ItemsPannel.RECEVING);
-				// window.frame.setVisible(true);
+				//ItemsPannel.getInstance("", ItemsPannel.RECEVING);
+				ContainerPannel.getInstance();
 			} else if (e.getSource() == btnMoving) {
 				// ItemsPannel window = new ItemsPannel(ItemsPannel.MOVING);
 				// window.frame.setVisible(true);

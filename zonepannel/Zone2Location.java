@@ -117,7 +117,7 @@ public class Zone2Location implements ActionListener {
 		
 		JPanel exitControl = new JPanel();
 		exitControl.setLayout(new GridLayout(0, 2));
-		JButton exit = new JButton(new AbstractAction("Prev"){
+		JButton exit = new JButton(new AbstractAction("Back"){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {

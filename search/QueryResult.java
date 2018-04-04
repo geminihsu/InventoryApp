@@ -1,4 +1,4 @@
-package spirit.fitness.scanner.inquiry;
+package spirit.fitness.scanner.search;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -431,7 +431,7 @@ public class QueryResult {
 		quantity.setText("QUANTITY :" + queryModelCount);
 		panel.setBackground(Constrant.BACKGROUN_COLOR);
 
-		JButton prev = new JButton(new AbstractAction("Prev") {
+		JButton prev = new JButton(new AbstractAction("Back") {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -600,7 +600,7 @@ public class QueryResult {
 
 		}
 
-		JButton prev = new JButton(new AbstractAction("Prev") {
+		JButton prev = new JButton(new AbstractAction("Back") {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {

@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -22,8 +23,9 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import spirit.fitness.scanner.common.Constrant;
-import spirit.fitness.scanner.inquiry.QueryPannel;
+import spirit.fitness.scanner.model.Containerbean;
 import spirit.fitness.scanner.receving.ItemsPannel;
+import spirit.fitness.scanner.search.QueryPannel;
 import spirit.fitness.scanner.zonepannel.Zone2Location.Zone2CodeCallBackFunction;
 
 public class ZoneMenu implements ActionListener {
@@ -36,6 +38,7 @@ public class ZoneMenu implements ActionListener {
 	public JFrame frame;
 	private String items;
 	private int assignType;
+	private List<Containerbean> containers;
 
 	public ZoneMenu(String content, int type) {
 		items = content;
@@ -45,9 +48,25 @@ public class ZoneMenu implements ActionListener {
 			initialize(content);
 	}
 	
+	public ZoneMenu(List<Containerbean> _containers,String content, int type) {
+		items = content;
+		assignType = type;
+		containers = _containers;
+
+		if (assignType != -1)
+			initialize(content);
+	}
+	
 	 public static ZoneMenu getInstance(String content, int type){
 	        if(instance == null){
 	            instance = new ZoneMenu(content,type);
+	        }
+	        return instance;
+	    }
+	 
+	 public static ZoneMenu getInstance(List<Containerbean> _containers,String content, int type){
+	        if(instance == null){
+	            instance = new ZoneMenu(_containers,content,type);
 	        }
 	        return instance;
 	    }
@@ -135,7 +154,7 @@ public class ZoneMenu implements ActionListener {
 
 		JPanel exitControl = new JPanel();
 		exitControl.setLayout(new GridLayout(0, 2));
-		JButton exit = new JButton(new AbstractAction("Prev") {
+		JButton exit = new JButton(new AbstractAction("Back") {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {

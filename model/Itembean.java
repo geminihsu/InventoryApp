@@ -27,6 +27,8 @@ public class Itembean {
     public String ModelNo;
     @SerializedName("SalesOreder")
     public String SalesOreder;
+    @SerializedName("ContainerNo")
+    public String ContainerNo;
 
     @Override
     public String toString() {

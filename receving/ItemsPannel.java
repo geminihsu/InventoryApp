@@ -20,7 +20,9 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.swing.AbstractAction;
@@ -61,6 +63,7 @@ import spirit.fitness.scanner.util.LoadingFrameHelper;
 import spirit.fitness.scanner.util.LocationHelper;
 import spirit.fitness.scanner.util.PrinterHelper;
 import spirit.fitness.scanner.zonepannel.ZoneMenu;
+import spirit.fitness.scanner.model.Containerbean;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.model.ModelDailyReportbean;
 import spirit.fitness.scanner.model.ModelZone2bean;
@@ -77,6 +80,12 @@ public class ItemsPannel {
 	private static final String TEXT_SUBMIT = "text-submit";
 	private static final String INSERT_BREAK = "insert-break";
 
+	// Key:modelID, value:current scanner quality
+	private LinkedHashMap<String, Integer> modelScanCurMap;
+	
+	// Key:modelID, value:total quality
+	private LinkedHashMap<String, Integer> modelTotalCurMap;
+
 	public JFrame frame;
 	public JFrame scanResultFrame;
 	public JFrame dialogFrame;
@@ -86,7 +95,9 @@ public class ItemsPannel {
 	private String items;
 	private String result;
 	private String scanContent;
+	private String containerNo;
 	private int assignType;
+	private int orderTotalCount;
 	private boolean repMove = false;
 	private HashSet<String> set;
 
@@ -104,6 +115,13 @@ public class ItemsPannel {
 		assignType = type;
 		// initialize(type);
 		scanInfo(prevText, type);
+		exceuteCallback();
+		loadModelMapZone2();
+	}
+
+	private ItemsPannel(List<Containerbean> container, String preText) {
+
+		scanPannel(container, preText);
 		exceuteCallback();
 		loadModelMapZone2();
 	}
@@ -126,6 +144,13 @@ public class ItemsPannel {
 	public static ItemsPannel getInstance(String content, String location, int type) {
 		if (instance == null) {
 			instance = new ItemsPannel(content, location, type);
+		}
+		return instance;
+	}
+
+	public static ItemsPannel getInstance(List<Containerbean> container, String preText) {
+		if (instance == null) {
+			instance = new ItemsPannel(container, preText);
 		}
 		return instance;
 	}
@@ -408,6 +433,326 @@ public class ItemsPannel {
 
 	}
 
+	private void scanContainerPannel(JPanel panel, String prevTxt, List<Containerbean> container) {
+		panel.setLayout(null);
+		Font font = new Font("Verdana", Font.BOLD, 18);
+		// Creating JLabel
+		JLabel shippingLabel = new JLabel("Received Date : ");
+
+		shippingLabel.setBounds(50, 30, 200, 25);
+		shippingLabel.setFont(font);
+		panel.add(shippingLabel);
+
+		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+		JLabel shippingDate = new JLabel(timeStamp);
+		shippingDate.setText(timeStamp);
+		shippingDate.setFont(font);
+		shippingDate.setBounds(320, 20, 250, 50);
+		panel.add(shippingDate);
+		modelTotalCurMap = new LinkedHashMap<String, Integer>();
+		modelScanCurMap = new LinkedHashMap<String, Integer>();
+		containerNo = container.get(0).ContainerNo;
+		orderTotalCount = 0;
+		for (Containerbean item : container) {
+			orderTotalCount += Integer.valueOf(item.SNEnd.substring(10, 16))
+					- Integer.valueOf(item.SNBegin.substring(10, 16));
+			modelTotalCurMap.put(item.SNBegin.substring(0, 10),
+					Integer.valueOf(item.SNEnd.substring(10, 16)) - Integer.valueOf(item.SNBegin.substring(10, 16)));
+			modelScanCurMap.put(item.SNBegin.substring(0, 10),0);
+		}
+
+		// Creating JLabel
+		ltotal = new JLabel("");
+
+		
+
+		ltotal.setBounds(50, 150, 300, 500);
+		ltotal.setFont(font);
+		panel.add(ltotal);
+
+		// Creating JLabel
+		JLabel proLabel = new JLabel("Container # ");
+
+		proLabel.setBounds(50, 60, 200, 25);
+		proLabel.setFont(font);
+		panel.add(proLabel);
+
+		JLabel proNumber = new JLabel(container.get(0).ContainerNo);
+
+		scanResultFrame.addWindowListener(new WindowAdapter() {
+			public void windowOpened(WindowEvent e) {
+				proNumber.requestFocus();
+			}
+		});
+
+		proNumber.setFont(font);
+		proNumber.setBounds(320, 50, 250, 50);
+		panel.add(proNumber);
+
+		String sample = "";
+		
+		for(int i = 489; i < 536; i++) 
+		{
+			sample += "8508451802001" + String.valueOf(i) +"\n";
+		}
+		
+		
+		prevTxt = sample;
+		inputSN = new JTextArea(20, 15);
+		String content = "";
+		inputSN.setText(prevTxt);
+		String[] item = prevTxt.split("\n");
+		set = new HashSet<String>();
+		int len = 0;
+		if (!prevTxt.equals("")) {
+
+			len = item.length;
+			modelScanCurMap.clear();
+			for (String s : item) {
+				set.add(s);
+				
+				String modelNo = s.substring(0,10); 
+				if(!modelScanCurMap.containsKey(modelNo))
+				modelScanCurMap.put(modelNo, 1); 
+				else modelScanCurMap.put(modelNo,
+				 modelScanCurMap.get(modelNo) + 1);
+				
+
+			}
+
+		}
+
+		JScrollPane scrollPanel1 = new JScrollPane(inputSN);
+		scrollPanel1.setBounds(320, 100, 250, 500);
+		inputSN.setFont(font);
+		ltotal.setText(setModelScanCountLabel(set.size()));
+
+		InputMap input = inputSN.getInputMap();
+		KeyStroke enter = KeyStroke.getKeyStroke("ENTER");
+		KeyStroke shiftEnter = KeyStroke.getKeyStroke("shift ENTER");
+		input.put(shiftEnter, INSERT_BREAK); // input.get(enter)) = "insert-break"
+		input.put(enter, TEXT_SUBMIT);
+
+		ActionMap actions = inputSN.getActionMap();
+		actions.put(TEXT_SUBMIT, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				inputSN.setText(inputSN.getText().toString() + "\n");
+				String prev = inputSN.getText().toString();
+				String[] item = inputSN.getText().toString().split("\n");
+
+				boolean lenError = false;
+
+				String model = "";
+				int curModelCnt = 0;
+				if (item[item.length - 1].length() == 16) {
+					model = item[item.length - 1].substring(0, 10);
+
+					if (modelScanCurMap.get(model) == null)
+						lenError = true;
+					else
+						curModelCnt = modelScanCurMap.get(model);
+
+				}
+
+				if (!set.contains(item[item.length - 1]) && item[item.length - 1].length() == 16
+						&& set.size() <= orderTotalCount && modelTotalCurMap.containsKey(model)
+						&& curModelCnt < modelTotalCurMap.get(model) && !lenError) {
+
+					modelScanCurMap.put(model, modelScanCurMap.get(model) + 1);
+					set.add(item[item.length - 1]);
+				} else {
+					lenError = true;
+					prev = prev.substring(0, prev.length() - (item[item.length - 1].length()) - 1);
+
+				}
+
+				if (lenError) {
+
+					inputSN.setText(prev);
+				} else {
+
+					ltotal.setForeground(Color.BLACK);
+					ltotal.setText(setModelScanCountLabel(set.size()));
+
+				}
+
+			}
+		});
+
+		panel.add(scrollPanel1);
+
+		InputMap inputPro = proNumber.getInputMap();
+		KeyStroke enterPro = KeyStroke.getKeyStroke("ENTER");
+		KeyStroke shiftEnterPro = KeyStroke.getKeyStroke("shift ENTER");
+		inputPro.put(enterPro, INSERT_BREAK); // input.get(enter)) = "insert-break"
+		inputPro.put(shiftEnterPro, TEXT_SUBMIT);
+
+		// Creating Query button
+		JButton queryButton = new JButton("Exit");
+		queryButton.setFont(font);
+		queryButton.setBounds(320, 670, 251, 50);
+
+		queryButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				instance = null;
+				scanResultFrame.dispose();
+				scanResultFrame.setVisible(false);
+			}
+		});
+
+		panel.add(queryButton);
+
+		// Creating clear button
+		JButton resetButton = new JButton("Clear");
+		resetButton.setFont(font);
+		resetButton.setBounds(420, 610, 150, 50);
+		resetButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int result = -1;
+				if (inputSN.getText().toString().length() > 0) {
+					result = JOptionPane.showConfirmDialog(frame, "Do you want to clear the all item?", "",
+							JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+					if (result == JOptionPane.YES_OPTION) {
+						inputSN.setText("");
+						set.clear();
+						for (Map.Entry<String, Integer> location : modelScanCurMap.entrySet()) {
+							modelScanCurMap.put(location.getKey(), 0);
+						}
+						ltotal.setText(setModelScanCountLabel(0));
+						ltotal.setForeground(Color.BLACK);
+					}
+				}
+			}
+		});
+
+		panel.add(resetButton);
+
+		// Creating Exit button
+		JButton exitButton = new JButton("000");
+		exitButton.setFont(font);
+		exitButton.setBounds(50, 610, 150, 50);
+		exitButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				String[] item = inputSN.getText().toString().split("\n");
+
+				if (inputSN.getText().isEmpty())
+					JOptionPane.showMessageDialog(null, "Please scan serial number.");
+				else if(item.length != orderTotalCount)
+					JOptionPane.showMessageDialog(null, "Quantity Error!");
+				else {
+					scanResultFrame.setVisible(false);
+					scanResultFrame.dispose();
+					instance = null;
+					displayScanResultFrame(inputSN.getText().toString(), "000", RECEVING);
+				}
+			}
+		});
+
+		panel.add(exitButton);
+
+		// Creating Exit button
+		JButton location = new JButton("Location");
+		location.setFont(font);
+		location.setBounds(240, 610, 150, 50);
+		location.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				
+				String[] scanitem = inputSN.getText().toString().split("\n");
+
+				if (inputSN.getText().isEmpty())
+					JOptionPane.showMessageDialog(null, "Please scan serial number.");
+				else if(scanitem.length != orderTotalCount)
+					JOptionPane.showMessageDialog(null, "Quantity Error!");
+				else {
+
+					items = inputSN.getText().toString();
+					scanResultFrame.setVisible(false);
+					scanResultFrame.dispose();
+					instance = null;
+					// if (type == MOVING) {
+					loadingframe = new LoadingFrameHelper("Checking data...");
+					loading = loadingframe.loadingSample("Checking data...");
+
+					String[] itemList = items.split("\n");
+
+					if (itemList.length == 0 && !inputSN.getText().toString().equals("")) {
+						itemList = new String[0];
+						itemList[0] = inputSN.getText().toString();
+					}
+
+					List<Itembean> items = new ArrayList<Itembean>();
+
+					String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+							.format(Calendar.getInstance().getTime());
+					for (String item : itemList) {
+						Itembean _item = new Itembean();
+
+						_item.SN = item;
+						_item.ModelNo = item.substring(0, 6);
+						items.add(_item);
+
+					}
+
+					checkItemExits(items);
+
+				}
+			}
+		});
+
+		panel.add(location);
+
+		
+		// Creating Exit button
+		JButton back = new JButton("Back");
+		back.setFont(font);
+		back.setBounds(50, 670, 260, 50);
+		back.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				instance = null;
+				scanResultFrame.dispose();
+				scanResultFrame.setVisible(false);
+				ContainerPannel.getInstance();
+			}
+		});
+		
+		panel.add(back);
+
+	}
+
+	public void scanPannel(List<Containerbean> container, String prevTxt) {
+
+		scanResultFrame = new JFrame("");
+		// Setting the width and height of frame
+		scanResultFrame.setSize(620, 750);
+		scanResultFrame.setLocationRelativeTo(null);
+		scanResultFrame.setUndecorated(true);
+		scanResultFrame.setResizable(false);
+
+		JPanel panel = new JPanel();
+		panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Constrant.FRAME_BORDER_BACKGROUN_COLOR));
+		panel.setBackground(Constrant.BACKGROUN_COLOR);
+		// adding panel to frame
+		scanResultFrame.add(panel);
+
+		scanContainerPannel(panel, prevTxt, container);
+
+		scanResultFrame.setBackground(Color.WHITE);
+		scanResultFrame.setVisible(true);
+
+		scanResultFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		scanResultFrame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+
+				scanResultFrame.dispose();
+				scanResultFrame.setVisible(false);
+			}
+		});
+
+	}
+
 	private void exceuteCallback() {
 
 		fgModelZone2 = new ModelZoneMapRepositoryImplRetrofit();
@@ -484,9 +829,10 @@ public class ItemsPannel {
 					loadingframe.setVisible(false);
 					loadingframe.dispose();
 
+					
 					if (scanResultFrame != null)
 						scanResultFrame.setVisible(true);
-
+					
 					if (dialogFrame != null) {
 						dialogFrame.dispose();
 						dialogFrame.setVisible(false);
@@ -545,7 +891,25 @@ public class ItemsPannel {
 							for (Itembean i : items) {
 								updateTxt += i.SN + "\n";
 							}
-							ltotal.setText("Total : " + items.size());
+							if(modelScanCurMap.isEmpty())
+								ltotal.setText("Total : " + items.size());
+							else {
+								set.clear();
+								modelScanCurMap.clear();
+								for (Itembean s : items) {
+									set.add(s.SN);
+									
+									String modelNo = s.SN.substring(0,10); 
+									if(!modelScanCurMap.containsKey(modelNo))
+									modelScanCurMap.put(modelNo, 1); 
+									else modelScanCurMap.put(modelNo,
+									 modelScanCurMap.get(modelNo) + 1);
+									
+
+								}
+								ltotal.setText(setModelScanCountLabel(set.size()));
+								
+							}
 							inputSN.setText(updateTxt);
 							scanResultFrame.setVisible(true);
 						}
@@ -827,9 +1191,9 @@ public class ItemsPannel {
 			String zoneCode = LocationHelper.DisplayZoneCode(LocationHelper.MapZoneCode(location));
 			// Creating JLabel
 			JLabel modelLabel = new JLabel("<html>Do you want to assign all items :" + " <br/>" + "Model :"
-					+ model.ModelNo + "(" + Constrant.models.get(((String) sortedList.get(0)).substring(0, 6)).Desc + ") <br/>" + "Total : "
-					+ sortedList.size() + " <br/>" + result + " <br/>" + "to location " + "[" + zoneCode + "]["
-					+ location + "] ?</html>");
+					+ model.ModelNo + "(" + Constrant.models.get(((String) sortedList.get(0)).substring(0, 6)).Desc
+					+ ") <br/>" + "Total : " + sortedList.size() + " <br/>" + result + " <br/>" + "to location " + "["
+					+ zoneCode + "][" + location + "] ?</html>");
 
 			/*
 			 * This method specifies the location and size of component. setBounds(x, y,
@@ -869,6 +1233,7 @@ public class ItemsPannel {
 						_item.date = timeStamp;
 						_item.Location = location;
 						_item.ModelNo = item.substring(0, 6);
+						_item.ContainerNo = containerNo;
 						items.add(_item);
 
 					}
@@ -897,7 +1262,7 @@ public class ItemsPannel {
 				}
 			});
 
-			JButton prev = new JButton("Prev");
+			JButton prev = new JButton("Back");
 			prev.setBounds(220, 330, 150, 50);
 			prev.setFont(font);
 			panel.add(prev);
@@ -907,7 +1272,10 @@ public class ItemsPannel {
 					dialogFrame.dispose();
 					dialogFrame.setVisible(false);
 					dialogFrame = null;
-					scanInfo(content, assignType);
+				   if(modelScanCurMap.isEmpty())
+					   scanInfo(content, assignType);
+				   else
+					   ContainerPannel.getInstance();
 				}
 			});
 
@@ -1078,6 +1446,17 @@ public class ItemsPannel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private String setModelScanCountLabel(int curCount) {
+		String modelQty = "<html>" + "Total : " + curCount + "/" + String.valueOf(orderTotalCount) + " </br>";
+		for (Map.Entry<String, Integer> location : modelScanCurMap.entrySet()) {
+			int cnt = 0;
+
+			modelQty += location.getKey().substring(0, 10) + "(" + location.getValue() + "/" + modelTotalCurMap.get(location.getKey().substring(0, 10)) + ") </br>";
+		}
+		modelQty = modelQty + "</br></html>";
+		return modelQty;
 	}
 
 	// Loading Models data from Server

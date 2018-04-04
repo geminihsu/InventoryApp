@@ -1,4 +1,4 @@
-package spirit.fitness.scanner.inquiry;
+package spirit.fitness.scanner.search;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

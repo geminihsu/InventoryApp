@@ -1,9 +1,9 @@
 package spirit.fitness.scanner.util;
 
-import spirit.fitness.scanner.inquiry.QueryPannel;
 import spirit.fitness.scanner.receving.ItemsPannel;
 import spirit.fitness.scanner.report.DailyReport;
 import spirit.fitness.scanner.report.ModelZone2Report;
+import spirit.fitness.scanner.search.QueryPannel;
 import spirit.fitness.scanner.shipping.ShippingConfirm;
 import spirit.fitness.scanner.shipping.ShippingPicking;
 
