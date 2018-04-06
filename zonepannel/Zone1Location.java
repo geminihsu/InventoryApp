@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -20,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import spirit.fitness.scanner.common.Constrant;
+import spirit.fitness.scanner.model.Containerbean;
 import spirit.fitness.scanner.receving.ItemsPannel;
 import spirit.fitness.scanner.zonepannel.ReturnLocation.ZoneCodeReturnCallBackFunction;
 
@@ -33,8 +35,17 @@ public class Zone1Location implements ActionListener {
 	protected JFrame frame;
 	private String items;
 	private int assignType = 0;
-
+	private List<Containerbean> containers;
+	
 	public Zone1Location(String list, int type) {
+		items = list;
+		assignType = type;
+		if (assignType != -1)
+			initialize();
+	}
+	
+	public Zone1Location(List<Containerbean> _containers,String list, int type) {
+		containers = _containers;
 		items = list;
 		assignType = type;
 		if (assignType != -1)
@@ -100,7 +111,10 @@ public class Zone1Location implements ActionListener {
 
                         //ItemsPannel window = new ItemsPannel(items, content, assignType);
 						//window.dialogFrame.setVisible(true);
-						ItemsPannel.getInstance(items, content, assignType);
+						if(containers != null)
+							ItemsPannel.getInstance(containers,items, content, assignType);
+						else
+							ItemsPannel.getInstance(items, content, assignType);
 					}
 
 				}
@@ -121,7 +135,10 @@ public class Zone1Location implements ActionListener {
 				
 				//ZoneMenu window = new ZoneMenu(items, assignType);
 				//window.frame.setVisible(true);
-				ZoneMenu.getInstance(items, assignType);
+				if(containers != null)
+					ZoneMenu.getInstance(containers,items, assignType);
+				else
+					ZoneMenu.getInstance(items, assignType);
 			}
 		});
 		

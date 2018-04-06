@@ -100,6 +100,7 @@ public class ItemsPannel {
 	private int orderTotalCount;
 	private boolean repMove = false;
 	private HashSet<String> set;
+	private List<Containerbean> containers;
 
 	private JButton btnDone;
 
@@ -119,15 +120,26 @@ public class ItemsPannel {
 		loadModelMapZone2();
 	}
 
-	private ItemsPannel(List<Containerbean> container, String preText) {
-
-		scanPannel(container, preText);
+	private ItemsPannel(List<Containerbean> _container, String preText, int type) {
+		assignType = type;
+		containers = _container;
+		scanPannel( preText);
 		exceuteCallback();
 		loadModelMapZone2();
 	}
 
 	public ItemsPannel(String content, String location, int type) {
 		assignType = type;
+		// displayTable(content, location, type);
+		displayScanResultFrame(content, location, type);
+		exceuteCallback();
+		loadModelMapZone2();
+	}
+	
+	public ItemsPannel(List<Containerbean> _container, String content, String location, int type) {
+		assignType = type;
+		containers = _container;
+		containerNo = _container.get(0).ContainerNo;
 		// displayTable(content, location, type);
 		displayScanResultFrame(content, location, type);
 		exceuteCallback();
@@ -148,12 +160,20 @@ public class ItemsPannel {
 		return instance;
 	}
 
-	public static ItemsPannel getInstance(List<Containerbean> container, String preText) {
+	public static ItemsPannel getInstance(List<Containerbean> container, String preText, int type) {
 		if (instance == null) {
-			instance = new ItemsPannel(container, preText);
+			instance = new ItemsPannel(container, preText,type);
 		}
 		return instance;
 	}
+	
+	public static ItemsPannel getInstance(List<Containerbean> container, String content, String location, int type) {
+		if (instance == null) {
+			instance = new ItemsPannel(container,content, location, type);
+		}
+		return instance;
+	}
+
 
 	public static boolean isExit() {
 		return instance != null;
@@ -433,7 +453,7 @@ public class ItemsPannel {
 
 	}
 
-	private void scanContainerPannel(JPanel panel, String prevTxt, List<Containerbean> container) {
+	private void scanContainerPannel(JPanel panel, String prevTxt) {
 		panel.setLayout(null);
 		Font font = new Font("Verdana", Font.BOLD, 18);
 		// Creating JLabel
@@ -451,9 +471,9 @@ public class ItemsPannel {
 		panel.add(shippingDate);
 		modelTotalCurMap = new LinkedHashMap<String, Integer>();
 		modelScanCurMap = new LinkedHashMap<String, Integer>();
-		containerNo = container.get(0).ContainerNo;
+		containerNo = containers.get(0).ContainerNo;
 		orderTotalCount = 0;
-		for (Containerbean item : container) {
+		for (Containerbean item : containers) {
 			orderTotalCount += Integer.valueOf(item.SNEnd.substring(10, 16))
 					- Integer.valueOf(item.SNBegin.substring(10, 16));
 			modelTotalCurMap.put(item.SNBegin.substring(0, 10),
@@ -477,7 +497,7 @@ public class ItemsPannel {
 		proLabel.setFont(font);
 		panel.add(proLabel);
 
-		JLabel proNumber = new JLabel(container.get(0).ContainerNo);
+		JLabel proNumber = new JLabel(containers.get(0).ContainerNo);
 
 		scanResultFrame.addWindowListener(new WindowAdapter() {
 			public void windowOpened(WindowEvent e) {
@@ -722,7 +742,7 @@ public class ItemsPannel {
 
 	}
 
-	public void scanPannel(List<Containerbean> container, String prevTxt) {
+	public void scanPannel(String prevTxt) {
 
 		scanResultFrame = new JFrame("");
 		// Setting the width and height of frame
@@ -737,7 +757,7 @@ public class ItemsPannel {
 		// adding panel to frame
 		scanResultFrame.add(panel);
 
-		scanContainerPannel(panel, prevTxt, container);
+		scanContainerPannel(panel, prevTxt);
 
 		scanResultFrame.setBackground(Color.WHITE);
 		scanResultFrame.setVisible(true);
@@ -852,10 +872,7 @@ public class ItemsPannel {
 					loadingframe.setVisible(false);
 					loadingframe.dispose();
 
-					if (assignType == RECEVING) {
-						JOptionPane.showMessageDialog(null, "Insert Data Success!");
-						EmailHelper.sendMail(scanContent);
-					}
+					
 
 					if (assignType == MOVING) {
 						JOptionPane.showMessageDialog(null, "Update Data Success!");
@@ -871,6 +888,13 @@ public class ItemsPannel {
 						dialogFrame.dispose();
 						dialogFrame.setVisible(false);
 					}
+					
+					if (assignType == RECEVING) {
+						JOptionPane.showMessageDialog(null, "Insert Data Success!");
+						EmailHelper.sendMail(scanContent);
+					}
+					
+					
 				}
 			}
 
@@ -918,7 +942,7 @@ public class ItemsPannel {
 							dialogFrame.setVisible(false);
 						}
 					} else
-						ZoneMenu.getInstance(inputSN.getText().toString(), assignType);
+						ZoneMenu.getInstance(containers,inputSN.getText().toString(), assignType);
 
 				} else if (assignType == MOVING) {
 
@@ -1272,10 +1296,10 @@ public class ItemsPannel {
 					dialogFrame.dispose();
 					dialogFrame.setVisible(false);
 					dialogFrame = null;
-				   if(modelScanCurMap.isEmpty())
+				   if(containers == null)
 					   scanInfo(content, assignType);
 				   else
-					   ContainerPannel.getInstance();
+					   scanPannel(content);
 				}
 			});
 
@@ -1476,4 +1500,5 @@ public class ItemsPannel {
 
 	}
 
+	
 }

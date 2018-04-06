@@ -12,4 +12,6 @@ public class Containerbean {
 	public String SNBegin;
 	@SerializedName("SNEnd")
 	public String SNEnd;
+    @SerializedName("Close")
+    public Boolean Close;
 }

@@ -313,7 +313,7 @@ public class ContainerPannel implements ActionListener {
 					frame.dispose();
 					frame.setVisible(false);
 					receivingPannel = null;
-					ItemsPannel.getInstance(curContainers, "");
+					ItemsPannel.getInstance(curContainers, "",ItemsPannel.RECEVING);
 				}else
 					JOptionPane.showMessageDialog(null, "Please select one container before scan.");
 

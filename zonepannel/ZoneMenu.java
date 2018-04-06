@@ -165,7 +165,11 @@ public class ZoneMenu implements ActionListener {
 				{
 					//ItemsPannel window = new ItemsPannel(ItemsPannel.RECEVING);
 					//window.frame.setVisible(true);
-					ItemsPannel.getInstance(content,ItemsPannel.RECEVING);
+					
+					if(containers != null)
+						ItemsPannel.getInstance(containers,content,ItemsPannel.RECEVING);
+					else
+						ItemsPannel.getInstance(content,ItemsPannel.RECEVING);
 					
 				}else if(assignType == ItemsPannel.MOVING) 
 				{
@@ -234,8 +238,12 @@ public class ZoneMenu implements ActionListener {
 			this.frame.setVisible(false);
 			this.frame.dispose();
 
-			Zone1Location window = new Zone1Location(items, assignType);
-			window.frame.setVisible(true);
+			Zone1Location window = null;
+			if(containers == null) {
+				window = new Zone1Location(items, assignType);
+			}else
+				window = new Zone1Location(containers,items, assignType);
+				window.frame.setVisible(true);
 
 		} else if (e.getSource() == btnZone2) {
 			instance = null;
@@ -251,7 +259,11 @@ public class ZoneMenu implements ActionListener {
 			this.frame.setVisible(false);
 			this.frame.dispose();
 
-			ReturnLocation window = new ReturnLocation(items, assignType);
+			ReturnLocation window =null;
+			if(containers == null) 
+				window = new ReturnLocation(items, assignType);
+			else
+				window = new ReturnLocation(containers,items, assignType);
 			window.frame.setVisible(true);
 
 		} else if (e.getSource() == btnDisplayRoom) {

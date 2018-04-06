@@ -11,11 +11,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
 import spirit.fitness.scanner.model.Containerbean;
+import spirit.fitness.scanner.model.CustOrderbean;
 import spirit.fitness.scanner.model.Historybean;
 import spirit.fitness.scanner.model.Itembean;
 import spirit.fitness.scanner.restful.callback.ContainerCallback;
 import spirit.fitness.scanner.restful.callback.HistoryCallback;
 import spirit.fitness.scanner.restful.callback.InventoryCallback;
+import spirit.fitness.scanner.restful.callback.OrderCallback;
 import spirit.fitness.scanner.restful.listener.ContainerCallBackFunction;
 import spirit.fitness.scanner.restful.listener.HistoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
@@ -87,6 +89,18 @@ public class ContainerRepositoryImplRetrofit {
 		return items.execute().body();
 	}
 
+	
+	public List<Containerbean> updateItem(List<Containerbean> item) throws Exception {
+		Retrofit retrofit = new Retrofit.Builder().baseUrl(Constrant.webUrl)
+				.addConverterFactory(GsonConverterFactory.create()).build();
+		ContainerCallback service = retrofit.create(ContainerCallback.class);
+
+		Response<List<Containerbean>> request = service.updateItem(item).execute();
+		int code = request.code();
+		
+		List<Containerbean> result = retriveCode(code,request);
+		return result;
+	}
 
 
 	public void deleteItem(Integer seq) {
