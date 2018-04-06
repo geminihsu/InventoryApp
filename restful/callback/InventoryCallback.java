@@ -22,31 +22,31 @@ import spirit.fitness.scanner.model.Itembean;
 public interface InventoryCallback {
     
 	@Headers("Content-Type: application/json")
-	@GET("api/FGInventory")
+	@GET("FGService/api/FGInventory")
 	Call<List<Itembean>> getAllItems();
 	
 	
-	@GET("api/FGInventory/location/{location}")
+	@GET("FGService/api/FGInventory/location/{location}")
 	Call<List<Itembean>> getItemsByLocation(@Path("location") Integer location);
 	
-	@GET("api/FGInventory/model/{modelNo}")
+	@GET("FGService/api/FGInventory/model/{modelNo}")
 	Call<List<Itembean>> getItemsByModelNo(@Path("modelNo") String modelNo);
 	
-	@GET("api/FGInventory/model/{modelNo}/location/{location}")
+	@GET("FGService/api/FGInventory/model/{modelNo}/location/{location}")
 	Call<List<Itembean>> getItemsByModelNoAndLocation(@Path("modelNo") String modelNo,@Path("location") Integer location);
 	
 	
-	@GET("api/FGInventory/model/{modelNo}/count/{count}")
+	@GET("FGService/api/FGInventory/model/{modelNo}/count/{count}")
 	Call<List<Itembean>> getItemsByModelNoAndCount(@Path("modelNo") String modelNo,@Path("count") Integer count);
 	
-	@GET("api/FGInventory/model/{modelNo}/date/{date}")
+	@GET("FGService/api/FGInventory/model/{modelNo}/date/{date}")
 	Call<List<Itembean>> getItemsByModelNoAndDate(@Path("modelNo") String modelNo,@Path("date") String date);
 	//Post one item
 	/*@POST("/api/FGInventory")
 	Call<Itembean> createItem(@Body Itembean itembean);*/
 	
 	//Post ArrayList items
-	@POST("api/FGInventory")
+	@POST("FGService/api/FGInventory")
 	Call<List<Itembean>> createItem(@Body List<Itembean> itembean);
 
 	/*//PUT one item
@@ -55,18 +55,18 @@ public interface InventoryCallback {
 
 	
 	//PUT more than one item
-	@PUT("api/FGInventory")
+	@PUT("FGService/api/FGInventory")
 	Call<List<Itembean>> updateItem(@Body List<Itembean> itembean);
 
-	@PUT("api/FGInventory/SN/NotExist")
+	@PUT("FGService/api/FGInventory/SN/NotExist")
 	Call<List<Itembean>> getItemsLocationBySNExits(@Body List<Itembean> itembean);
 
-	@PUT("api/FGInventory/SN/Zone2/{salesOrder}")
+	@PUT("FGService/api/FGInventory/SN/Zone2/{salesOrder}")
 	Call<List<Itembean>> getItemsZone2BySNExits(@Path("salesOrder") String salesOrder,@Body List<Itembean> itembean);
 
 	
 	//Delete no work
-	@DELETE("api/FGInventory")
+	@DELETE("FGService/api/FGInventory")
 	Call<List<Itembean>> deleteItem(@Body List<Itembean> itembean);
 
 }

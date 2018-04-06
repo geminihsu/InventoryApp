@@ -24,10 +24,10 @@ import spirit.fitness.scanner.model.Modelbean;
 public interface LocationCallback {
     
 	@Headers("Content-Type: application/json")
-	@GET("api/Locations")
+	@GET("FGService/api/Locations")
 	Call<List<Locationbean>> getAllLocations();
 	
-	@GET("api/Locations/{Code}")
+	@GET("FGService/api/Locations/{Code}")
 	Call<List<Locationbean>> getLocationsByCode(@Path("Code") Integer code);
 	//Post one item
 	/*@POST("/api/FGInventory")

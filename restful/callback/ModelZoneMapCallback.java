@@ -26,16 +26,16 @@ public interface ModelZoneMapCallback {
     
 	@Headers("Content-Type: application/json")
 
-	@GET("api/ModelZoneMaps")
+	@GET("FGService/api/ModelZoneMaps")
 	Call<List<ModelZone2bean>> getAllModelMapZone2();
 	
-	@GET("api/ModelZoneMaps/Qty")
+	@GET("FGService/api/ModelZoneMaps/Qty")
 	Call<List<ModelZone2bean>> getAllModelQtyReport();
 	
-	@GET("api/ModelZoneMaps/DailyReport/date/{date}")
+	@GET("FGService/api/ModelZoneMaps/DailyReport/date/{date}")
 	Call<List<ModelDailyReportbean>> getAllModelDailyReport(@Path("date") String date);
 	
-	@GET("api/ModelZoneMaps/{modelNo}")
+	@GET("FGService/api/ModelZoneMaps/{modelNo}")
 	Call<List<ModelZone2bean>> getItemsByModelNo(@Path("modelNo") Integer modelNo);
 	//Post one item
 	/*@POST("/api/FGInventory")
