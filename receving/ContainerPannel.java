@@ -427,7 +427,20 @@ public class ContainerPannel implements ActionListener {
 		queryButton.setBounds(250, 330, 150, 50);
 		queryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				if (!snbegin.getText().toString().trim().substring(0, 6)
+						.equals(snend.getText().toString().trim().substring(0, 6)))
+					JOptionPane.showMessageDialog(null,
+							"If the container has more than one model, please create another container.");
 
+				else if (snbegin.getText().toString().trim().equals(snend.getText().toString().trim()))
+					JOptionPane.showMessageDialog(null,
+							"The SN start number the same as the end number. Please check them.");
+
+				else if (Integer.valueOf(snend.getText().toString().trim().substring(10, 16)) - Integer.valueOf(snbegin.getText().toString().trim().substring(10, 16)) <0)
+					JOptionPane.showMessageDialog(null,
+							"The SN start number is smaller than SN end number. Please check them.");
+
+				else 
 				if (!dateText.getText().toString().equals("") && !containerNo.getText().toString().equals("")
 						&& !snbegin.getText().toString().equals("") && !snend.getText().toString().equals("")
 						&& snbegin.getText().toString().length() == 16 && snend.getText().toString().length() == 16) {
