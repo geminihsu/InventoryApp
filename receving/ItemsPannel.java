@@ -54,8 +54,10 @@ import javax.swing.table.DefaultTableModel;
 
 import spirit.fitness.scanner.common.Constrant;
 import spirit.fitness.scanner.common.HttpRequestCode;
+import spirit.fitness.scanner.restful.ContainerRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.FGRepositoryImplRetrofit;
 import spirit.fitness.scanner.restful.ModelZoneMapRepositoryImplRetrofit;
+import spirit.fitness.scanner.restful.listener.ContainerCallBackFunction;
 import spirit.fitness.scanner.restful.listener.InventoryCallBackFunction;
 import spirit.fitness.scanner.restful.listener.ModelZone2CallBackFunction;
 import spirit.fitness.scanner.util.EmailHelper;
@@ -82,7 +84,7 @@ public class ItemsPannel {
 
 	// Key:modelID, value:current scanner quality
 	private LinkedHashMap<String, Integer> modelScanCurMap;
-	
+
 	// Key:modelID, value:total quality
 	private LinkedHashMap<String, Integer> modelTotalCurMap;
 
@@ -109,6 +111,7 @@ public class ItemsPannel {
 
 	private FGRepositoryImplRetrofit fgRepository;
 	private ModelZoneMapRepositoryImplRetrofit fgModelZone2;
+	private ContainerRepositoryImplRetrofit containerRepository;
 
 	private ModelZone2bean modelzone2;
 
@@ -123,7 +126,7 @@ public class ItemsPannel {
 	private ItemsPannel(List<Containerbean> _container, String preText, int type) {
 		assignType = type;
 		containers = _container;
-		scanPannel( preText);
+		scanPannel(preText);
 		exceuteCallback();
 		loadModelMapZone2();
 	}
@@ -135,7 +138,7 @@ public class ItemsPannel {
 		exceuteCallback();
 		loadModelMapZone2();
 	}
-	
+
 	public ItemsPannel(List<Containerbean> _container, String content, String location, int type) {
 		assignType = type;
 		containers = _container;
@@ -162,18 +165,17 @@ public class ItemsPannel {
 
 	public static ItemsPannel getInstance(List<Containerbean> container, String preText, int type) {
 		if (instance == null) {
-			instance = new ItemsPannel(container, preText,type);
-		}
-		return instance;
-	}
-	
-	public static ItemsPannel getInstance(List<Containerbean> container, String content, String location, int type) {
-		if (instance == null) {
-			instance = new ItemsPannel(container,content, location, type);
+			instance = new ItemsPannel(container, preText, type);
 		}
 		return instance;
 	}
 
+	public static ItemsPannel getInstance(List<Containerbean> container, String content, String location, int type) {
+		if (instance == null) {
+			instance = new ItemsPannel(container, content, location, type);
+		}
+		return instance;
+	}
 
 	public static boolean isExit() {
 		return instance != null;
@@ -478,13 +480,11 @@ public class ItemsPannel {
 					- Integer.valueOf(item.SNBegin.substring(10, 16));
 			modelTotalCurMap.put(item.SNBegin.substring(0, 10),
 					Integer.valueOf(item.SNEnd.substring(10, 16)) - Integer.valueOf(item.SNBegin.substring(10, 16)));
-			modelScanCurMap.put(item.SNBegin.substring(0, 10),0);
+			modelScanCurMap.put(item.SNBegin.substring(0, 10), 0);
 		}
 
 		// Creating JLabel
 		ltotal = new JLabel("");
-
-		
 
 		ltotal.setBounds(50, 150, 300, 500);
 		ltotal.setFont(font);
@@ -510,13 +510,11 @@ public class ItemsPannel {
 		panel.add(proNumber);
 
 		String sample = "";
-		
-		for(int i = 489; i < 536; i++) 
-		{
-			sample += "8508451802001" + String.valueOf(i) +"\n";
+
+		for (int i = 489; i < 536; i++) {
+			sample += "8508451802001" + String.valueOf(i) + "\n";
 		}
-		
-		
+
 		prevTxt = sample;
 		inputSN = new JTextArea(20, 15);
 		String content = "";
@@ -530,13 +528,12 @@ public class ItemsPannel {
 			modelScanCurMap.clear();
 			for (String s : item) {
 				set.add(s);
-				
-				String modelNo = s.substring(0,10); 
-				if(!modelScanCurMap.containsKey(modelNo))
-				modelScanCurMap.put(modelNo, 1); 
-				else modelScanCurMap.put(modelNo,
-				 modelScanCurMap.get(modelNo) + 1);
-				
+
+				String modelNo = s.substring(0, 10);
+				if (!modelScanCurMap.containsKey(modelNo))
+					modelScanCurMap.put(modelNo, 1);
+				else
+					modelScanCurMap.put(modelNo, modelScanCurMap.get(modelNo) + 1);
 
 			}
 
@@ -654,12 +651,12 @@ public class ItemsPannel {
 		exitButton.setBounds(50, 610, 150, 50);
 		exitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+
 				String[] item = inputSN.getText().toString().split("\n");
 
 				if (inputSN.getText().isEmpty())
 					JOptionPane.showMessageDialog(null, "Please scan serial number.");
-				else if(item.length != orderTotalCount)
+				else if (item.length != orderTotalCount)
 					JOptionPane.showMessageDialog(null, "Quantity Error!");
 				else {
 					scanResultFrame.setVisible(false);
@@ -678,13 +675,12 @@ public class ItemsPannel {
 		location.setBounds(240, 610, 150, 50);
 		location.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				
+
 				String[] scanitem = inputSN.getText().toString().split("\n");
 
 				if (inputSN.getText().isEmpty())
 					JOptionPane.showMessageDialog(null, "Please scan serial number.");
-				else if(scanitem.length != orderTotalCount)
+				else if (scanitem.length != orderTotalCount)
 					JOptionPane.showMessageDialog(null, "Quantity Error!");
 				else {
 
@@ -724,7 +720,6 @@ public class ItemsPannel {
 
 		panel.add(location);
 
-		
 		// Creating Exit button
 		JButton back = new JButton("Back");
 		back.setFont(font);
@@ -737,7 +732,7 @@ public class ItemsPannel {
 				ContainerPannel.getInstance();
 			}
 		});
-		
+
 		panel.add(back);
 
 	}
@@ -849,10 +844,9 @@ public class ItemsPannel {
 					loadingframe.setVisible(false);
 					loadingframe.dispose();
 
-					
 					if (scanResultFrame != null)
 						scanResultFrame.setVisible(true);
-					
+
 					if (dialogFrame != null) {
 						dialogFrame.dispose();
 						dialogFrame.setVisible(false);
@@ -872,8 +866,6 @@ public class ItemsPannel {
 					loadingframe.setVisible(false);
 					loadingframe.dispose();
 
-					
-
 					if (assignType == MOVING) {
 						JOptionPane.showMessageDialog(null, "Update Data Success!");
 
@@ -888,13 +880,19 @@ public class ItemsPannel {
 						dialogFrame.dispose();
 						dialogFrame.setVisible(false);
 					}
-					
+
 					if (assignType == RECEVING) {
-						JOptionPane.showMessageDialog(null, "Insert Data Success!");
-						EmailHelper.sendMail(scanContent);
+
+						List<Containerbean> updateContainer = new ArrayList<Containerbean>();
+						for(Containerbean container : containers) 
+						{
+							container.Close = true;
+							updateContainer.add(container);
+							
+						}
+						updateContainerStatus(updateContainer);
 					}
-					
-					
+
 				}
 			}
 
@@ -915,24 +913,23 @@ public class ItemsPannel {
 							for (Itembean i : items) {
 								updateTxt += i.SN + "\n";
 							}
-							if(modelScanCurMap.isEmpty())
+							if (modelScanCurMap.isEmpty())
 								ltotal.setText("Total : " + items.size());
 							else {
 								set.clear();
 								modelScanCurMap.clear();
 								for (Itembean s : items) {
 									set.add(s.SN);
-									
-									String modelNo = s.SN.substring(0,10); 
-									if(!modelScanCurMap.containsKey(modelNo))
-									modelScanCurMap.put(modelNo, 1); 
-									else modelScanCurMap.put(modelNo,
-									 modelScanCurMap.get(modelNo) + 1);
-									
+
+									String modelNo = s.SN.substring(0, 10);
+									if (!modelScanCurMap.containsKey(modelNo))
+										modelScanCurMap.put(modelNo, 1);
+									else
+										modelScanCurMap.put(modelNo, modelScanCurMap.get(modelNo) + 1);
 
 								}
 								ltotal.setText(setModelScanCountLabel(set.size()));
-								
+
 							}
 							inputSN.setText(updateTxt);
 							scanResultFrame.setVisible(true);
@@ -942,7 +939,7 @@ public class ItemsPannel {
 							dialogFrame.setVisible(false);
 						}
 					} else
-						ZoneMenu.getInstance(containers,inputSN.getText().toString(), assignType);
+						ZoneMenu.getInstance(containers, inputSN.getText().toString(), assignType);
 
 				} else if (assignType == MOVING) {
 
@@ -963,6 +960,31 @@ public class ItemsPannel {
 			@Override
 			public void checkInventoryZone2Items(int result, List<Itembean> items) {
 				// TODO Auto-generated method stub
+
+			}
+		});
+
+		containerRepository = new ContainerRepositoryImplRetrofit();
+		containerRepository.setContainerServiceCallBackFunction(new ContainerCallBackFunction() {
+
+			@Override
+			public void resultCode(int code) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void addContainerInfo(List<Containerbean> items) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void getContainerItems(List<Containerbean> items) {
+				if (!items.isEmpty()) {
+					JOptionPane.showMessageDialog(null, "Insert Data Success!");
+					EmailHelper.sendMail(scanContent);
+				}
 
 			}
 		});
@@ -1296,10 +1318,10 @@ public class ItemsPannel {
 					dialogFrame.dispose();
 					dialogFrame.setVisible(false);
 					dialogFrame = null;
-				   if(containers == null)
-					   scanInfo(content, assignType);
-				   else
-					   scanPannel(content);
+					if (containers == null)
+						scanInfo(content, assignType);
+					else
+						scanPannel(content);
 				}
 			});
 
@@ -1477,7 +1499,8 @@ public class ItemsPannel {
 		for (Map.Entry<String, Integer> location : modelScanCurMap.entrySet()) {
 			int cnt = 0;
 
-			modelQty += location.getKey().substring(0, 10) + "(" + location.getValue() + "/" + modelTotalCurMap.get(location.getKey().substring(0, 10)) + ") </br>";
+			modelQty += location.getKey().substring(0, 10) + "(" + location.getValue() + "/"
+					+ modelTotalCurMap.get(location.getKey().substring(0, 10)) + ") </br>";
 		}
 		modelQty = modelQty + "</br></html>";
 		return modelQty;
@@ -1500,5 +1523,21 @@ public class ItemsPannel {
 
 	}
 
-	
+	// Updated container status from open to close
+	private void updateContainerStatus(List<Containerbean> container) {
+
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+
+					containerRepository.updateItem(container);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+	}
+
 }

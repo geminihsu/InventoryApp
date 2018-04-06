@@ -90,7 +90,7 @@ public class AppMenu implements ActionListener {
 		// loadReport();
 		loadModelMapZone2();
 		loadModel();
-		loadLocatin();
+		loadLocation();
 	}
 
 	public static AppMenu getInstance() {
@@ -387,7 +387,7 @@ public class AppMenu implements ActionListener {
 	}
 
 	// Loading Models data from Server
-	private void loadLocatin() {
+	private void loadLocation() {
 		// loading model and location information from Server
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
