@@ -11,8 +11,8 @@ import spirit.fitness.scanner.model.Modelbean;
 
 
 public class Constrant {
-	//public static String webUrl = "http://172.16.2.96:5000";
-	public static String webUrl = "http://172.16.2.6";
+	public static String webUrl = "http://172.16.2.96:5000";
+	//public static String webUrl = "http://172.16.2.6";
 	public static String weburlprefix = "FGService/api/";
 	
 	public static HashMap<String,Modelbean> models;

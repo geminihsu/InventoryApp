@@ -17,25 +17,25 @@ import spirit.fitness.scanner.model.Historybean;
 public interface ContainerCallback {
 	@Headers("Content-Type: application/json")
 	
-	@GET("FGService/api/Containers")
+	@GET("api/Containers")
 	Call<List<Containerbean>> getAllItems();
 	
-	@GET("FGService/api/Containers/date/{date}")
+	@GET("api/Containers/date/{date}")
 	Call<List<Containerbean>> getItemsByDate(@Path("date") String date);
 	
-	@GET("FGService/api/Containers/{containerNo}")
+	@GET("api/Containers/{containerNo}")
 	Call<List<Containerbean>> getItemsBycontainerNo(@Path("containerNo") String containerNo);
 
 	//Post ArrayList items
-	@POST("FGService/api/Containers")
+	@POST("api/Containers")
 	Call<List<Containerbean>> createItem(@Body List<Containerbean> itembean);
 
 	
 	//PUT more than one item
-    @PUT("FGService/api/Containers")
+    @PUT("api/Containers")
 	Call<List<Containerbean>> updateItem(@Body List<Containerbean> itembean);
 
 	//Delete no work
-	@DELETE("FGService/api/Containers/{seq}")
+	@DELETE("api/Containers/{seq}")
 	Call<Containerbean> deleteItem(@Path("seq") Integer seq);
 }

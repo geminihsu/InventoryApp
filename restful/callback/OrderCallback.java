@@ -24,17 +24,17 @@ import spirit.fitness.scanner.model.Modelbean;
 public interface OrderCallback {
     
 	@Headers("Content-Type: application/json")
-	@GET("FGService/api/CustOrders")
+	@GET("api/CustOrders")
 	Call<List<CustOrderbean>> getAllOrders();
 	
-	@GET("FGService/api/CustOrders/salesOrder/{salesorder}")
+	@GET("api/CustOrders/salesOrder/{salesorder}")
 	Call<List<CustOrderbean>> getItemsBySalesOrder(@Path("salesorder") String salesOrder);
 	//Post one item
 	/*@POST("/api/FGInventory")
 	Call<Itembean> createItem(@Body Itembean itembean);*/
 	
 	//PUT more than one item
-	@PUT("FGService/api/CustOrders")
+	@PUT("api/CustOrders")
 	Call<List<CustOrderbean>> updateItem(@Body List<CustOrderbean> itembean);
 
 }
