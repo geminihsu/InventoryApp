@@ -987,6 +987,12 @@ public class ItemsPannel {
 				}
 
 			}
+
+			@Override
+			public void deleteContainerIteam(boolean result) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
 
 	}

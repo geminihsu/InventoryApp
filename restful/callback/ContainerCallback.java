@@ -11,7 +11,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import spirit.fitness.scanner.model.Containerbean;
-import spirit.fitness.scanner.model.Historybean;
+
 
 
 public interface ContainerCallback {
@@ -36,6 +36,6 @@ public interface ContainerCallback {
 	Call<List<Containerbean>> updateItem(@Body List<Containerbean> itembean);
 
 	//Delete no work
-	@DELETE("FGService/api/Containers/{seq}")
-	Call<Containerbean> deleteItem(@Path("seq") Integer seq);
+	@DELETE("FGService/api/Containers/{Seq}")
+	Call<Containerbean> deleteItem(@Path("Seq") Integer Seq);
 }

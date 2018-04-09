@@ -355,11 +355,13 @@ public class ContainerPannel implements ActionListener {
 		exit.setFont(font);
 
 		scan.setBounds(33, 520, 200, 50);
-		add.setBounds(250, 520, 200, 50);
-		prev.setBounds(460, 520, 130, 50);
-		exit.setBounds(600, 520, 130, 50);
+		//add.setBounds(250, 520, 200, 50);
+		//prev.setBounds(460, 520, 130, 50);
+		//exit.setBounds(600, 520, 130, 50);
+		prev.setBounds(250, 520, 200, 50);
+		exit.setBounds(460, 520, 200, 50);
 		panel.add(scan);
-		panel.add(add);
+		//panel.add(add);
 		panel.add(prev);
 		panel.add(exit);
 	}
@@ -552,6 +554,12 @@ public class ContainerPannel implements ActionListener {
 				addContainerFrame.setVisible(false);
 				addContainerFrame.dispose();
 
+			}
+
+			@Override
+			public void deleteContainerIteam(boolean result) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 

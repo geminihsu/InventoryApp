@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class Containerbean {
 	
+	@SerializedName("Seq")
+	public Integer Seq;
 	@SerializedName("Date")
 	public String date;
 	@SerializedName("ContainerNo")
