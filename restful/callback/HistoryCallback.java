@@ -22,22 +22,22 @@ import spirit.fitness.scanner.model.Itembean;
 public interface HistoryCallback {
     
 	@Headers("Content-Type: application/json")
-	@GET("FGService/api/Histories")
+	@GET("api/Histories")
 	Call<List<Historybean>> getAllItems();
 
-	@GET("FGService/api/Histories/date/{date}")
+	@GET("api/Histories/date/{date}")
 	Call<List<Historybean>> getItemsByDate(@Path("date") String location);
 	
-	@GET("FGService/api/Histories/model/{modelNo}")
+	@GET("api/Histories/model/{modelNo}")
 	Call<List<Historybean>> getItemsByModelNo(@Path("modelNo") Integer modelNo);
-	@GET("FGService/api/Histories/salesOrder/{salesOrder}")
+	@GET("api/Histories/salesOrder/{salesOrder}")
 	Call<List<Historybean>> getItemsBySalesOrder(@Path("salesOrder") String modelNo);
 	//Post one item
 	/*@POST("/api/FGInventory")
 	Call<Itembean> createItem(@Body Itembean itembean);*/
 	
 	//Post ArrayList items
-	@POST("FGService/api/Histories")
+	@POST("api/Histories")
 	Call<List<Historybean>> createItem(@Body List<Historybean> itembean);
 
 	/*//PUT one item
@@ -46,11 +46,11 @@ public interface HistoryCallback {
 
 	
 	//PUT more than one item
-	@PUT("FGService/api/Histories")
+	@PUT("api/Histories")
 	Call<List<Historybean>> updateItem(@Body List<Historybean> itembean);
 
 	//Delete no work
-	@DELETE("FGService/api/Histories/{seq}")
+	@DELETE("api/Histories/{seq}")
 	Call<Historybean> deleteItem(@Path("seq") Integer seq);
 
 }

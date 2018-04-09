@@ -23,10 +23,10 @@ import spirit.fitness.scanner.model.Modelbean;
 public interface ModelCallback {
     
 	@Headers("Content-Type: application/json")
-	@GET("FGService/api/ModelInfoes")
+	@GET("api/ModelInfoes")
 	Call<List<Modelbean>> getAllModels();
 	
-	@GET("FGService/api/ModelInfoes/{modelNo}")
+	@GET("api/ModelInfoes/{modelNo}")
 	Call<List<Modelbean>> getItemsByModelNo(@Path("modelNo") String modelNo);
 	//Post one item
 	/*@POST("/api/FGInventory")
